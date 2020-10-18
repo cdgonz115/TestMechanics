@@ -1,11 +1,11 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class TestMovement : MonoBehaviour
 {
     Rigidbody rb;
-    float x, y, z, g;
+    float x, y, z;
 
     public float walkSpeed;
     public float runSpeed;
@@ -37,6 +37,7 @@ public class TestMovement : MonoBehaviour
     {
         Move();
         Jump();
+        rb.velocity += (transform.up * y);
         //print(rb.velocity);
     }
     void Move()
@@ -44,18 +45,18 @@ public class TestMovement : MonoBehaviour
         //groundCheck = (Physics.Raycast(transform.position, -Vector3.up, groundDistance * 1.05f));
         //Physics.sphere
         groundCheck = Physics.CheckSphere(sphereCheck.position, groundDistance, mask);
-        if (isGrounded && !groundCheck)
+        if (isGrounded && !groundCheck && !isJumping)
         {
-            g = initialGravity;
+            y = initialGravity;
         }
-        if (isGrounded && groundCheck) g = 0;
+        if (isGrounded && groundCheck && !isJumping) y = 0;
         isGrounded = groundCheck;
         speed = (Input.GetKey(KeyCode.LeftShift))? runSpeed : walkSpeed;
-        if (!isGrounded)
+        if (!isGrounded && !isJumping)
         {
             x = Input.GetAxis("Horizontal") * speed;
             z = Input.GetAxis("Vertical") * speed;
-            if(g>-19.6)g /= gravityRate;
+            y /= gravityRate;
         }
         else 
         {
@@ -67,8 +68,6 @@ public class TestMovement : MonoBehaviour
             else x = 0;
         }
         rb.velocity = (transform.right * x + transform.forward * z);
-        rb.velocity += (transform.up * g);
-        print(g);
     }
     void Jump()
     {
@@ -82,12 +81,11 @@ public class TestMovement : MonoBehaviour
             if (y > 1f) y /= jumpDecreaseRte;
             else
             {
-                y = 0;
+                y = initialGravity;
                 isJumping = false;
             }
         }
-        rb.velocity += (transform.up * y);
-        //print(y);
+        print(y);
 
     }
     void ApplyGravity()

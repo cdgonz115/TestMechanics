@@ -4,41 +4,26 @@ using UnityEngine;
 
 public class MoveCamera : MonoBehaviour
 {
-    [SerializeField]
-    private GameObject player;
+    public float mouseSensitvity = 100f;
 
-    [SerializeField]
-    private float _sensitivityX = 1f, _sensitivityY = 1f;
+    public Transform player;
 
+    float xRotation = 0f;
 
     private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-    }
-    void Update()
-    {
-        HandleLookX();
-        HandleLookY();
     }
 
-    private void HandleLookX()
+    private void Update()
     {
-        float mouseX = Input.GetAxis("Mouse X");
+        float mouseX = Input.GetAxis("Mouse X") * mouseSensitvity * Time.deltaTime;
+        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitvity * Time.deltaTime;
 
-        Vector3 rotation = player.transform.localEulerAngles;
-        rotation.y += mouseX * _sensitivityX;
-        player.transform.localEulerAngles = rotation;
-    }
+        xRotation -= mouseY;
+        xRotation = Mathf.Clamp(xRotation, -90, 90f);
 
-    private void HandleLookY()
-    {
-        float mouseY = Input.GetAxis("Mouse Y");
-
-        Vector3 rotation = transform.localEulerAngles;
-        rotation.x += -mouseY * _sensitivityY;
-        rotation.x = (rotation.x > 180) ? rotation.x - 360 : rotation.x;
-        rotation.x = Mathf.Clamp(rotation.x, -70, 60);
-        transform.localEulerAngles = rotation;
+        transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+        player.Rotate(Vector2.up * mouseX);
     }
 }
