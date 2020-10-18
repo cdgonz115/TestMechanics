@@ -869,13 +869,13 @@ MonoBehaviour:
   walkSpeed: 5
   runSpeed: 10
   speed: 0
-  jumpStrenght: 20
-  jumpDecreaseRte: 1.01
+  jumpStrenght: 30
+  jumpDecreaseRte: 1.1
   isJumping: 0
   sphereCheck: {fileID: 303145170}
   groundDistance: 0.3
   initialGravity: -2
-  gravityRate: 0.98
+  gravityRate: 0.96
   isGrounded: 1
   groundCheck: 0
   mask:

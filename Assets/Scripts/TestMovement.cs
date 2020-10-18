@@ -33,7 +33,7 @@ public class TestMovement : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         Move();
         Jump();
@@ -48,7 +48,7 @@ public class TestMovement : MonoBehaviour
         {
             g = initialGravity;
         }
-        if (isGrounded && groundCheck) g = 0;
+        if (groundCheck) g = 0;
         isGrounded = groundCheck;
         speed = (Input.GetKey(KeyCode.LeftShift))? runSpeed : walkSpeed;
         if (!isGrounded)
@@ -68,11 +68,12 @@ public class TestMovement : MonoBehaviour
         }
         rb.velocity = (transform.right * x + transform.forward * z);
         rb.velocity += (transform.up * g);
-        print(g);
+   
     }
     void Jump()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        if (isJumping && isGrounded) isJumping = false;
+        if (isGrounded && Input.GetKey(KeyCode.Space))
         {
             isJumping = true; //rb.AddForce(new Vector3(0, jumpStrenght, 0), ForceMode.Impulse);
             y = jumpStrenght;
@@ -86,9 +87,10 @@ public class TestMovement : MonoBehaviour
                 isJumping = false;
             }
         }
+        else y = 0;
         rb.velocity += (transform.up * y);
         //print(y);
-
+        //
     }
     void ApplyGravity()
     { 
