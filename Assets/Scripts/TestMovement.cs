@@ -13,6 +13,9 @@ public class TestMovement : MonoBehaviour
 
     public float jumpStrenght;
     public float jumpDecreaseRte;
+    public float jumpBuffer;
+    public float jumpBufferValue;
+    public bool jumpBuffering;
     public bool isJumping;
 
 
@@ -26,13 +29,29 @@ public class TestMovement : MonoBehaviour
 
     public Vector3 velocity;
 
+
+    [Header("Camera Stuff")]
+    public float mouseSensitvity = 100f;
+    public Transform player;
+    public Transform camera;
+    float xRotation = 0f;
+
     void Start()
     {
+        Cursor.lockState = CursorLockMode.Locked;
         rb = GetComponent<Rigidbody>();
         //groundDistance = GetComponent<CapsuleCollider>().height / 2f;
     }
 
-    // Update is called once per frame
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            jumpBuffering = true;
+            jumpBuffer = jumpBufferValue;
+        }
+        if (jumpBuffering) jumpBuffer -= Time.deltaTime;
+    }
     void FixedUpdate()
     {
         Move();
@@ -55,7 +74,7 @@ public class TestMovement : MonoBehaviour
         {
             x = Input.GetAxis("Horizontal") * speed;
             z = Input.GetAxis("Vertical") * speed;
-            if(g>-19.6)g /= gravityRate;
+            if(g>-39.2f)g /= gravityRate;
         }
         else 
         {
@@ -68,12 +87,22 @@ public class TestMovement : MonoBehaviour
         }
         rb.velocity = (transform.right * x + transform.forward * z);
         rb.velocity += (transform.up * g);
-   
+    }
+    void CameraMovement()
+    {
+        float mouseX = Input.GetAxis("Mouse X") * mouseSensitvity * Time.deltaTime;
+        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitvity * Time.deltaTime;
+
+        xRotation -= mouseY;
+        xRotation = Mathf.Clamp(xRotation, -90, 90f);
+
+        camera.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+        player.Rotate(Vector2.up * mouseX);
     }
     void Jump()
     {
         if (isJumping && isGrounded) isJumping = false;
-        if (isGrounded && Input.GetKey(KeyCode.Space))
+        if (isGrounded && jumpBuffer>0)
         {
             isJumping = true; //rb.AddForce(new Vector3(0, jumpStrenght, 0), ForceMode.Impulse);
             y = jumpStrenght;
