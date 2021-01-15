@@ -7,18 +7,25 @@ public class TestMovement : MonoBehaviour
     Rigidbody rb;
     float x, y, z, g;
 
+    [Header("Speed Variables")]
+    public float friction;
+    public float airDecrease;
+    public float speedIncrease;
     public float walkSpeed;
     public float runSpeed;
     public float speed;
 
+
+    [Header("Jump Variables")]
     public float jumpStrenght;
-    public float jumpDecreaseRte;
+    public float jumpDecreaseRate;
     public float jumpBuffer;
     public float jumpBufferValue;
     public bool jumpBuffering;
     public bool isJumping;
 
 
+    [Header("Grounded Variables")]
     public Transform sphereCheck;
     public float groundDistance;
     public float initialGravity;
@@ -28,13 +35,8 @@ public class TestMovement : MonoBehaviour
     public LayerMask mask;
 
     public Vector3 velocity;
+    public Vector3 total;
 
-
-    [Header("Camera Stuff")]
-    public float mouseSensitvity = 100f;
-    public Transform player;
-    public Transform camera;
-    float xRotation = 0f;
 
     void Start()
     {
@@ -56,10 +58,14 @@ public class TestMovement : MonoBehaviour
     {
         Move();
         Jump();
-        //print(rb.velocity);
+        rb.velocity += total;
+        Debug.DrawLine(transform.position,transform.position + rb.velocity, Color.red);
     }
     void Move()
     {
+        z = 0;
+        x = 0;
+        total = Vector3.zero;
         //groundCheck = (Physics.Raycast(transform.position, -Vector3.up, groundDistance * 1.05f));
         //Physics.sphere
         groundCheck = Physics.CheckSphere(sphereCheck.position, groundDistance, mask);
@@ -70,34 +76,29 @@ public class TestMovement : MonoBehaviour
         if (groundCheck) g = 0;
         isGrounded = groundCheck;
         speed = (Input.GetKey(KeyCode.LeftShift))? runSpeed : walkSpeed;
+        velocity = new Vector3(rb.velocity.x,0,rb.velocity.z);
         if (!isGrounded)
         {
-            x = Input.GetAxis("Horizontal") * speed;
-            z = Input.GetAxis("Vertical") * speed;
-            if(g>-39.2f)g /= gravityRate;
+            if (Input.GetKey(KeyCode.W)) z = speedIncrease * airDecrease;
+            else if (Input.GetKey(KeyCode.S)) z = -speedIncrease * airDecrease;
+            if (Input.GetKey(KeyCode.D)) x = speedIncrease * airDecrease;
+            else if (Input.GetKey(KeyCode.A)) x = -speedIncrease * airDecrease;
+            total += (transform.right.normalized * x + transform.forward.normalized * z);
+            if (g>-39.2f)g /= gravityRate;
         }
         else 
         {
-            if (Input.GetKey(KeyCode.W)) z = speed;
-            else if (Input.GetKey(KeyCode.S)) z = -speed;
-            else z = 0;
-            if (Input.GetKey(KeyCode.D)) x = speed;
-            else if (Input.GetKey(KeyCode.A)) x = -speed;
-            else x = 0;
+            if (velocity.magnitude < speed)
+            {
+                if (Input.GetKey(KeyCode.W)) z = speedIncrease;
+                else if (Input.GetKey(KeyCode.S)) z = -speedIncrease;
+                if (Input.GetKey(KeyCode.D)) x = speedIncrease;
+                else if (Input.GetKey(KeyCode.A)) x = -speedIncrease;
+                total += (transform.right.normalized * x + transform.forward.normalized * z);
+            }
+            if (total.magnitude == 0) total -= velocity * friction;
         }
-        rb.velocity = (transform.right * x + transform.forward * z);
-        rb.velocity += (transform.up * g);
-    }
-    void CameraMovement()
-    {
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitvity * Time.deltaTime;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitvity * Time.deltaTime;
-
-        xRotation -= mouseY;
-        xRotation = Mathf.Clamp(xRotation, -90, 90f);
-
-        camera.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
-        player.Rotate(Vector2.up * mouseX);
+        total += (transform.up.normalized * g);
     }
     void Jump()
     {
@@ -109,7 +110,7 @@ public class TestMovement : MonoBehaviour
         }
         if (isJumping)
         {
-            if (y > 1f) y /= jumpDecreaseRte;
+            if (y > 1f) y /= jumpDecreaseRate;
             else
             {
                 y = 0;
@@ -117,7 +118,7 @@ public class TestMovement : MonoBehaviour
             }
         }
         else y = 0;
-        rb.velocity += (transform.up * y);
+        total += (transform.up.normalized * y);
         //print(y);
         //
     }

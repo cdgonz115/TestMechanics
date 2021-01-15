@@ -2786,7 +2786,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1380475377}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -42.4, y: 43.6, z: -107.3}
+  m_LocalPosition: {x: -42.4, y: 30, z: -144.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1737461204}
@@ -2806,28 +2806,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 737df7178d91f884cbc50fa73f2721f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  friction: 0.1
+  airDecrease: 0.2
+  speedIncrease: 1
   walkSpeed: 10
-  runSpeed: 30
+  runSpeed: 15
   speed: 0
-  jumpStrenght: 35
-  jumpDecreaseRte: 1.05
+  jumpStrenght: 3.5
+  jumpDecreaseRate: 1.05
   jumpBuffer: 0
   jumpBufferValue: 0.2
   jumpBuffering: 0
   isJumping: 0
   sphereCheck: {fileID: 303145170}
   groundDistance: 0.3
-  initialGravity: -4
-  gravityRate: 0.96
+  initialGravity: -2
+  gravityRate: 0.98
   isGrounded: 1
   groundCheck: 0
   mask:
     serializedVersion: 2
     m_Bits: 512
   velocity: {x: 0, y: 0, z: 0}
-  mouseSensitvity: 100
-  player: {fileID: 1380475382}
-  camera: {fileID: 1737461204}
+  total: {x: 0, y: 0, z: 0}
 --- !u!114 &1380475384
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2835,7 +2836,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1380475377}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 13c8799e209a63f4d94a441629c98f75, type: 3}
   m_Name: 
@@ -3511,7 +3512,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 90
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
