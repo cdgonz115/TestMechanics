@@ -2786,7 +2786,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1380475377}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -42.4, y: 30, z: -144.6}
+  m_LocalPosition: {x: 5.6, y: 30, z: -58.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1737461204}
@@ -2812,16 +2812,22 @@ MonoBehaviour:
   walkSpeed: 10
   runSpeed: 15
   speed: 0
-  jumpStrenght: 3.5
+  jumpStrength: 3.5
+  airJumpStrength: 5
   jumpDecreaseRate: 1.05
   jumpBuffer: 0
   jumpBufferValue: 0.2
+  justJumpedCooldown: 0.1
+  _justJumpedCooldown: 0
+  airJumps: 1
+  _airJumps: 0
   jumpBuffering: 0
   isJumping: 0
+  airJumpBypass: 0
   sphereCheck: {fileID: 303145170}
-  groundDistance: 0.3
-  initialGravity: -2
-  gravityRate: 0.98
+  groundDistance: 0.1
+  initialGravity: -3
+  gravityRate: 0.99
   isGrounded: 1
   groundCheck: 0
   mask:

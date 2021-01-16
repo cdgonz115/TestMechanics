@@ -17,12 +17,18 @@ public class TestMovement : MonoBehaviour
 
 
     [Header("Jump Variables")]
-    public float jumpStrenght;
+    public float jumpStrength;
+    public float airJumpStrength;
     public float jumpDecreaseRate;
     public float jumpBuffer;
     public float jumpBufferValue;
+    public float justJumpedCooldown;
+    public float _justJumpedCooldown;
+    public int airJumps;
+    public int _airJumps;
     public bool jumpBuffering;
     public bool isJumping;
+    public bool airJumpBypass;
 
 
     [Header("Grounded Variables")]
@@ -42,6 +48,7 @@ public class TestMovement : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
         rb = GetComponent<Rigidbody>();
+        _airJumps = airJumps;
         //groundDistance = GetComponent<CapsuleCollider>().height / 2f;
     }
 
@@ -51,8 +58,8 @@ public class TestMovement : MonoBehaviour
         {
             jumpBuffering = true;
             jumpBuffer = jumpBufferValue;
+            if(isJumping)print("queued" + isGrounded);
         }
-        if (jumpBuffering) jumpBuffer -= Time.deltaTime;
     }
     void FixedUpdate()
     {
@@ -73,7 +80,11 @@ public class TestMovement : MonoBehaviour
         {
             g = initialGravity;
         }
-        if (groundCheck) g = 0;
+        if (groundCheck)
+        {
+            g = 0;
+
+        }
         isGrounded = groundCheck;
         speed = (Input.GetKey(KeyCode.LeftShift))? runSpeed : walkSpeed;
         velocity = new Vector3(rb.velocity.x,0,rb.velocity.z);
@@ -100,16 +111,62 @@ public class TestMovement : MonoBehaviour
         }
         total += (transform.up.normalized * g);
     }
+    public void ResetJumpBuffer()
+    {
+        jumpBuffering = false;
+        jumpBuffer = 0;
+    }
     void Jump()
     {
-        if (isJumping && isGrounded) isJumping = false;
-        if (isGrounded && jumpBuffer>0)
+        if (isJumping && isGrounded && _justJumpedCooldown<=0)
         {
-            isJumping = true; //rb.AddForce(new Vector3(0, jumpStrenght, 0), ForceMode.Impulse);
-            y = jumpStrenght;
+            //print("whoops");
+            isJumping = false;
+            _airJumps = airJumps;
+            airJumpBypass=true;
         }
+        if (jumpBuffering) jumpBuffer -= Time.deltaTime;
+        if (jumpBuffer <= 0)
+        {
+            ResetJumpBuffer();
+            airJumpBypass = false;
+        }
+        if (jumpBuffer > 0)
+        {
+            if (isGrounded && !airJumpBypass)
+            {
+                ResetJumpBuffer();
+                isJumping = true;
+                y = jumpStrength;
+                _justJumpedCooldown = justJumpedCooldown;
+            }
+            else if (_airJumps > 0)
+            {
+                ResetJumpBuffer();
+                _airJumps--;
+                isJumping = true;
+                y = airJumpStrength;
+                _justJumpedCooldown = justJumpedCooldown;
+                g = initialGravity;
+                airJumpBypass = false;
+                rb.velocity = new Vector3(rb.velocity.x,0, rb.velocity.z);
+            }
+        }
+        //if (isGrounded && jumpBuffer > 0)
+        //{
+        //    isJumping = true; //rb.AddForce(new Vector3(0, jumpStrenght, 0), ForceMode.Impulse);
+        //    y = jumpStrength;
+        //}
+        //else if(!isGrounded && jumpBuffer>0 && airJumps>0)
+        //{
+        //    airJumps--;
+        //    isJumping = true;
+        //    y = jumpStrength;
+        //}
         if (isJumping)
         {
+            _justJumpedCooldown -= Time.deltaTime;
+            //print("times");
             if (y > 1f) y /= jumpDecreaseRate;
             else
             {
