@@ -703,6 +703,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 303145170}
+  - component: {fileID: 303145171}
   m_Layer: 0
   m_Name: GroundCheck
   m_TagString: Untagged
@@ -724,6 +725,19 @@ Transform:
   m_Father: {fileID: 1380475382}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!135 &303145171
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 303145169}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.01
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &352736805
 GameObject:
   m_ObjectHideFlags: 0
@@ -2786,7 +2800,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1380475377}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.6, y: 30, z: -58.6}
+  m_LocalPosition: {x: 5.6, y: 30, z: -46.19}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1737461204}
@@ -2809,14 +2823,15 @@ MonoBehaviour:
   friction: 0.1
   airDecrease: 0.2
   speedIncrease: 1
-  walkSpeed: 10
-  runSpeed: 15
+  walkSpeed: 5
+  runSpeed: 10
   speed: 0
-  jumpStrength: 3.5
-  airJumpStrength: 5
+  jumpStrength: 3.2
+  airJumpStrength: 4.3
   jumpDecreaseRate: 1.05
   jumpBuffer: 0
   jumpBufferValue: 0.2
+  inAirHorizontalSpeed: 7
   justJumpedCooldown: 0.1
   _justJumpedCooldown: 0
   airJumps: 1
@@ -2825,9 +2840,10 @@ MonoBehaviour:
   isJumping: 0
   airJumpBypass: 0
   sphereCheck: {fileID: 303145170}
-  groundDistance: 0.1
-  initialGravity: -3
-  gravityRate: 0.99
+  groundDistance: 0.01
+  initialGravity: -2
+  gravityRate: 0.999
+  maxGravity: 39.2
   isGrounded: 1
   groundCheck: 0
   mask:

@@ -22,6 +22,7 @@ public class TestMovement : MonoBehaviour
     public float jumpDecreaseRate;
     public float jumpBuffer;
     public float jumpBufferValue;
+    public float inAirHorizontalSpeed;
     public float justJumpedCooldown;
     public float _justJumpedCooldown;
     public int airJumps;
@@ -36,6 +37,7 @@ public class TestMovement : MonoBehaviour
     public float groundDistance;
     public float initialGravity;
     public float gravityRate;
+    public float maxGravity;
     public bool isGrounded;
     public bool groundCheck;
     public LayerMask mask;
@@ -58,7 +60,7 @@ public class TestMovement : MonoBehaviour
         {
             jumpBuffering = true;
             jumpBuffer = jumpBufferValue;
-            if(isJumping)print("queued" + isGrounded);
+            //if(isJumping)print("queued" + isGrounded);
         }
     }
     void FixedUpdate()
@@ -75,7 +77,7 @@ public class TestMovement : MonoBehaviour
         total = Vector3.zero;
         //groundCheck = (Physics.Raycast(transform.position, -Vector3.up, groundDistance * 1.05f));
         //Physics.sphere
-        groundCheck = Physics.CheckSphere(sphereCheck.position, groundDistance, mask);
+        groundCheck = Physics.CheckSphere(transform.position - Vector3.up * GetComponent<CapsuleCollider>().height*.5f, groundDistance, mask);
         if (isGrounded && !groundCheck)
         {
             g = initialGravity;
@@ -95,7 +97,7 @@ public class TestMovement : MonoBehaviour
             if (Input.GetKey(KeyCode.D)) x = speedIncrease * airDecrease;
             else if (Input.GetKey(KeyCode.A)) x = -speedIncrease * airDecrease;
             total += (transform.right.normalized * x + transform.forward.normalized * z);
-            if (g>-39.2f)g /= gravityRate;
+            if (g>-maxGravity)g /= gravityRate;
         }
         else 
         {
@@ -118,15 +120,15 @@ public class TestMovement : MonoBehaviour
     }
     void Jump()
     {
-        if (isJumping && isGrounded && _justJumpedCooldown<=0)
+        if (isGrounded)
         {
             //print("whoops");
             isJumping = false;
             _airJumps = airJumps;
-            airJumpBypass=true;
+            //airJumpBypass=true;
         }
         if (jumpBuffering) jumpBuffer -= Time.deltaTime;
-        if (jumpBuffer <= 0)
+        if (jumpBuffer < 0)
         {
             ResetJumpBuffer();
             airJumpBypass = false;
@@ -138,7 +140,7 @@ public class TestMovement : MonoBehaviour
                 ResetJumpBuffer();
                 isJumping = true;
                 y = jumpStrength;
-                _justJumpedCooldown = justJumpedCooldown;
+                //_justJumpedCooldown = justJumpedCooldown;
             }
             else if (_airJumps > 0)
             {
@@ -146,10 +148,10 @@ public class TestMovement : MonoBehaviour
                 _airJumps--;
                 isJumping = true;
                 y = airJumpStrength;
-                _justJumpedCooldown = justJumpedCooldown;
+                //_justJumpedCooldown = justJumpedCooldown;
                 g = initialGravity;
                 airJumpBypass = false;
-                rb.velocity = new Vector3(rb.velocity.x,0, rb.velocity.z);
+                rb.velocity = new Vector3(total.x, 0 , total.z).normalized * inAirHorizontalSpeed;
             }
         }
         //if (isGrounded && jumpBuffer > 0)
@@ -165,7 +167,7 @@ public class TestMovement : MonoBehaviour
         //}
         if (isJumping)
         {
-            _justJumpedCooldown -= Time.deltaTime;
+            //_justJumpedCooldown -= Time.deltaTime;
             //print("times");
             if (y > 1f) y /= jumpDecreaseRate;
             else
