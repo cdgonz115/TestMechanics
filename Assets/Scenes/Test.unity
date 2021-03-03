@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 262.3371, g: 325.05005, b: 430.21954, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -135,7 +135,7 @@ GameObject:
   - component: {fileID: 79665228}
   - component: {fileID: 79665227}
   - component: {fileID: 79665226}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Tower (15)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -230,7 +230,7 @@ GameObject:
   - component: {fileID: 105815331}
   - component: {fileID: 105815330}
   - component: {fileID: 105815329}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Plane (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -326,7 +326,7 @@ GameObject:
   - component: {fileID: 148905516}
   - component: {fileID: 148905515}
   - component: {fileID: 148905514}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Tower (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -421,7 +421,7 @@ GameObject:
   - component: {fileID: 195054605}
   - component: {fileID: 195054604}
   - component: {fileID: 195054603}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Tower (11)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -516,7 +516,7 @@ GameObject:
   - component: {fileID: 212886951}
   - component: {fileID: 212886950}
   - component: {fileID: 212886949}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Tower (8)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -611,7 +611,7 @@ GameObject:
   - component: {fileID: 239679340}
   - component: {fileID: 239679339}
   - component: {fileID: 239679338}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Tower (7)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -694,50 +694,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 239679336}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &303145169
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 303145170}
-  - component: {fileID: 303145171}
-  m_Layer: 0
-  m_Name: GroundCheck
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &303145170
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 303145169}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.993, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 1380475382}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!135 &303145171
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 303145169}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.01
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &352736805
 GameObject:
   m_ObjectHideFlags: 0
@@ -750,7 +706,7 @@ GameObject:
   - component: {fileID: 352736809}
   - component: {fileID: 352736808}
   - component: {fileID: 352736807}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Tower (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -845,7 +801,7 @@ GameObject:
   - component: {fileID: 356513376}
   - component: {fileID: 356513375}
   - component: {fileID: 356513374}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Platform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -940,7 +896,7 @@ GameObject:
   - component: {fileID: 455096747}
   - component: {fileID: 455096746}
   - component: {fileID: 455096745}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Tower (17)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1035,7 +991,7 @@ GameObject:
   - component: {fileID: 488085910}
   - component: {fileID: 488085909}
   - component: {fileID: 488085908}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Platform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1113,7 +1069,7 @@ Transform:
   m_GameObject: {fileID: 488085907}
   m_LocalRotation: {x: 0.51278216, y: -0, z: -0, w: 0.8585188}
   m_LocalPosition: {x: -30.1, y: 0.23, z: -8}
-  m_LocalScale: {x: 1, y: 10, z: 2.603}
+  m_LocalScale: {x: 5.9996, y: 10, z: 2.603}
   m_Children: []
   m_Father: {fileID: 1234656754}
   m_RootOrder: 1
@@ -1130,7 +1086,7 @@ GameObject:
   - component: {fileID: 530769450}
   - component: {fileID: 530769449}
   - component: {fileID: 530769448}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Platform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1213,6 +1169,115 @@ Transform:
   m_Father: {fileID: 1234656754}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &613178941
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 613178946}
+  - component: {fileID: 613178945}
+  - component: {fileID: 613178944}
+  - component: {fileID: 613178943}
+  - component: {fileID: 613178942}
+  m_Layer: 0
+  m_Name: Cube (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &613178942
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 613178941}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e2e8c05306fa2c49a5779fdb09e0da8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  force: 200
+--- !u!65 &613178943
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 613178941}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &613178944
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 613178941}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 73c176f402d2c2f4d929aa5da7585d17, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &613178945
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 613178941}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &613178946
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 613178941}
+  m_LocalRotation: {x: -0.12810355, y: -0, z: -0, w: 0.99176085}
+  m_LocalPosition: {x: 92.6, y: 2, z: -467}
+  m_LocalScale: {x: 4, y: 4, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 8
+  m_LocalEulerAnglesHint: {x: -14.72, y: 0, z: 0}
 --- !u!1 &615739690
 GameObject:
   m_ObjectHideFlags: 0
@@ -1225,7 +1290,7 @@ GameObject:
   - component: {fileID: 615739694}
   - component: {fileID: 615739693}
   - component: {fileID: 615739692}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Tower (22)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1308,6 +1373,115 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 615739690}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &633638741
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 633638745}
+  - component: {fileID: 633638744}
+  - component: {fileID: 633638743}
+  - component: {fileID: 633638742}
+  - component: {fileID: 633638746}
+  m_Layer: 0
+  m_Name: Cube
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!65 &633638742
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 633638741}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &633638743
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 633638741}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 73c176f402d2c2f4d929aa5da7585d17, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &633638744
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 633638741}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &633638745
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 633638741}
+  m_LocalRotation: {x: -0, y: 0.9898863, z: 0.14186327, w: 0}
+  m_LocalPosition: {x: 92.6, y: 2, z: 45.5}
+  m_LocalScale: {x: 4, y: 4, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: -16.311, y: 180, z: 0}
+--- !u!114 &633638746
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 633638741}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e2e8c05306fa2c49a5779fdb09e0da8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  force: 200
 --- !u!1 &653693065
 GameObject:
   m_ObjectHideFlags: 0
@@ -1524,7 +1698,7 @@ GameObject:
   - component: {fileID: 669017028}
   - component: {fileID: 669017027}
   - component: {fileID: 669017026}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Plane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1620,7 +1794,7 @@ GameObject:
   - component: {fileID: 703708069}
   - component: {fileID: 703708068}
   - component: {fileID: 703708067}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Tower (9)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1715,7 +1889,7 @@ GameObject:
   - component: {fileID: 810267582}
   - component: {fileID: 810267581}
   - component: {fileID: 810267580}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Tower
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1810,7 +1984,7 @@ GameObject:
   - component: {fileID: 906343678}
   - component: {fileID: 906343677}
   - component: {fileID: 906343676}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Tower (21)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1905,7 +2079,7 @@ GameObject:
   - component: {fileID: 966916270}
   - component: {fileID: 966916269}
   - component: {fileID: 966916268}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Tower (5)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2000,7 +2174,7 @@ GameObject:
   - component: {fileID: 967106200}
   - component: {fileID: 967106199}
   - component: {fileID: 967106198}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Tower (20)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2095,7 +2269,7 @@ GameObject:
   - component: {fileID: 993888545}
   - component: {fileID: 993888544}
   - component: {fileID: 993888543}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Platform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2190,7 +2364,7 @@ GameObject:
   - component: {fileID: 1027811703}
   - component: {fileID: 1027811702}
   - component: {fileID: 1027811701}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Tower (13)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2285,7 +2459,7 @@ GameObject:
   - component: {fileID: 1042989174}
   - component: {fileID: 1042989173}
   - component: {fileID: 1042989172}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Tower (14)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2380,7 +2554,7 @@ GameObject:
   - component: {fileID: 1055219859}
   - component: {fileID: 1055219858}
   - component: {fileID: 1055219857}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Tower (6)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2475,7 +2649,7 @@ GameObject:
   - component: {fileID: 1140684484}
   - component: {fileID: 1140684483}
   - component: {fileID: 1140684482}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Platform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2608,7 +2782,7 @@ GameObject:
   - component: {fileID: 1320814380}
   - component: {fileID: 1320814379}
   - component: {fileID: 1320814378}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Tower (18)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2706,7 +2880,7 @@ GameObject:
   - component: {fileID: 1380475378}
   - component: {fileID: 1380475384}
   - component: {fileID: 1380475383}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Capsule
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2800,11 +2974,10 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1380475377}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.6, y: 30, z: -46.19}
+  m_LocalPosition: {x: -26.82, y: 2.49, z: -15.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1737461204}
-  - {fileID: 303145170}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2831,7 +3004,7 @@ MonoBehaviour:
   jumpDecreaseRate: 1.05
   jumpBuffer: 0
   jumpBufferValue: 0.2
-  inAirHorizontalSpeed: 7
+  inAirHorizontalSpeed: 12
   justJumpedCooldown: 0.1
   _justJumpedCooldown: 0
   airJumps: 1
@@ -2839,18 +3012,23 @@ MonoBehaviour:
   jumpBuffering: 0
   isJumping: 0
   airJumpBypass: 0
-  sphereCheck: {fileID: 303145170}
+  sphereCheck: {fileID: 0}
   groundDistance: 0.01
-  initialGravity: -2
+  initialGravity: -1.75
   gravityRate: 0.999
   maxGravity: 39.2
   isGrounded: 1
   groundCheck: 0
   mask:
     serializedVersion: 2
-    m_Bits: 512
+    m_Bits: 1
+  launched: 1
   velocity: {x: 0, y: 0, z: 0}
   total: {x: 0, y: 0, z: 0}
+  capCollider: {fileID: 1380475379}
+  test1: {x: 0, y: 0, z: 0}
+  test2: {x: 0, y: 0, z: 0}
+  tscale: 1
 --- !u!114 &1380475384
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2866,6 +3044,102 @@ MonoBehaviour:
   mouseSensitvity: 100
   player: {fileID: 1380475382}
   camera: {fileID: 1737461204}
+--- !u!1 &1404926706
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1404926710}
+  - component: {fileID: 1404926709}
+  - component: {fileID: 1404926708}
+  - component: {fileID: 1404926707}
+  m_Layer: 0
+  m_Name: Plane (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!64 &1404926707
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1404926706}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &1404926708
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1404926706}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 64d95811e6d62244e86cee1edf34772e, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1404926709
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1404926706}
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &1404926710
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1404926706}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 96.8, y: 0, z: 0}
+  m_LocalScale: {x: 10, y: 10, z: 10}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1509342868
 GameObject:
   m_ObjectHideFlags: 0
@@ -2878,7 +3152,7 @@ GameObject:
   - component: {fileID: 1509342872}
   - component: {fileID: 1509342871}
   - component: {fileID: 1509342870}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Tower (19)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3018,7 +3292,7 @@ GameObject:
   - component: {fileID: 1587102594}
   - component: {fileID: 1587102593}
   - component: {fileID: 1587102592}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Tower (12)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3113,7 +3387,7 @@ GameObject:
   - component: {fileID: 1596505514}
   - component: {fileID: 1596505513}
   - component: {fileID: 1596505512}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Tower (23)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3208,7 +3482,7 @@ GameObject:
   - component: {fileID: 1608698438}
   - component: {fileID: 1608698437}
   - component: {fileID: 1608698436}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Platform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3303,7 +3577,7 @@ GameObject:
   - component: {fileID: 1628138954}
   - component: {fileID: 1628138953}
   - component: {fileID: 1628138952}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Platform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3398,7 +3672,7 @@ GameObject:
   - component: {fileID: 1638012723}
   - component: {fileID: 1638012722}
   - component: {fileID: 1638012721}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Tower (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3494,7 +3768,7 @@ GameObject:
   - component: {fileID: 1737461202}
   - component: {fileID: 1737461205}
   - component: {fileID: 1737461206}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Main Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
@@ -3698,7 +3972,7 @@ GameObject:
   - component: {fileID: 1761467314}
   - component: {fileID: 1761467313}
   - component: {fileID: 1761467312}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Tower (10)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3793,7 +4067,7 @@ GameObject:
   - component: {fileID: 1832621869}
   - component: {fileID: 1832621868}
   - component: {fileID: 1832621867}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Tower
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3885,7 +4159,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1906955603}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Second
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3943,7 +4217,7 @@ GameObject:
   - component: {fileID: 1939764131}
   - component: {fileID: 1939764130}
   - component: {fileID: 1939764129}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Tower (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4038,7 +4312,7 @@ GameObject:
   - component: {fileID: 2100284409}
   - component: {fileID: 2100284408}
   - component: {fileID: 2100284407}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Tower (16)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

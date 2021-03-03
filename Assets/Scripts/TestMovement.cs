@@ -42,8 +42,16 @@ public class TestMovement : MonoBehaviour
     public bool groundCheck;
     public LayerMask mask;
 
+    [Header("Other Variables")]
+    public bool launched;
+    float scrollwheel;
     public Vector3 velocity;
     public Vector3 total;
+    public CapsuleCollider capCollider;
+    public Vector3 test1;
+    public Vector3 test2;
+
+    public float tscale;
 
 
     void Start()
@@ -51,12 +59,15 @@ public class TestMovement : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         rb = GetComponent<Rigidbody>();
         _airJumps = airJumps;
-        //groundDistance = GetComponent<CapsuleCollider>().height / 2f;
+        capCollider = GetComponent<CapsuleCollider>();
+        groundDistance = capCollider.height * .5f - capCollider.radius;
+        Time.timeScale = tscale;
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        scrollwheel = Input.GetAxis("Mouse ScrollWheel");
+        if (Input.GetKeyDown(KeyCode.Space) || scrollwheel < 0)
         {
             jumpBuffering = true;
             jumpBuffer = jumpBufferValue;
@@ -68,7 +79,9 @@ public class TestMovement : MonoBehaviour
         Move();
         Jump();
         rb.velocity += total;
-        Debug.DrawLine(transform.position,transform.position + rb.velocity, Color.red);
+        Debug.DrawLine(transform.position, transform.position + rb.velocity, Color.red);
+        //Debug.DrawLine(transform.position, transform.position + test1.normalized * 5, Color.red);
+        //Debug.DrawLine(transform.position, transform.position + test2.normalized * 5, Color.red);
     }
     void Move()
     {
@@ -77,19 +90,27 @@ public class TestMovement : MonoBehaviour
         total = Vector3.zero;
         //groundCheck = (Physics.Raycast(transform.position, -Vector3.up, groundDistance * 1.05f));
         //Physics.sphere
-        groundCheck = Physics.CheckSphere(transform.position - Vector3.up * GetComponent<CapsuleCollider>().height*.5f, groundDistance, mask);
+        RaycastHit hit;
+        groundCheck = Physics.SphereCast(transform.position, capCollider.radius + 0.01f, -transform.up, out hit, groundDistance);
+        //groundCheck = Physics.CheckSphere(transform.position - Vector3.up * (groundDistance), capCollider.radius + 0.01f, mask);
         if (isGrounded && !groundCheck)
         {
             g = initialGravity;
+
         }
         if (groundCheck)
         {
             g = 0;
+            rb.velocity -= transform.up.normalized * rb.velocity.y;
+        }
+        if (!isGrounded && groundCheck)
+        {
+            launched = false;
 
         }
         isGrounded = groundCheck;
-        speed = (Input.GetKey(KeyCode.LeftShift))? runSpeed : walkSpeed;
-        velocity = new Vector3(rb.velocity.x,0,rb.velocity.z);
+        speed = (Input.GetKey(KeyCode.LeftShift)) ? runSpeed : walkSpeed;
+        velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
         if (!isGrounded)
         {
             if (Input.GetKey(KeyCode.W)) z = speedIncrease * airDecrease;
@@ -97,10 +118,12 @@ public class TestMovement : MonoBehaviour
             if (Input.GetKey(KeyCode.D)) x = speedIncrease * airDecrease;
             else if (Input.GetKey(KeyCode.A)) x = -speedIncrease * airDecrease;
             total += (transform.right.normalized * x + transform.forward.normalized * z);
-            if (g>-maxGravity)g /= gravityRate;
+            if (g > -maxGravity) g /= gravityRate;
         }
-        else 
+        else
         {
+            test1 = Vector3.Cross(hit.normal, -transform.right);
+            test2 = Vector3.Cross(hit.normal, transform.forward);
             if (velocity.magnitude < speed)
             {
                 if (Input.GetKey(KeyCode.W)) z = speedIncrease;
@@ -108,8 +131,10 @@ public class TestMovement : MonoBehaviour
                 if (Input.GetKey(KeyCode.D)) x = speedIncrease;
                 else if (Input.GetKey(KeyCode.A)) x = -speedIncrease;
                 total += (transform.right.normalized * x + transform.forward.normalized * z);
+                //total += (test2.normalized * x + test1.normalized * z);
+
             }
-            if (total.magnitude == 0) total -= velocity * friction;
+            total -= velocity * friction;
         }
         total += (transform.up.normalized * g);
     }
@@ -125,7 +150,6 @@ public class TestMovement : MonoBehaviour
             //print("whoops");
             isJumping = false;
             _airJumps = airJumps;
-            //airJumpBypass=true;
         }
         if (jumpBuffering) jumpBuffer -= Time.deltaTime;
         if (jumpBuffer < 0)
@@ -151,20 +175,14 @@ public class TestMovement : MonoBehaviour
                 //_justJumpedCooldown = justJumpedCooldown;
                 g = initialGravity;
                 airJumpBypass = false;
-                rb.velocity = new Vector3(total.x, 0 , total.z).normalized * inAirHorizontalSpeed;
+                if (launched)
+                {
+                    rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+                    rb.velocity += new Vector3(total.x, 0, total.z).normalized * inAirHorizontalSpeed;
+                }
+                else rb.velocity = new Vector3(total.x, 0, total.z).normalized * inAirHorizontalSpeed;
             }
         }
-        //if (isGrounded && jumpBuffer > 0)
-        //{
-        //    isJumping = true; //rb.AddForce(new Vector3(0, jumpStrenght, 0), ForceMode.Impulse);
-        //    y = jumpStrength;
-        //}
-        //else if(!isGrounded && jumpBuffer>0 && airJumps>0)
-        //{
-        //    airJumps--;
-        //    isJumping = true;
-        //    y = jumpStrength;
-        //}
         if (isJumping)
         {
             //_justJumpedCooldown -= Time.deltaTime;
@@ -181,8 +199,8 @@ public class TestMovement : MonoBehaviour
         //print(y);
         //
     }
-    void ApplyGravity()
-    { 
-        //if(isGrounded)
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawWireSphere(transform.position - Vector3.up * (groundDistance), capCollider.radius + 0.01f);
     }
 }
