@@ -93,6 +93,7 @@ public class TestMovement : MonoBehaviour
         RaycastHit hit;
         groundCheck = Physics.SphereCast(transform.position, capCollider.radius + 0.01f, -transform.up, out hit, groundDistance);
         //groundCheck = Physics.CheckSphere(transform.position - Vector3.up * (groundDistance), capCollider.radius + 0.01f, mask);
+        print(hit.normal);
         if (isGrounded && !groundCheck)
         {
             g = initialGravity;
