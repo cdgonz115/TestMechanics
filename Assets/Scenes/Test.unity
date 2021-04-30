@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 262.3371, g: 325.05005, b: 430.21954, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2901,7 +2901,7 @@ Rigidbody:
   m_Mass: 1
   m_Drag: 0
   m_AngularDrag: 0.05
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 2
   m_Constraints: 112
@@ -2977,7 +2977,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1380475377}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -26.82, y: 2.49, z: -15.9}
+  m_LocalPosition: {x: -26.82, y: 1, z: -15.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1737461204}
@@ -3064,8 +3064,9 @@ MonoBehaviour:
   sprintSpeedIncrease: 2
   speedIncrease: 0
   maxWalkVelocity: 5
-  maxSprintVelocity: 10
+  maxSprintVelocity: 15
   maxVelocity: 0
+  minVelocity: 0
   friction: 0.1
   actualForward: {x: 0, y: 0, z: 0}
   actualRight: {x: 0, y: 0, z: 0}
@@ -3073,7 +3074,12 @@ MonoBehaviour:
   capCollider: {fileID: 1380475379}
   rb: {fileID: 1380475378}
   groundCheck: 0
-  groundDistance: 0.01
+  isGrounded: 0
+  initialGravity: 0
+  groundCheckDistance: 0
+  startingAirStrafe: 0
+  airStrafeDecreaser: 0
+  airStrafe: 0
 --- !u!1 &1404926706
 GameObject:
   m_ObjectHideFlags: 0
