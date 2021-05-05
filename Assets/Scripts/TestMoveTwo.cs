@@ -7,7 +7,7 @@ public class TestMoveTwo : MonoBehaviour
     float z;
     float x;
 
-    float g;
+    public float g;
 
     public bool sprinting;
 
@@ -26,7 +26,7 @@ public class TestMoveTwo : MonoBehaviour
     public Vector3 actualRight;
 
     public Vector3 totalVelocity;
-
+    public Vector3 newForwardandRight;
     public CapsuleCollider capCollider;
     public Rigidbody rb;
 
@@ -35,17 +35,19 @@ public class TestMoveTwo : MonoBehaviour
     public bool isGrounded;
 
     public float initialGravity;
-    
+    public float gravityRate;
+    public float maxGravity;
+
     public float groundCheckDistance;
 
     public float startingAirStrafe;
     public float airStrafeDecreaser;
     public float airStrafe;
 
-
     private void Start()
     {
         groundCheckDistance = capCollider.height * .5f - capCollider.radius;
+        g = initialGravity;
     }
 
     private void Update()
@@ -62,8 +64,10 @@ public class TestMoveTwo : MonoBehaviour
     private void FixedUpdate()
     {
         Move();
-        if (rb.velocity.magnitude > minVelocity) rb.velocity += totalVelocity;
-        else rb.velocity = Vector3.zero;
+        ApplyGravity();
+        //if (rb.velocity.magnitude > minVelocity) rb.velocity += totalVelocity;
+        //else rb.velocity = Vector3.zero;
+        rb.velocity += totalVelocity;
 
         Debug.DrawLine(transform.position, transform.position + actualForward.normalized * 5, Color.red);
         Debug.DrawLine(transform.position, transform.position + actualRight.normalized * 5, Color.red);
@@ -76,7 +80,6 @@ public class TestMoveTwo : MonoBehaviour
         {
             g = initialGravity;
             //airStrafe = startingAirStrafe;
-
         }
         if (groundCheck)
         {
@@ -85,8 +88,9 @@ public class TestMoveTwo : MonoBehaviour
         }
         isGrounded = groundCheck;
 
-        Vector3 newDirection;
+
         totalVelocity = Vector3.zero;
+        newForwardandRight = Vector3.zero;
 
         RaycastHit hit;
         groundCheck = Physics.SphereCast(transform.position, capCollider.radius + 0.01f, -transform.up, out hit, groundCheckDistance);
@@ -104,15 +108,24 @@ public class TestMoveTwo : MonoBehaviour
         {
             if (rb.velocity.magnitude < maxVelocity)
             {
-                newDirection = (actualRight.normalized * x + actualForward.normalized * z);
+                newForwardandRight = (actualRight.normalized * x + actualForward.normalized * z);
 
-                totalVelocity += newDirection;
+                totalVelocity += newForwardandRight;
 
                 z = 0;
                 x = 0;
             }
             totalVelocity -= rb.velocity * friction;
         }
+    }
+
+    private void ApplyGravity()
+    {
+        if (!isGrounded)
+        {
+            totalVelocity += Vector3.up * g;
+        }
+        if (g > maxGravity) g *= gravityRate;
     }
 
     private void OnDrawGizmos()
