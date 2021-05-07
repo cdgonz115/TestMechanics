@@ -2977,7 +2977,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1380475377}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -26.82, y: 3.14, z: -15.9}
+  m_LocalPosition: {x: -26.82, y: 21.36, z: -15.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1737461204}
@@ -3081,9 +3081,16 @@ MonoBehaviour:
   gravityRate: 1.001
   maxGravity: -39.2
   groundCheckDistance: 0
-  startingAirStrafe: 0
-  airStrafeDecreaser: 0
-  airStrafe: 0
+  initialAirStrafe: 0.75
+  airStrafeDecreaser: 0.05
+  airStrafe: 0.15
+  y: 0
+  jumpBuffer: 0
+  jumpBufferValue: 0.2
+  jumpBuffering: 0
+  isJumping: 0
+  jumpStrength: 25
+  justJumpedCooldown: 0.1
 --- !u!1 &1404926706
 GameObject:
   m_ObjectHideFlags: 0

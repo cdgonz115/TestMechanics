@@ -40,9 +40,23 @@ public class TestMoveTwo : MonoBehaviour
 
     public float groundCheckDistance;
 
-    public float startingAirStrafe;
+    public float initialAirStrafe;
     public float airStrafeDecreaser;
     public float airStrafe;
+
+    public float y;
+    public float jumpBuffer;
+    public float jumpBufferValue;
+    public bool jumpBuffering;
+    public bool isJumping;
+    public float jumpStrength;
+    public float justJumpedCooldown;
+    private float _justJumpedCooldown;
+
+    float scrollwheel;
+
+    RaycastHit hit;
+
 
     private void Start()
     {
@@ -59,47 +73,57 @@ public class TestMoveTwo : MonoBehaviour
         else if (Input.GetKey(KeyCode.S)) z = -speedIncrease;
         if (Input.GetKey(KeyCode.D)) x = speedIncrease;
         else if (Input.GetKey(KeyCode.A)) x = -speedIncrease;
+
+        scrollwheel = Input.GetAxis("Mouse ScrollWheel");
+        if (Input.GetKeyDown(KeyCode.Space) || scrollwheel > 0)
+        {
+            jumpBuffering = true;
+            jumpBuffer = jumpBufferValue;
+        }
     }
 
     private void FixedUpdate()
     {
+        GroundCheck();
         Move();
+        Jump();
         ApplyGravity();
-        //if (rb.velocity.magnitude > minVelocity) rb.velocity += totalVelocity;
-        //else rb.velocity = Vector3.zero;
         rb.velocity += totalVelocity;
+        if (rb.velocity.magnitude < .1f && x == 0 && z == 0 && (isGrounded)) rb.velocity = Vector3.zero;
 
         Debug.DrawLine(transform.position, transform.position + actualForward.normalized * 5, Color.red);
         Debug.DrawLine(transform.position, transform.position + actualRight.normalized * 5, Color.red);
 
     }
 
-    private void Move()
+    private void GroundCheck()
     {
+        if(_justJumpedCooldown>0)_justJumpedCooldown -= Time.fixedDeltaTime;
+        groundCheck = (_justJumpedCooldown <=0)? Physics.SphereCast(transform.position, capCollider.radius + 0.01f, -transform.up, out hit, groundCheckDistance) : false;
+
         if (isGrounded && !groundCheck)
         {
             g = initialGravity;
-            //airStrafe = startingAirStrafe;
+            airStrafe = initialAirStrafe;
         }
         if (groundCheck)
         {
             g = 0;
-            //rb.velocity -= transform.up.normalized * rb.velocity.y;
         }
         isGrounded = groundCheck;
+    }
 
-
+    private void Move()
+    {
         totalVelocity = Vector3.zero;
         newForwardandRight = Vector3.zero;
-
-        RaycastHit hit;
-        groundCheck = Physics.SphereCast(transform.position, capCollider.radius + 0.01f, -transform.up, out hit, groundCheckDistance);
 
         actualForward = Vector3.Cross(hit.normal, -transform.right);
         actualRight = Vector3.Cross(hit.normal, transform.forward);
 
         if (!isGrounded)
         {
+            //airStrafe -= airStrafeDecreaser;
             x *= airStrafe;
             z *= airStrafe;
             totalVelocity += ((transform.right.normalized * x + transform.forward.normalized * z));
@@ -127,7 +151,34 @@ public class TestMoveTwo : MonoBehaviour
         }
         if (g > maxGravity) g *= gravityRate;
     }
-
+    public void ResetJumpBuffer()
+    {
+        jumpBuffering = false;
+        jumpBuffer = 0;
+    }
+    void Jump()
+    {
+        if (isGrounded)isJumping = false;
+        if (jumpBuffer < 0)ResetJumpBuffer();
+        if (jumpBuffer > 0 && isGrounded && !isJumping)StartCoroutine(JumpCoroutine());
+        if (jumpBuffering) jumpBuffer -= Time.fixedDeltaTime;
+    }
+    IEnumerator JumpCoroutine()
+    {
+        WaitForFixedUpdate fixedUpdate = new WaitForFixedUpdate();
+        ResetJumpBuffer();
+        isJumping = true;
+        isGrounded = false;
+        y = jumpStrength;
+        g = initialGravity;
+        _justJumpedCooldown = justJumpedCooldown;
+        while (y > 0.1f && !isGrounded)
+        {
+            y -= .05f;
+            totalVelocity += Vector3.up * y;
+            yield return fixedUpdate;
+        }
+    }
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireSphere(transform.position - Vector3.up * (groundCheckDistance), capCollider.radius + 0.01f);
