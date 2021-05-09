@@ -3069,6 +3069,8 @@ MonoBehaviour:
   maxVelocity: 0
   minVelocity: 0
   friction: 0.1
+  groundFriction: 0.1
+  airFriction: 0
   actualForward: {x: 0, y: 0, z: 0}
   actualRight: {x: 0, y: 0, z: 0}
   totalVelocity: {x: 0, y: 0, z: 0}
@@ -3081,9 +3083,10 @@ MonoBehaviour:
   gravityRate: 1.001
   maxGravity: -39.2
   groundCheckDistance: 0
-  initialAirStrafe: 0.75
-  airStrafeDecreaser: 0.05
-  airStrafe: 0.15
+  initialAirStrafe: 1
+  airStrafeDecreaser: 0.01
+  airStrafe: 1
+  maxAirVelocity: 3
   y: 0
   jumpBuffer: 0
   jumpBufferValue: 0.2

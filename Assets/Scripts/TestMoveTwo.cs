@@ -21,6 +21,8 @@ public class TestMoveTwo : MonoBehaviour
     public float minVelocity;
 
     public float friction;
+    public float groundFriction;
+    public float airFriction;
 
     public Vector3 actualForward;
     public Vector3 actualRight;
@@ -43,6 +45,7 @@ public class TestMoveTwo : MonoBehaviour
     public float initialAirStrafe;
     public float airStrafeDecreaser;
     public float airStrafe;
+    public float maxAirVelocity;
 
     public float y;
     public float jumpBuffer;
@@ -104,11 +107,11 @@ public class TestMoveTwo : MonoBehaviour
         if (isGrounded && !groundCheck)
         {
             g = initialGravity;
-            airStrafe = initialAirStrafe;
         }
         if (groundCheck)
         {
             g = 0;
+            airStrafe = initialAirStrafe;
         }
         isGrounded = groundCheck;
     }
@@ -123,13 +126,37 @@ public class TestMoveTwo : MonoBehaviour
 
         if (!isGrounded)
         {
-            //airStrafe -= airStrafeDecreaser;
             x *= airStrafe;
             z *= airStrafe;
-            totalVelocity += ((transform.right.normalized * x + transform.forward.normalized * z));
+
+            Vector3 currentForwardAndRight = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+
+            //float speed = currentForwardAndRight.magnitude;
+
+            
+            newForwardandRight = (transform.right * x + transform.forward * z);
+
+            //newForwardandRight = (newForwardandRight + currentForwardAndRight. normalized).normalized;
+
+
+            //if (currentForwardAndRight.magnitude < maxVelocity)
+            //{
+                totalVelocity = newForwardandRight.normalized * currentForwardAndRight.magnitude * .25f + currentForwardAndRight * .75f;
+                print("decreasing");
+            //}
+
+            rb.velocity -= currentForwardAndRight * airFriction;
+
+            //print(x);
+            //print(z);
+            //print(tempForwardAndRight.magnitude);
+            Debug.DrawLine(transform.position, transform.position + newForwardandRight.normalized * 5, Color.red);
+            //totalVelocity -= new Vector3(rb.velocity.x , 0, rb.velocity.z )  * airFriction;
         }
         else
         {
+            friction = groundFriction;
+
             if (rb.velocity.magnitude < maxVelocity)
             {
                 newForwardandRight = (actualRight.normalized * x + actualForward.normalized * z);
@@ -139,7 +166,7 @@ public class TestMoveTwo : MonoBehaviour
                 z = 0;
                 x = 0;
             }
-            totalVelocity -= rb.velocity * friction;
+            totalVelocity -= rb.velocity * groundFriction;
         }
     }
 
