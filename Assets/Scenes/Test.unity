@@ -3070,7 +3070,7 @@ MonoBehaviour:
   minVelocity: 0
   friction: 0.1
   groundFriction: 0.1
-  airFriction: 0
+  airFriction: 1
   actualForward: {x: 0, y: 0, z: 0}
   actualRight: {x: 0, y: 0, z: 0}
   totalVelocity: {x: 0, y: 0, z: 0}
