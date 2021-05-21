@@ -29,6 +29,7 @@ public class TestMoveTwo : MonoBehaviour
 
     public Vector3 totalVelocity;
     public Vector3 newForwardandRight;
+    public Vector3 currentForwardAndRight;
 
     public CapsuleCollider capCollider;
     public Rigidbody rb;
@@ -64,18 +65,30 @@ public class TestMoveTwo : MonoBehaviour
     public bool crouchBuffer;
 
 
+    public bool isSliding;
+    public float slidingFriction;
+    public float velocityToSlide;
+    public float slideForce;
+
+
     RaycastHit hit;
+    WaitForFixedUpdate fixedUpdate;
 
 
     private void Start()
     {
         groundCheckDistance = capCollider.height * .5f - capCollider.radius;
         g = initialGravity;
+        fixedUpdate = new WaitForFixedUpdate();
+        friction = groundFriction;
     }
 
     private void Update()
     {
-        sprinting = Input.GetKey(KeyCode.LeftShift);
+
+        crouchBuffer = Input.GetKey(KeyCode.LeftControl);
+
+        sprinting = (crouchBuffer)? false: Input.GetKey(KeyCode.LeftShift);
         speedIncrease = sprinting ? sprintSpeedIncrease : walkSpeedIncrease;
         maxVelocity = sprinting ? maxSprintVelocity : maxWalkVelocity;
         if (Input.GetKey(KeyCode.W)) z = speedIncrease;
@@ -89,8 +102,6 @@ public class TestMoveTwo : MonoBehaviour
             jumpBuffering = true;
             jumpBuffer = jumpBufferValue;
         }
-
-        crouchBuffer = Input.GetKey(KeyCode.LeftControl);
     }
 
     private void FixedUpdate()
@@ -101,14 +112,10 @@ public class TestMoveTwo : MonoBehaviour
         Jump();
         ApplyGravity();
         rb.velocity += totalVelocity;
-        //if (rb.velocity.magnitude < .1f && x == 0 && z == 0 && (isGrounded)) rb.velocity = Vector3.zero;
-
+        if (rb.velocity.magnitude < .1f && x == 0 && z == 0 && (isGrounded)) rb.velocity = Vector3.zero;
 
         Debug.DrawLine(transform.position, transform.position + actualForward.normalized * 5, Color.red);
         Debug.DrawLine(transform.position, transform.position + actualRight.normalized * 5, Color.red);
-
-        //if (rb.velocity.magnitude < 1) print("wtf");
-
     }
 
     private void GroundCheck()
@@ -132,6 +139,7 @@ public class TestMoveTwo : MonoBehaviour
     {
         totalVelocity = Vector3.zero;
         newForwardandRight = Vector3.zero;
+        currentForwardAndRight = Vector3.zero;
 
         actualForward = Vector3.Cross(hit.normal, -transform.right);
         actualRight = Vector3.Cross(hit.normal, transform.forward);
@@ -141,7 +149,7 @@ public class TestMoveTwo : MonoBehaviour
             x *= airStrafe;
             z *= airStrafe;
 
-            Vector3 currentForwardAndRight = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+            currentForwardAndRight = new Vector3(rb.velocity.x, 0, rb.velocity.z);
 
             newForwardandRight = (transform.right * x + transform.forward * z);
 
@@ -153,18 +161,16 @@ public class TestMoveTwo : MonoBehaviour
         }
         else
         {
-            friction = groundFriction;
+            newForwardandRight = (actualRight.normalized * x + actualForward.normalized * z);
 
             if (rb.velocity.magnitude < maxVelocity)
             {
-                newForwardandRight = (actualRight.normalized * x + actualForward.normalized * z);
-
                 totalVelocity += newForwardandRight;
 
                 z = 0;
                 x = 0;
             }
-            totalVelocity -= rb.velocity * groundFriction;
+            totalVelocity -= rb.velocity * friction;
         }
     }
     void Crouch()
@@ -175,6 +181,8 @@ public class TestMoveTwo : MonoBehaviour
             capCollider.center += Vector3.up * -.5f;
             isCrouching = true;
             moveCamera.AdjustCameraHeight(true);
+
+            if (isGrounded && !isSliding && rb.velocity.magnitude > velocityToSlide) StartCoroutine(SlideCoroutine());
         }
         if (isCrouching && !crouchBuffer)
         {
@@ -205,9 +213,20 @@ public class TestMoveTwo : MonoBehaviour
         if (jumpBuffer > 0 && isGrounded && !isJumping)StartCoroutine(JumpCoroutine());
         if (jumpBuffering) jumpBuffer -= Time.fixedDeltaTime;
     }
+    IEnumerator SlideCoroutine()
+    {
+        friction = slidingFriction;
+        isSliding = true;
+        totalVelocity += newForwardandRight * slideForce ;
+        while (rb.velocity.magnitude > maxSprintVelocity)
+        {
+            yield return fixedUpdate;
+        }
+        friction = groundFriction;
+        isSliding = false;
+    }
     IEnumerator JumpCoroutine()
     {
-        WaitForFixedUpdate fixedUpdate = new WaitForFixedUpdate();
         ResetJumpBuffer();
         isJumping = true;
         isGrounded = false;
