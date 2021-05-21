@@ -2977,7 +2977,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1380475377}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -26.82, y: 21.36, z: -15.9}
+  m_LocalPosition: {x: 12.7, y: 8.14, z: -56.72}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1737461204}
@@ -4307,6 +4307,7 @@ GameObject:
   - component: {fileID: 1832621869}
   - component: {fileID: 1832621868}
   - component: {fileID: 1832621867}
+  - component: {fileID: 1832621871}
   m_Layer: 0
   m_Name: Tower
   m_TagString: Untagged
@@ -4323,7 +4324,7 @@ BoxCollider:
   m_GameObject: {fileID: 1832621866}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -4390,6 +4391,20 @@ Transform:
   m_Father: {fileID: 1906955603}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!64 &1832621871
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1832621866}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &1906955602
 GameObject:
   m_ObjectHideFlags: 0

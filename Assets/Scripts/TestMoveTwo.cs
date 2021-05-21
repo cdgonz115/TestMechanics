@@ -92,10 +92,13 @@ public class TestMoveTwo : MonoBehaviour
         Jump();
         ApplyGravity();
         rb.velocity += totalVelocity;
-        if (rb.velocity.magnitude < .1f && x == 0 && z == 0 && (isGrounded)) rb.velocity = Vector3.zero;
+        //if (rb.velocity.magnitude < .1f && x == 0 && z == 0 && (isGrounded)) rb.velocity = Vector3.zero;
+
 
         Debug.DrawLine(transform.position, transform.position + actualForward.normalized * 5, Color.red);
         Debug.DrawLine(transform.position, transform.position + actualRight.normalized * 5, Color.red);
+
+        //if (rb.velocity.magnitude < 1) print("wtf");
 
     }
 
@@ -103,7 +106,7 @@ public class TestMoveTwo : MonoBehaviour
     {
         if(_justJumpedCooldown>0)_justJumpedCooldown -= Time.fixedDeltaTime;
         groundCheck = (_justJumpedCooldown <=0)? Physics.SphereCast(transform.position, capCollider.radius + 0.01f, -transform.up, out hit, groundCheckDistance) : false;
-
+        if (groundCheck && !isGrounded) rb.velocity = rb.velocity - Vector3.up * rb.velocity.y;
         if (isGrounded && !groundCheck)
         {
             g = initialGravity;
@@ -131,27 +134,13 @@ public class TestMoveTwo : MonoBehaviour
 
             Vector3 currentForwardAndRight = new Vector3(rb.velocity.x, 0, rb.velocity.z);
 
-            //float speed = currentForwardAndRight.magnitude;
-
-            
             newForwardandRight = (transform.right * x + transform.forward * z);
 
-            //newForwardandRight = (newForwardandRight + currentForwardAndRight. normalized).normalized;
-
-
-            //if (currentForwardAndRight.magnitude < maxVelocity)
-            //{
-                totalVelocity = newForwardandRight.normalized * currentForwardAndRight.magnitude * .25f + currentForwardAndRight * .75f;
-                print("decreasing");
-            //}
+            totalVelocity = newForwardandRight.normalized * currentForwardAndRight.magnitude * .25f + currentForwardAndRight * .75f;
 
             rb.velocity -= currentForwardAndRight * airFriction;
 
-            //print(x);
-            //print(z);
-            //print(tempForwardAndRight.magnitude);
-            Debug.DrawLine(transform.position, transform.position + newForwardandRight.normalized * 5, Color.red);
-            //totalVelocity -= new Vector3(rb.velocity.x , 0, rb.velocity.z )  * airFriction;
+            //Debug.DrawLine(transform.position, transform.position + newForwardandRight.normalized * 5, Color.red);
         }
         else
         {
