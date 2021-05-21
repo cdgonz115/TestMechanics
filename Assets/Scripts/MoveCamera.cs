@@ -27,4 +27,10 @@ public class MoveCamera : MonoBehaviour
         camera.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
         player.Rotate(Vector2.up * mouseX);
     }
+
+    public void AdjustCameraHeight(bool moveDown)
+    {
+        if (moveDown) camera.transform.position -= Vector3.up;
+        else camera.transform.position += Vector3.up;
+    }
 }

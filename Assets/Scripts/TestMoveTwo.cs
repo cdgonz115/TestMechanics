@@ -29,8 +29,10 @@ public class TestMoveTwo : MonoBehaviour
 
     public Vector3 totalVelocity;
     public Vector3 newForwardandRight;
+
     public CapsuleCollider capCollider;
     public Rigidbody rb;
+    public MoveCamera moveCamera;
 
 
     public bool groundCheck;
@@ -58,6 +60,10 @@ public class TestMoveTwo : MonoBehaviour
 
     float scrollwheel;
 
+    public bool isCrouching;
+    public bool crouchBuffer;
+
+
     RaycastHit hit;
 
 
@@ -83,12 +89,15 @@ public class TestMoveTwo : MonoBehaviour
             jumpBuffering = true;
             jumpBuffer = jumpBufferValue;
         }
+
+        crouchBuffer = Input.GetKey(KeyCode.LeftControl);
     }
 
     private void FixedUpdate()
     {
         GroundCheck();
         Move();
+        Crouch();
         Jump();
         ApplyGravity();
         rb.velocity += totalVelocity;
@@ -156,6 +165,23 @@ public class TestMoveTwo : MonoBehaviour
                 x = 0;
             }
             totalVelocity -= rb.velocity * groundFriction;
+        }
+    }
+    void Crouch()
+    {
+        if (!isCrouching && crouchBuffer)
+        {
+            capCollider.height *= .5f;
+            capCollider.center += Vector3.up * -.5f;
+            isCrouching = true;
+            moveCamera.AdjustCameraHeight(true);
+        }
+        if (isCrouching && !crouchBuffer)
+        {
+            capCollider.height *= 2f;
+            capCollider.center += Vector3.up * .5f;
+            isCrouching = false;
+            moveCamera.AdjustCameraHeight(false);
         }
     }
 
