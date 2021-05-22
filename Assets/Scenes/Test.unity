@@ -3194,9 +3194,9 @@ MonoBehaviour:
   isCrouching: 0
   crouchBuffer: 0
   isSliding: 0
-  slidingFriction: 0.05
-  velocityToSlide: 6
-  slideForce: 50
+  slidingFriction: 0.025
+  velocityToSlide: 13
+  slideForce: 10
 --- !u!1 &1404926706
 GameObject:
   m_ObjectHideFlags: 0

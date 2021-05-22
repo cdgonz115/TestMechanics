@@ -74,7 +74,6 @@ public class TestMoveTwo : MonoBehaviour
     RaycastHit hit;
     WaitForFixedUpdate fixedUpdate;
 
-
     private void Start()
     {
         groundCheckDistance = capCollider.height * .5f - capCollider.radius;
@@ -88,13 +87,15 @@ public class TestMoveTwo : MonoBehaviour
 
         crouchBuffer = Input.GetKey(KeyCode.LeftControl);
 
-        sprinting = (crouchBuffer)? false: Input.GetKey(KeyCode.LeftShift);
+        sprinting = (isCrouching)? false: Input.GetKey(KeyCode.LeftShift);
         speedIncrease = sprinting ? sprintSpeedIncrease : walkSpeedIncrease;
         maxVelocity = sprinting ? maxSprintVelocity : maxWalkVelocity;
         if (Input.GetKey(KeyCode.W)) z = speedIncrease;
         else if (Input.GetKey(KeyCode.S)) z = -speedIncrease;
+        else if (isGrounded) z = 0;
         if (Input.GetKey(KeyCode.D)) x = speedIncrease;
         else if (Input.GetKey(KeyCode.A)) x = -speedIncrease;
+        else if (isGrounded) x = 0;
 
         scrollwheel = Input.GetAxis("Mouse ScrollWheel");
         if (Input.GetKeyDown(KeyCode.Space) || scrollwheel > 0)
@@ -139,17 +140,16 @@ public class TestMoveTwo : MonoBehaviour
     {
         totalVelocity = Vector3.zero;
         newForwardandRight = Vector3.zero;
-        currentForwardAndRight = Vector3.zero;
 
         actualForward = Vector3.Cross(hit.normal, -transform.right);
         actualRight = Vector3.Cross(hit.normal, transform.forward);
+
+        currentForwardAndRight = new Vector3(rb.velocity.x, 0, rb.velocity.z);
 
         if (!isGrounded)
         {
             x *= airStrafe;
             z *= airStrafe;
-
-            currentForwardAndRight = new Vector3(rb.velocity.x, 0, rb.velocity.z);
 
             newForwardandRight = (transform.right * x + transform.forward * z);
 
@@ -167,10 +167,16 @@ public class TestMoveTwo : MonoBehaviour
             {
                 totalVelocity += newForwardandRight;
 
-                z = 0;
-                x = 0;
             }
-            totalVelocity -= rb.velocity * friction;
+            else if(!isSliding)
+            {
+                rb.velocity = (newForwardandRight.normalized * currentForwardAndRight.magnitude * .5f + currentForwardAndRight * .5f).normalized * maxVelocity;
+                totalVelocity = Vector3.zero;
+            }
+            if (rb.velocity.magnitude != maxVelocity || (x == 0 && z == 0))
+            {
+                totalVelocity -= rb.velocity * friction;
+            }
         }
     }
     void Crouch()
@@ -182,7 +188,11 @@ public class TestMoveTwo : MonoBehaviour
             isCrouching = true;
             moveCamera.AdjustCameraHeight(true);
 
-            if (isGrounded && !isSliding && rb.velocity.magnitude > velocityToSlide) StartCoroutine(SlideCoroutine());
+            //print(isGrounded + " " + isSliding + " " + rb.velocity.magnitude + " mag");
+            if (isGrounded && !isSliding && rb.velocity.magnitude > velocityToSlide)
+            {
+                StartCoroutine(SlideCoroutine());
+            }
         }
         if (isCrouching && !crouchBuffer)
         {
@@ -215,13 +225,18 @@ public class TestMoveTwo : MonoBehaviour
     }
     IEnumerator SlideCoroutine()
     {
+        //print("co called");
         friction = slidingFriction;
         isSliding = true;
         totalVelocity += newForwardandRight * slideForce ;
-        while (rb.velocity.magnitude > maxSprintVelocity)
+        //print(rb.velocity.magnitude + " " + maxVelocity);
+        maxVelocity = maxWalkVelocity;
+        while (rb.velocity.magnitude > maxVelocity)
         {
+            //print(rb.velocity.magnitude + " " + maxVelocity);
             yield return fixedUpdate;
         }
+        //print(rb.velocity.magnitude + " " + maxVelocity);
         friction = groundFriction;
         isSliding = false;
     }
