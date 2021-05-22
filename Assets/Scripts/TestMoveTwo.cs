@@ -168,7 +168,7 @@ public class TestMoveTwo : MonoBehaviour
                 totalVelocity += newForwardandRight;
 
             }
-            else if(!isSliding)
+            else if(!isCrouching)
             {
                 rb.velocity = (newForwardandRight.normalized * currentForwardAndRight.magnitude * .5f + currentForwardAndRight * .5f).normalized * maxVelocity;
                 totalVelocity = Vector3.zero;
@@ -226,7 +226,7 @@ public class TestMoveTwo : MonoBehaviour
         isSliding = true;
         totalVelocity += newForwardandRight * slideForce ;
         maxVelocity = maxWalkVelocity;
-        while (rb.velocity.magnitude > maxVelocity)
+        while (rb.velocity.magnitude > maxVelocity && !isJumping)
         {
             yield return fixedUpdate;
         }
@@ -241,6 +241,7 @@ public class TestMoveTwo : MonoBehaviour
         y = jumpStrength;
         g = initialGravity;
         _justJumpedCooldown = justJumpedCooldown;
+        totalVelocity += newForwardandRight;
         while (y > 0.1f && !isGrounded)
         {
             y -= .05f;
