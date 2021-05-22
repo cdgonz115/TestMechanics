@@ -188,11 +188,8 @@ public class TestMoveTwo : MonoBehaviour
             isCrouching = true;
             moveCamera.AdjustCameraHeight(true);
 
-            //print(isGrounded + " " + isSliding + " " + rb.velocity.magnitude + " mag");
-            if (isGrounded && !isSliding && rb.velocity.magnitude > velocityToSlide)
-            {
-                StartCoroutine(SlideCoroutine());
-            }
+            if (isGrounded && !isSliding && rb.velocity.magnitude > velocityToSlide)StartCoroutine(SlideCoroutine());
+
         }
         if (isCrouching && !crouchBuffer)
         {
@@ -225,18 +222,14 @@ public class TestMoveTwo : MonoBehaviour
     }
     IEnumerator SlideCoroutine()
     {
-        //print("co called");
         friction = slidingFriction;
         isSliding = true;
         totalVelocity += newForwardandRight * slideForce ;
-        //print(rb.velocity.magnitude + " " + maxVelocity);
         maxVelocity = maxWalkVelocity;
         while (rb.velocity.magnitude > maxVelocity)
         {
-            //print(rb.velocity.magnitude + " " + maxVelocity);
             yield return fixedUpdate;
         }
-        //print(rb.velocity.magnitude + " " + maxVelocity);
         friction = groundFriction;
         isSliding = false;
     }
