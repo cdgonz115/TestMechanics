@@ -3159,7 +3159,7 @@ MonoBehaviour:
   walkSpeedIncrease: 1
   sprintSpeedIncrease: 2
   speedIncrease: 0
-  maxWalkVelocity: 5
+  maxWalkVelocity: 7.5
   maxSprintVelocity: 15
   maxVelocity: 0
   minVelocity: 0
