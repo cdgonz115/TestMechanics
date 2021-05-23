@@ -4,6 +4,20 @@ using UnityEngine;
 
 public class TestMoveTwo : MonoBehaviour
 {
+    public enum PlayerState
+    { 
+        NotMoving,
+        Grounded,
+        Crouching,
+        Sliding,
+        Jumping,
+        Climbing,
+        Vaulting,
+        InAir,
+    };
+
+    PlayerState playerState;
+
     float z;
     float x;
 
@@ -70,6 +84,15 @@ public class TestMoveTwo : MonoBehaviour
     public float velocityToSlide;
     public float slideForce;
 
+    public bool topCheck;
+    public bool forwardCheck;
+
+    public float climbingTime;
+    public float _climbingTime;
+    public float climbingForce;
+    public float _climbingForce;
+    public float climbingForceDecreaser;
+    public bool isClimbing;
 
     RaycastHit hit;
     WaitForFixedUpdate fixedUpdate;
@@ -111,9 +134,10 @@ public class TestMoveTwo : MonoBehaviour
     private void FixedUpdate()
     {
         GroundCheck();
+        ForwardCheck();
         Move();
         Crouch();
-        Jump();
+        HanldeJumpImput();
         ApplyGravity();
         rb.velocity += totalVelocity;
         if (rb.velocity.magnitude < .1f && x == 0 && z == 0 && (isGrounded))
@@ -141,6 +165,13 @@ public class TestMoveTwo : MonoBehaviour
             airStrafe = initialAirStrafe;
         }
         isGrounded = groundCheck;
+    }
+    void ForwardCheck()
+    {
+
+        topCheck = (Physics.Raycast(Camera.main.transform.position, transform.forward, capCollider.radius + .1f));
+        
+        forwardCheck = (Physics.Raycast(transform.position, transform.forward, capCollider.radius + .1f));
     }
 
     private void Move()
@@ -206,26 +237,52 @@ public class TestMoveTwo : MonoBehaviour
             moveCamera.AdjustCameraHeight(false);
         }
     }
-
-    private void ApplyGravity()
+    void HanldeJumpImput()
     {
-        if (!isGrounded)
+        if (isGrounded) isJumping = false;
+        if (jumpBuffer < 0) ResetJumpBuffer();
+        if (jumpBuffer > 0 && isGrounded && !isJumping)
         {
-            totalVelocity += Vector3.up * g;
-        }
-        if (g > maxGravity) g *= gravityRate;
+            if (!forwardCheck) StartCoroutine(JumpCoroutine());
+            else StartCoroutine(ClimbCoroutine());
+        } 
+        if (jumpBuffering) jumpBuffer -= Time.fixedDeltaTime;
     }
     public void ResetJumpBuffer()
     {
         jumpBuffering = false;
         jumpBuffer = 0;
     }
-    void Jump()
+    IEnumerator ClimbCoroutine()
     {
-        if (isGrounded)isJumping = false;
-        if (jumpBuffer < 0)ResetJumpBuffer();
-        if (jumpBuffer > 0 && isGrounded && !isJumping)StartCoroutine(JumpCoroutine());
-        if (jumpBuffering) jumpBuffer -= Time.fixedDeltaTime;
+        rb.velocity = Vector3.zero;
+        _climbingTime = climbingTime;
+        isClimbing = true;
+        _climbingForce = climbingForce;
+        totalVelocity += Vector3.up * climbingForce;
+        g = initialGravity;
+        float random = .5f;
+        while (forwardCheck && _climbingTime > 0)
+        {
+            rb.velocity -= Vector3.up * random;
+            random *= 1.0005f;
+            _climbingTime -= Time.fixedDeltaTime;
+            yield return fixedUpdate;
+        }
+        rb.velocity = Vector3.zero;
+        totalVelocity += Vector3.up * climbingForce * .2f;
+        isClimbing = false;
+    }
+    private void ApplyGravity()
+    {
+        if (!isClimbing)
+        {
+            if (!isGrounded)
+            {
+                totalVelocity += Vector3.up * g;
+            }
+            if (g > maxGravity) g *= gravityRate;
+        }
     }
     IEnumerator SlideCoroutine()
     {

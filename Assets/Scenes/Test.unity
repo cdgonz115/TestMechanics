@@ -3197,6 +3197,14 @@ MonoBehaviour:
   slidingFriction: 0.025
   velocityToSlide: 13
   slideForce: 10
+  topCheck: 0
+  forwardCheck: 0
+  climbingTime: 2.5
+  _climbingTime: 0
+  climbingForce: 20
+  _climbingForce: 0
+  climbingForceDecreaser: 0.002
+  isClimbing: 0
 --- !u!1 &1404926706
 GameObject:
   m_ObjectHideFlags: 0
