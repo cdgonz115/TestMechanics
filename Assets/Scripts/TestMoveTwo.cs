@@ -243,6 +243,7 @@ public class TestMoveTwo : MonoBehaviour
     }
     IEnumerator JumpCoroutine()
     {
+        bool continueSprint = isSliding;
         ResetJumpBuffer();
         isJumping = true;
         isGrounded = false;
@@ -256,6 +257,7 @@ public class TestMoveTwo : MonoBehaviour
             totalVelocity += Vector3.up * y;
             yield return fixedUpdate;
         }
+        sprinting = sprinting? sprinting :continueSprint;
     }
     private void OnDrawGizmos()
     {
