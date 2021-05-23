@@ -87,7 +87,10 @@ public class TestMoveTwo : MonoBehaviour
 
         crouchBuffer = Input.GetKey(KeyCode.LeftControl);
 
-        sprinting = (isCrouching)? false: Input.GetKey(KeyCode.LeftShift);
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            sprinting = (isCrouching) ? false : true;
+        }
         speedIncrease = sprinting ? sprintSpeedIncrease : walkSpeedIncrease;
         maxVelocity = sprinting ? maxSprintVelocity : maxWalkVelocity;
         if (Input.GetKey(KeyCode.W)) z = speedIncrease;
@@ -113,7 +116,11 @@ public class TestMoveTwo : MonoBehaviour
         Jump();
         ApplyGravity();
         rb.velocity += totalVelocity;
-        if (rb.velocity.magnitude < .1f && x == 0 && z == 0 && (isGrounded)) rb.velocity = Vector3.zero;
+        if (rb.velocity.magnitude < .1f && x == 0 && z == 0 && (isGrounded))
+        {
+            rb.velocity = Vector3.zero;
+            sprinting = false;
+        } 
 
         Debug.DrawLine(transform.position, transform.position + actualForward.normalized * 5, Color.red);
         Debug.DrawLine(transform.position, transform.position + actualRight.normalized * 5, Color.red);
@@ -232,6 +239,7 @@ public class TestMoveTwo : MonoBehaviour
         }
         friction = groundFriction;
         isSliding = false;
+        sprinting = false;
     }
     IEnumerator JumpCoroutine()
     {
