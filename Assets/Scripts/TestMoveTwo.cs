@@ -91,7 +91,9 @@ public class TestMoveTwo : MonoBehaviour
     public float _climbingTime;
     public float climbingForce;
     public float _climbingForce;
-    public float climbingForceDecreaser;
+    public float initialClimbingGravity;
+    public float climbingGravity;
+    public float climbingGravityMultiplier;
     public bool isClimbing;
 
     RaycastHit hit;
@@ -103,6 +105,7 @@ public class TestMoveTwo : MonoBehaviour
         g = initialGravity;
         fixedUpdate = new WaitForFixedUpdate();
         friction = groundFriction;
+        //Time.timeScale = .1f;
     }
 
     private void Update()
@@ -241,37 +244,13 @@ public class TestMoveTwo : MonoBehaviour
     {
         if (isGrounded) isJumping = false;
         if (jumpBuffer < 0) ResetJumpBuffer();
-        if (jumpBuffer > 0 && isGrounded && !isJumping)
-        {
-            if (!forwardCheck) StartCoroutine(JumpCoroutine());
-            else StartCoroutine(ClimbCoroutine());
-        } 
+        if (jumpBuffer > 0 && isGrounded && !isJumping)StartCoroutine(JumpCoroutine());
         if (jumpBuffering) jumpBuffer -= Time.fixedDeltaTime;
     }
     public void ResetJumpBuffer()
     {
         jumpBuffering = false;
         jumpBuffer = 0;
-    }
-    IEnumerator ClimbCoroutine()
-    {
-        rb.velocity = Vector3.zero;
-        _climbingTime = climbingTime;
-        isClimbing = true;
-        _climbingForce = climbingForce;
-        totalVelocity += Vector3.up * climbingForce;
-        g = initialGravity;
-        float random = .5f;
-        while (forwardCheck && _climbingTime > 0)
-        {
-            rb.velocity -= Vector3.up * random;
-            random *= 1.0005f;
-            _climbingTime -= Time.fixedDeltaTime;
-            yield return fixedUpdate;
-        }
-        rb.velocity = Vector3.zero;
-        totalVelocity += Vector3.up * climbingForce * .2f;
-        isClimbing = false;
     }
     private void ApplyGravity()
     {
@@ -312,9 +291,34 @@ public class TestMoveTwo : MonoBehaviour
         {
             y -= .05f;
             totalVelocity += Vector3.up * y;
+            if (forwardCheck && rb.velocity.y > -0.1f)
+            {
+                isJumping = false;
+                totalVelocity -= Vector3.up * y;
+                StartCoroutine(ClimbCoroutine());
+                yield break;
+            }
             yield return fixedUpdate;
         }
+        isJumping = false;
         sprinting = sprinting? sprinting :continueSprint;
+    }
+    IEnumerator ClimbCoroutine()
+    {
+        _climbingTime = climbingTime;
+        isClimbing = true;
+        _climbingForce = climbingForce;
+        rb.velocity = Vector3.up * climbingForce;
+        climbingGravity = initialClimbingGravity;
+        while (forwardCheck && _climbingTime > 0 && rb.velocity.y > 0)
+        {
+            rb.velocity -= Vector3.up * climbingGravity;
+            climbingGravity *= climbingGravityMultiplier;
+            _climbingTime -= Time.fixedDeltaTime;
+            yield return fixedUpdate;
+        }
+        rb.velocity = Vector3.up * climbingForce;
+        isClimbing = false;
     }
     private void OnDrawGizmos()
     {

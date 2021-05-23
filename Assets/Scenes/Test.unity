@@ -3072,7 +3072,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1380475377}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 12.7, y: 8.14, z: -45.17}
+  m_LocalPosition: {x: -36.5, y: 6, z: -1.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1737461204}
@@ -3203,7 +3203,9 @@ MonoBehaviour:
   _climbingTime: 0
   climbingForce: 20
   _climbingForce: 0
-  climbingForceDecreaser: 0.002
+  initialClimbingGravity: 0.5
+  climbingGravity: 0
+  climbingGravityMultiplier: 1.005
   isClimbing: 0
 --- !u!1 &1404926706
 GameObject:
