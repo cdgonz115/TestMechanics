@@ -211,7 +211,8 @@ public class TestMoveTwo : MonoBehaviour
             }
             else if(!isCrouching)
             {
-                rb.velocity = (newForwardandRight.normalized * currentForwardAndRight.magnitude * .5f + currentForwardAndRight * .5f).normalized * maxVelocity;
+                if (z == 0 && x == 0) rb.velocity *= .99f;
+                else rb.velocity = newForwardandRight.normalized * maxVelocity;
                 totalVelocity = Vector3.zero;
             }
             if (rb.velocity.magnitude != maxVelocity || (x == 0 && z == 0))
@@ -287,6 +288,7 @@ public class TestMoveTwo : MonoBehaviour
         g = initialGravity;
         _justJumpedCooldown = justJumpedCooldown;
         totalVelocity += newForwardandRight;
+        rb.velocity -= Vector3.up * rb.velocity.y;
         while (y > 0.1f && !isGrounded)
         {
             y -= .05f;
