@@ -317,10 +317,39 @@ public class TestMoveTwo : MonoBehaviour
             rb.velocity -= Vector3.up * climbingGravity;
             climbingGravity *= climbingGravityMultiplier;
             _climbingTime -= Time.fixedDeltaTime;
+            if (forwardCheck && !topCheck) 
+            {
+                StartCoroutine(VaultCoroutine());
+                yield break;
+            }
+
             yield return fixedUpdate;
         }
         rb.velocity = Vector3.up * climbingForce;
         isClimbing = false;
+        while (rb.velocity.y > 0)
+        {
+            if (forwardCheck && !topCheck)
+            {
+                isClimbing = true;
+                StartCoroutine(VaultCoroutine());
+                yield break;
+            } 
+            yield return fixedUpdate;
+        }
+    }
+    IEnumerator VaultCoroutine()
+    {
+        rb.velocity = Vector3.up * climbingForce;
+        float height = Camera.main.transform.position.y;
+        while (transform.position.y < height + capCollider.height)
+        {
+            rb.velocity += Vector3.up;
+            yield return fixedUpdate;
+        }
+        isClimbing = false;
+        rb.velocity = transform.forward * 50;
+
     }
     private void OnDrawGizmos()
     {
