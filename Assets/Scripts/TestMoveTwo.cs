@@ -95,8 +95,14 @@ public class TestMoveTwo : MonoBehaviour
     public float climbingGravity;
     public float climbingGravityMultiplier;
     public bool isClimbing;
+    public float climbingStrafe;
+    public float _climbingStrafe;
+    public float climbingStrafeDecreaser;
+
+    public float vaultingHorizontalForce;
 
     RaycastHit hit;
+    RaycastHit forwardHit;
     WaitForFixedUpdate fixedUpdate;
 
     private void Start()
@@ -173,8 +179,8 @@ public class TestMoveTwo : MonoBehaviour
     {
 
         topCheck = (Physics.Raycast(Camera.main.transform.position, transform.forward, capCollider.radius + .1f));
-        
-        forwardCheck = (Physics.Raycast(transform.position, transform.forward, capCollider.radius + .1f));
+
+        forwardCheck =   (Physics.Raycast(transform.position, transform.forward, capCollider.radius + .1f));
     }
 
     private void Move()
@@ -189,14 +195,17 @@ public class TestMoveTwo : MonoBehaviour
 
         if (!isGrounded)
         {
-            x *= airStrafe;
-            z *= airStrafe;
+            if (!isClimbing)
+            {
+                x *= airStrafe;
+                z *= airStrafe;
 
-            newForwardandRight = (transform.right * x + transform.forward * z);
+                newForwardandRight = (transform.right * x + transform.forward * z);
 
-            totalVelocity = newForwardandRight.normalized * currentForwardAndRight.magnitude * .25f + currentForwardAndRight * .75f;
+                totalVelocity = newForwardandRight.normalized * currentForwardAndRight.magnitude * .25f + currentForwardAndRight * .75f;
 
-            rb.velocity -= currentForwardAndRight * airFriction;
+                rb.velocity -= currentForwardAndRight * airFriction;
+            }
 
             //Debug.DrawLine(transform.position, transform.position + newForwardandRight.normalized * 5, Color.red);
         }
@@ -312,9 +321,14 @@ public class TestMoveTwo : MonoBehaviour
         _climbingForce = climbingForce;
         rb.velocity = Vector3.up * climbingForce;
         climbingGravity = initialClimbingGravity;
+        //Physics.SphereCast(transform.position, 1, transform.forward, out forwardHit, capCollider.radius + .1f);
+        Physics.BoxCast(transform.position + transform.forward.normalized * capCollider.radius, Vector3.one * capCollider.radius,transform.forward, out forwardHit);
+        _climbingStrafe = climbingStrafe;
         while (forwardCheck && _climbingTime > 0 && rb.velocity.y > 0)
         {
             rb.velocity -= Vector3.up * climbingGravity;
+            rb.velocity+= Vector3.Cross(forwardHit.normal, Vector3.up).normalized * x * _climbingStrafe;
+            Debug.DrawLine(transform.position, transform.position + Vector3.Cross(forwardHit.normal, Vector3.up).normalized * 5, Color.red);
             climbingGravity *= climbingGravityMultiplier;
             _climbingTime -= Time.fixedDeltaTime;
             if (forwardCheck && !topCheck) 
@@ -322,10 +336,11 @@ public class TestMoveTwo : MonoBehaviour
                 StartCoroutine(VaultCoroutine());
                 yield break;
             }
+            _climbingStrafe -= .001f;
 
             yield return fixedUpdate;
         }
-        rb.velocity = Vector3.up * climbingForce;
+        rb.velocity = Vector3.up * climbingForce + Vector3.Cross(forwardHit.normal, Vector3.up).normalized * x *vaultingHorizontalForce;
         isClimbing = false;
         while (rb.velocity.y > 0)
         {
