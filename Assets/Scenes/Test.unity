@@ -3191,6 +3191,8 @@ MonoBehaviour:
   isJumping: 0
   jumpStrength: 25
   justJumpedCooldown: 0.1
+  inAirJumps: 1
+  coyoteTimer: 0.2
   isCrouching: 0
   crouchBuffer: 0
   isSliding: 0
