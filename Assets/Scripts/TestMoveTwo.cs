@@ -105,6 +105,7 @@ public class TestMoveTwo : MonoBehaviour
     public float climbingStrafe;
     public float _climbingStrafe;
     public float climbingStrafeDecreaser;
+    public float negativeVelocityToClimb;
 
     public float vaultingHorizontalForce;
 
@@ -317,7 +318,7 @@ public class TestMoveTwo : MonoBehaviour
         {
             y -= .05f;
             totalVelocity += Vector3.up * y;
-            if (forwardCheck && rb.velocity.y > -0.1f)
+            if (forwardCheck && rb.velocity.y > negativeVelocityToClimb)
             {
                 isJumping = false;
                 totalVelocity -= Vector3.up * y;

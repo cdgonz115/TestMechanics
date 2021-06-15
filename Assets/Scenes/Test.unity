@@ -3196,7 +3196,7 @@ MonoBehaviour:
   isCrouching: 0
   crouchBuffer: 0
   isSliding: 0
-  slidingFriction: 0.025
+  slidingFriction: 0.005
   velocityToSlide: 13
   slideForce: 10
   topCheck: 0
@@ -3212,6 +3212,7 @@ MonoBehaviour:
   climbingStrafe: 0.1
   _climbingStrafe: 0
   climbingStrafeDecreaser: 0
+  negativeVelocityToClimb: -0.1
   vaultingHorizontalForce: 15
 --- !u!1 &1404926706
 GameObject:
