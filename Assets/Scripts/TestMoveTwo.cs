@@ -73,6 +73,13 @@ public class TestMoveTwo : MonoBehaviour
     public float justJumpedCooldown;
     private float _justJumpedCooldown;
 
+    public int inAirJumps;
+    private int _inAirJumps;
+
+
+    public float coyoteTimer;
+    private float _coyoteTimer;
+
     float scrollwheel;
 
     public bool isCrouching;
@@ -161,17 +168,20 @@ public class TestMoveTwo : MonoBehaviour
 
     private void GroundCheck()
     {
+        _coyoteTimer -= Time.fixedDeltaTime;
         if(_justJumpedCooldown>0)_justJumpedCooldown -= Time.fixedDeltaTime;
         groundCheck = (_justJumpedCooldown <=0)? Physics.SphereCast(transform.position, capCollider.radius + 0.01f, -transform.up, out hit, groundCheckDistance) : false;
         if (groundCheck && !isGrounded) rb.velocity = rb.velocity - Vector3.up * rb.velocity.y;
         if (isGrounded && !groundCheck)
         {
             g = initialGravity;
+            _coyoteTimer = coyoteTimer;
         }
         if (groundCheck)
         {
             g = 0;
             airStrafe = initialAirStrafe;
+            _inAirJumps = inAirJumps;
         }
         isGrounded = groundCheck;
     }
@@ -254,7 +264,12 @@ public class TestMoveTwo : MonoBehaviour
     {
         if (isGrounded) isJumping = false;
         if (jumpBuffer < 0) ResetJumpBuffer();
-        if (jumpBuffer > 0 && isGrounded && !isJumping)StartCoroutine(JumpCoroutine());
+        if (jumpBuffer > 0 && (isGrounded || _coyoteTimer > 0) && !isJumping) StartCoroutine(JumpCoroutine());
+        else if (_inAirJumps > 0 && jumpBuffer > 0)
+        {
+            _inAirJumps--;
+            StartCoroutine(JumpCoroutine());
+        }
         if (jumpBuffering) jumpBuffer -= Time.fixedDeltaTime;
     }
     public void ResetJumpBuffer()
@@ -324,7 +339,7 @@ public class TestMoveTwo : MonoBehaviour
         //Physics.SphereCast(transform.position, 1, transform.forward, out forwardHit, capCollider.radius + .1f);
         Physics.BoxCast(transform.position + transform.forward.normalized * capCollider.radius, Vector3.one * capCollider.radius,transform.forward, out forwardHit);
         _climbingStrafe = climbingStrafe;
-        while (forwardCheck && _climbingTime > 0 && rb.velocity.y > 0)
+        while (forwardCheck && _climbingTime > 0 && rb.velocity.y > 0 && !isJumping)
         {
             rb.velocity -= Vector3.up * climbingGravity;
             rb.velocity+= Vector3.Cross(forwardHit.normal, Vector3.up).normalized * x * _climbingStrafe;
@@ -363,7 +378,7 @@ public class TestMoveTwo : MonoBehaviour
             yield return fixedUpdate;
         }
         isClimbing = false;
-        rb.velocity = transform.forward * 50;
+        rb.velocity = -forwardHit.normal * 10;
 
     }
     private void OnDrawGizmos()
