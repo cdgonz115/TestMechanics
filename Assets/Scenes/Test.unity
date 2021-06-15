@@ -3212,7 +3212,7 @@ MonoBehaviour:
   climbingStrafe: 0.1
   _climbingStrafe: 0
   climbingStrafeDecreaser: 0
-  negativeVelocityToClimb: -0.1
+  negativeVelocityToClimb: -3
   vaultingHorizontalForce: 15
 --- !u!1 &1404926706
 GameObject:
