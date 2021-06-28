@@ -1184,13 +1184,13 @@ GameObject:
   - component: {fileID: 488085908}
   m_Layer: 0
   m_Name: Platform
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!65 &488085908
-BoxCollider:
+--- !u!64 &488085908
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -1199,9 +1199,10 @@ BoxCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &488085909
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1259,7 +1260,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 488085907}
   m_LocalRotation: {x: 0.51278216, y: -0, z: -0, w: 0.8585188}
-  m_LocalPosition: {x: -36.44, y: 13.486, z: 16.617}
+  m_LocalPosition: {x: -36.44, y: 13.486, z: 11.85}
   m_LocalScale: {x: 18.681631, y: 65.91796, z: 2.603}
   m_Children: []
   m_Father: {fileID: 1234656754}
@@ -3548,7 +3549,6 @@ GameObject:
   - component: {fileID: 1380475379}
   - component: {fileID: 1380475378}
   - component: {fileID: 1380475384}
-  - component: {fileID: 1380475383}
   - component: {fileID: 1380475385}
   m_Layer: 10
   m_Name: Capsule
@@ -3644,61 +3644,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1380475377}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -75, y: 9.4, z: -94.5}
+  m_LocalPosition: {x: -37.96, y: 30.76, z: 40.92}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1737461204}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1380475383
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1380475377}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 737df7178d91f884cbc50fa73f2721f9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  friction: 0.1
-  airDecrease: 0.2
-  speedIncrease: 1
-  walkSpeed: 5
-  runSpeed: 10
-  speed: 0
-  jumpStrength: 3.2
-  airJumpStrength: 4.3
-  jumpDecreaseRate: 1.05
-  jumpBuffer: 0
-  jumpBufferValue: 0.2
-  inAirHorizontalSpeed: 12
-  justJumpedCooldown: 0.1
-  _justJumpedCooldown: 0
-  airJumps: 1
-  _airJumps: 0
-  jumpBuffering: 0
-  isJumping: 0
-  airJumpBypass: 0
-  sphereCheck: {fileID: 0}
-  groundDistance: 0.01
-  initialGravity: -1.25
-  gravityRate: 0.999
-  maxGravity: 39.2
-  isGrounded: 0
-  groundCheck: 0
-  mask:
-    serializedVersion: 2
-    m_Bits: 1
-  launched: 1
-  velocity: {x: 0, y: 0, z: 0}
-  total: {x: 0, y: 0, z: 0}
-  capCollider: {fileID: 1380475379}
-  test1: {x: 0, y: 0, z: 0}
-  test2: {x: 0, y: 0, z: 0}
-  tscale: 1
 --- !u!114 &1380475384
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4429,7 +4381,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1597005385}
   m_LocalRotation: {x: 0.36259225, y: 0.6070636, z: -0.3625912, w: 0.6070654}
-  m_LocalPosition: {x: -14.789, y: 18.796, z: 16.617}
+  m_LocalPosition: {x: -14.789, y: 18.796, z: 11.85}
   m_LocalScale: {x: 18.681631, y: 43.51817, z: 2.603}
   m_Children: []
   m_Father: {fileID: 1234656754}
@@ -4985,7 +4937,6 @@ GameObject:
   - component: {fileID: 1737461203}
   - component: {fileID: 1737461202}
   - component: {fileID: 1737461205}
-  - component: {fileID: 1737461206}
   m_Layer: 10
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -5163,21 +5114,6 @@ MonoBehaviour:
       data1: 0
       data2: 0
   defaultFrameSettings: 0
---- !u!114 &1737461206
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1737461201}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 13c8799e209a63f4d94a441629c98f75, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mouseSensitvity: 100
-  player: {fileID: 1380475382}
-  camera: {fileID: 0}
 --- !u!1 &1761467310
 GameObject:
   m_ObjectHideFlags: 0

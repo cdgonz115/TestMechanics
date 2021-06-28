@@ -76,7 +76,6 @@ public class TestMoveTwo : MonoBehaviour
     public int inAirJumps;
     private int _inAirJumps;
 
-
     public float coyoteTimer;
     private float _coyoteTimer;
 
@@ -172,7 +171,19 @@ public class TestMoveTwo : MonoBehaviour
         _coyoteTimer -= Time.fixedDeltaTime;
         if(_justJumpedCooldown>0)_justJumpedCooldown -= Time.fixedDeltaTime;
         groundCheck = (_justJumpedCooldown <=0)? Physics.SphereCast(transform.position, capCollider.radius + 0.01f, -transform.up, out hit, groundCheckDistance) : false;
-        if (groundCheck && !isGrounded) rb.velocity = rb.velocity - Vector3.up * rb.velocity.y;
+
+        totalVelocity = Vector3.zero;
+        newForwardandRight = Vector3.zero;
+
+        actualForward = Vector3.Cross(hit.normal, -transform.right);
+        actualRight = Vector3.Cross(hit.normal, transform.forward);
+
+        if (groundCheck && !isGrounded) 
+        {
+            rb.velocity = rb.velocity - Vector3.up * rb.velocity.y;
+
+            if (actualForward.y != 0) rb.velocity = (actualRight.normalized + actualForward.normalized) * rb.velocity.magnitude;
+        } 
         if (isGrounded && !groundCheck)
         {
             g = initialGravity;
@@ -196,12 +207,6 @@ public class TestMoveTwo : MonoBehaviour
 
     private void Move()
     {
-        totalVelocity = Vector3.zero;
-        newForwardandRight = Vector3.zero;
-
-        actualForward = Vector3.Cross(hit.normal, -transform.right);
-        actualRight = Vector3.Cross(hit.normal, transform.forward);
-
         currentForwardAndRight = new Vector3(rb.velocity.x, 0, rb.velocity.z);
 
         if (!isGrounded)
@@ -227,7 +232,6 @@ public class TestMoveTwo : MonoBehaviour
             if (rb.velocity.magnitude < maxVelocity)
             {
                 totalVelocity += newForwardandRight;
-
             }
             else if(!isCrouching)
             {
