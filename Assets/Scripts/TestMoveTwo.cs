@@ -236,7 +236,7 @@ public class TestMoveTwo : MonoBehaviour
             else if(!isCrouching)
             {
                 if (z == 0 && x == 0) rb.velocity *= .99f;
-                else rb.velocity = newForwardandRight.normalized * maxVelocity;
+                else if(rb.velocity.magnitude < maxVelocity + 5) rb.velocity = newForwardandRight.normalized * maxVelocity;
                 totalVelocity = Vector3.zero;
             }
             if (rb.velocity.magnitude != maxVelocity || (x == 0 && z == 0))
