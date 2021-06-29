@@ -331,7 +331,7 @@ public class TestMoveTwo : MonoBehaviour
         {
             y -= .05f;
             totalVelocity += Vector3.up * y;
-            if (forwardCheck && rb.velocity.y > negativeVelocityToClimb && z==1)
+            if (forwardCheck && rb.velocity.y > negativeVelocityToClimb && z > 0)
             {
                 isJumping = false;
                 totalVelocity -= Vector3.up * y;
