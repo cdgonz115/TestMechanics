@@ -45,6 +45,8 @@ public class TestMoveTwo : MonoBehaviour
     public Vector3 newForwardandRight;
     public Vector3 currentForwardAndRight;
 
+    Vector3 velocityAtCollision;
+
     public CapsuleCollider capCollider;
     public Rigidbody rb;
     public MoveCamera moveCamera;
@@ -105,8 +107,12 @@ public class TestMoveTwo : MonoBehaviour
     public float _climbingStrafe;
     public float climbingStrafeDecreaser;
     public float negativeVelocityToClimb;
+    public float climbingCooldown;
+    public float _climbingCooldown;
 
     public float vaultingHorizontalForce;
+
+    public float wallJumpStrenght;
 
     RaycastHit hit;
     RaycastHit forwardHit;
@@ -118,6 +124,9 @@ public class TestMoveTwo : MonoBehaviour
         g = initialGravity;
         fixedUpdate = new WaitForFixedUpdate();
         friction = groundFriction;
+        capCollider = GetComponent<CapsuleCollider>();
+        rb = GetComponent<Rigidbody>();
+        moveCamera = GetComponent<MoveCamera>();
         //Time.timeScale = .1f;
     }
 
@@ -167,7 +176,8 @@ public class TestMoveTwo : MonoBehaviour
         {
             rb.velocity = Vector3.zero;
             sprinting = false;
-        } 
+        }
+        if (_climbingCooldown > 0) _climbingCooldown -= Time.fixedDeltaTime;
 
         //Debug.DrawLine(transform.position, transform.position + actualForward.normalized * 5, Color.red);
         //Debug.DrawLine(transform.position, transform.position + actualRight.normalized * 5, Color.red);
@@ -201,6 +211,7 @@ public class TestMoveTwo : MonoBehaviour
             g = 0;
             airStrafe = initialAirStrafe;
             _inAirJumps = inAirJumps;
+            _climbingCooldown = 0;
         }
         isGrounded = groundCheck;
     }
@@ -222,14 +233,14 @@ public class TestMoveTwo : MonoBehaviour
         {
             if (!isClimbing)
             {
-                x *= airStrafe;
-                z *= airStrafe;
+                //x *= airStrafe;
+                //z *= airStrafe;
 
-                newForwardandRight = (transform.right * x + transform.forward * z);
+                //newForwardandRight = (transform.right * x + transform.forward * z);
 
-                totalVelocity = newForwardandRight.normalized * currentForwardAndRight.magnitude * .25f + currentForwardAndRight * .75f;
+                //totalVelocity = newForwardandRight.normalized * currentForwardAndRight.magnitude * .25f + currentForwardAndRight * .75f;
 
-                rb.velocity -= currentForwardAndRight * airFriction;
+                //rb.velocity -= currentForwardAndRight * airFriction;
             }
 
             //Debug.DrawLine(transform.position, transform.position + newForwardandRight.normalized * 5, Color.red);
@@ -278,11 +289,14 @@ public class TestMoveTwo : MonoBehaviour
     {
         if (isGrounded) isJumping = false;
         if (jumpBuffer < 0) ResetJumpBuffer();
-        if (jumpBuffer > 0 && (isGrounded || _coyoteTimer > 0) && !isJumping) StartCoroutine(JumpCoroutine());
-        else if (_inAirJumps > 0 && jumpBuffer > 0)
+        if (!isClimbing)
         {
-            _inAirJumps--;
-            StartCoroutine(JumpCoroutine());
+            if (jumpBuffer > 0 && (isGrounded || _coyoteTimer > 0) && !isJumping) StartCoroutine(JumpCoroutine());
+            else if (_inAirJumps > 0 && jumpBuffer > 0)
+            {
+                _inAirJumps--;
+                StartCoroutine(JumpCoroutine());
+            }
         }
         if (jumpBuffering) jumpBuffer -= Time.fixedDeltaTime;
     }
@@ -314,7 +328,7 @@ public class TestMoveTwo : MonoBehaviour
         }
         friction = groundFriction;
         isSliding = false;
-        sprinting = false;
+        //sprinting = false;
     }
     IEnumerator JumpCoroutine()
     {
@@ -331,7 +345,7 @@ public class TestMoveTwo : MonoBehaviour
         {
             y -= .05f;
             totalVelocity += Vector3.up * y;
-            if (forwardCheck && rb.velocity.y > negativeVelocityToClimb && z > 0)
+            if (forwardCheck && rb.velocity.y > negativeVelocityToClimb && (z > 0 || currentForwardAndRight.magnitude > 1f) && _climbingCooldown <= 0)
             {
                 isJumping = false;
                 totalVelocity -= Vector3.up * y;
@@ -346,15 +360,26 @@ public class TestMoveTwo : MonoBehaviour
     IEnumerator ClimbCoroutine()
     {
         _climbingTime = climbingTime;
+        _justJumpedCooldown = 0;
         isClimbing = true;
         _climbingForce = climbingForce;
-        rb.velocity = Vector3.up * climbingForce;
+        rb.velocity = rb.velocity + Vector3.up * (climbingForce - rb.velocity.y);
         climbingGravity = initialClimbingGravity;
         //Physics.SphereCast(transform.position, 1, transform.forward, out forwardHit, capCollider.radius + .1f);
         Physics.BoxCast(transform.position - transform.forward.normalized * capCollider.radius * .5f, Vector3.one * capCollider.radius, transform.forward, out forwardHit, Quaternion.identity, 1f);
         _climbingStrafe = climbingStrafe;
         while (forwardCheck && _climbingTime > 0 && rb.velocity.y > 0 && !isJumping)
         {
+            if (jumpBuffer > 0)
+            {
+                float wallBounceStrength = currentForwardAndRight.magnitude;
+                
+                rb.velocity = forwardHit.normal *wallJumpStrenght + Vector3.Cross(currentForwardAndRight, Vector3.up).normalized * wallBounceStrength;
+                isClimbing = false;
+                _climbingCooldown = climbingCooldown;
+                StartCoroutine(JumpCoroutine());
+                yield break;
+            }
             rb.velocity -= Vector3.up * climbingGravity;
             rb.velocity+= Vector3.Cross(forwardHit.normal, Vector3.up).normalized * x * _climbingStrafe;
             Debug.DrawLine(transform.position, transform.position - forwardHit.normal* 5, Color.red);
@@ -362,6 +387,7 @@ public class TestMoveTwo : MonoBehaviour
             _climbingTime -= Time.fixedDeltaTime;
             if (forwardCheck && !topCheck)
             {
+                isClimbing = true;
                 StartCoroutine(VaultCoroutine());
                 yield break;
             }
@@ -381,6 +407,7 @@ public class TestMoveTwo : MonoBehaviour
             } 
             yield return fixedUpdate;
         }
+        _climbingCooldown = climbingCooldown;
     }
     IEnumerator VaultCoroutine()
     {
