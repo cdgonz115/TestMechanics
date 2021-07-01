@@ -24,7 +24,7 @@ public class TestMoveThree : MonoBehaviour
     #region Primitive Variables
     float x, z;
     float pvX, pvZ;
-    float y, g;
+    public float y, g;
 
     float scrollWheelDelta;
     float groundCheckDistance;
@@ -73,15 +73,18 @@ public class TestMoveThree : MonoBehaviour
     public float initialGravity;
     public float gravityRate;
     public float maxGravity;
-    public float jumpingGravity;
+    public float jumpingInitialGravity;
+    public float jumpingGravityRate;
     #endregion
 
     #region Player States
     [Header("Jump Mrchanic Variables")]
     public float jumpBuffer;
-    public float _jumpBuffer;
-    //public bool jumpBuffering;
+    float _jumpBuffer;
     public float jumpStrength;
+    public float jumpStregthDecreaser;
+    public float highestPointHoldTime;
+    float _highestPointHoldTimer;
     public float justJumpedCooldown;
     float _justJumpedCooldown;
     public float coyoteTime;
@@ -89,7 +92,7 @@ public class TestMoveThree : MonoBehaviour
     #endregion
 
 
-    Vector3 actualForward;
+    public Vector3 actualForward;
     Vector3 actualRight;
 
     Vector3 totalVelocityToAdd;
@@ -108,6 +111,7 @@ public class TestMoveThree : MonoBehaviour
         groundCheckDistance = capCollider.height * .5f - capCollider.radius;
         friction = inAirFriction;
         g = initialGravity;
+        //Time.timeScale = .1f;
     }
 
     void Update()
@@ -165,13 +169,17 @@ public class TestMoveThree : MonoBehaviour
         {
             rb.velocity = rb.velocity - Vector3.up * rb.velocity.y;
 
-            if (actualForward.y != 0) rb.velocity = (actualRight.normalized + actualForward.normalized) * rb.velocity.magnitude;
+            if (actualForward.y != 0)rb.velocity = (actualRight.normalized * x + actualForward.normalized * z) * rb.velocity.magnitude;
+
         }
         if (isGrounded && !groundCheck)
         {
-            previousState = playerState;
-            playerState = PlayerState.InAir;
-            g = initialGravity;
+            if (playerState != PlayerState.Jumping)
+            {
+                previousState = playerState;
+                playerState = PlayerState.InAir;
+                g = initialGravity;
+            }
             _coyoteTimer = coyoteTime;
             friction = inAirFriction;
         }
@@ -222,7 +230,7 @@ public class TestMoveThree : MonoBehaviour
             {
 
                 if ((z == 0 && x == 0) || (pvX < 0 && x > 0) || (x < 0 && pvX > 0) || (pvZ < 0 && z > 0) || (z < 0 && pvZ > 0)) rb.velocity *= .99f; //Decrease 
-                else if (rb.velocity.magnitude < maxVelocity + 5) rb.velocity = newForwardandRight.normalized * maxVelocity;
+                else if (rb.velocity.magnitude < maxVelocity + .01f) rb.velocity = newForwardandRight.normalized * maxVelocity;
                 totalVelocityToAdd = Vector3.zero;
             }
 
@@ -269,13 +277,13 @@ public class TestMoveThree : MonoBehaviour
         previousState = playerState;
         playerState = PlayerState.Jumping;
         y = jumpStrength;
-        g = initialGravity;
+        g = jumpingInitialGravity;
         _justJumpedCooldown = justJumpedCooldown;
         totalVelocityToAdd += newForwardandRight;
         rb.velocity -= Vector3.up * rb.velocity.y;
-        while (y > 0.1f && playerState!=PlayerState.Grounded)
+        while (rb.velocity.y >= 0f && playerState!=PlayerState.Grounded)
         {
-            y -= .05f;
+            y -= jumpStregthDecreaser;
             totalVelocityToAdd += Vector3.up * y;
             //if (forwardCheck && rb.velocity.y > negativeVelocityToClimb && (z > 0 || currentForwardAndRight.magnitude > 1f) && _climbingCooldown <= 0)
             //{
@@ -286,7 +294,21 @@ public class TestMoveThree : MonoBehaviour
             //}
             yield return fixedUpdate;
         }
+
+        if(playerState != PlayerState.Grounded)
+        {
+            print("happened");
+            _highestPointHoldTimer = highestPointHoldTime;
+            g = 0;
+            rb.velocity -= rb.velocity.y * Vector3.up;
+            while (_highestPointHoldTimer > 0)
+            {
+                _highestPointHoldTimer -= Time.fixedDeltaTime;
+                yield return fixedUpdate;
+            }
+            g = initialGravity;
+        }
         previousState = playerState;
-        playerState = PlayerState.InAir;
+        if(!isGrounded)playerState = PlayerState.InAir;
     }
 }
