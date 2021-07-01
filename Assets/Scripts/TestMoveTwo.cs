@@ -120,12 +120,12 @@ public class TestMoveTwo : MonoBehaviour
 
     private void Start()
     {
+        capCollider = GetComponent<CapsuleCollider>();
+        rb = GetComponent<Rigidbody>();
         groundCheckDistance = capCollider.height * .5f - capCollider.radius;
         g = initialGravity;
         fixedUpdate = new WaitForFixedUpdate();
-        friction = groundFriction;
-        capCollider = GetComponent<CapsuleCollider>();
-        rb = GetComponent<Rigidbody>();
+        friction = groundFriction;        
         moveCamera = GetComponent<MoveCamera>();
         //Time.timeScale = .1f;
     }
