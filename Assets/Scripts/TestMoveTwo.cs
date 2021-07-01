@@ -135,10 +135,11 @@ public class TestMoveTwo : MonoBehaviour
 
         crouchBuffer = Input.GetKey(KeyCode.LeftControl);
 
-        if (Input.GetKeyDown(KeyCode.LeftShift))
+        if (Input.GetKey(KeyCode.LeftShift))
         {
-            sprinting = (isCrouching) ? false : !sprinting;
+            sprinting = (isCrouching) ? false : true;
         }
+        else sprinting = false;
         speedIncrease = sprinting ? sprintSpeedIncrease : walkSpeedIncrease;
         maxVelocity = sprinting ? maxSprintVelocity : maxWalkVelocity;
         if (Input.GetKey(KeyCode.W)) z = speedIncrease;
@@ -179,8 +180,8 @@ public class TestMoveTwo : MonoBehaviour
         }
         if (_climbingCooldown > 0) _climbingCooldown -= Time.fixedDeltaTime;
 
-        //Debug.DrawLine(transform.position, transform.position + actualForward.normalized * 5, Color.red);
-        //Debug.DrawLine(transform.position, transform.position + actualRight.normalized * 5, Color.red);
+        Debug.DrawLine(transform.position, transform.position + actualForward.normalized * 5, Color.red);
+        Debug.DrawLine(transform.position, transform.position + actualRight.normalized * 5, Color.red);
     }
 
     private void GroundCheck()
@@ -233,14 +234,14 @@ public class TestMoveTwo : MonoBehaviour
         {
             if (!isClimbing)
             {
-                //x *= airStrafe;
-                //z *= airStrafe;
+                x *= airStrafe;
+                z *= airStrafe;
 
-                //newForwardandRight = (transform.right * x + transform.forward * z);
+                newForwardandRight = (transform.right * x + transform.forward * z);
 
-                //totalVelocity = newForwardandRight.normalized * currentForwardAndRight.magnitude * .25f + currentForwardAndRight * .75f;
+                totalVelocity = newForwardandRight.normalized * currentForwardAndRight.magnitude * .25f + currentForwardAndRight * .75f;
 
-                //rb.velocity -= currentForwardAndRight * airFriction;
+                rb.velocity -= currentForwardAndRight * airFriction;
             }
 
             //Debug.DrawLine(transform.position, transform.position + newForwardandRight.normalized * 5, Color.red);
