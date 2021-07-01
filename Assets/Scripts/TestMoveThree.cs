@@ -8,7 +8,6 @@ public class TestMoveThree : MonoBehaviour
     {
         NotMoving,
         Grounded,
-        Crouching,
         Sliding,
         Jumping,
         Climbing,
@@ -19,12 +18,13 @@ public class TestMoveThree : MonoBehaviour
     #region Components
     private Rigidbody rb;
     private CapsuleCollider capCollider;
+    private MoveCamera moveCamera;
     #endregion
 
     #region Primitive Variables
     float x, z;
     float pvX, pvZ;
-    public float y, g;
+    float y, g;
 
     float scrollWheelDelta;
     float groundCheckDistance;
@@ -36,18 +36,19 @@ public class TestMoveThree : MonoBehaviour
     bool groundCheck;
     public bool isSprinting;
     public bool isJumping;
+    public bool isCrouching;
     public PlayerState playerState;
     public PlayerState previousState;
     #endregion
 
-    #region Player States
+    #region Acceleration
     [Header("Acceleration")]
     public float walkSpeedIncrease;
     public float sprintSpeedIncrease;
     public float speedIncrease;
     #endregion
 
-    #region Player States
+    #region Velocity Caps
     [Header("Velocity Boundaries")]
     public float maxWalkVelocity;
     public float maxSprintVelocity;
@@ -55,7 +56,7 @@ public class TestMoveThree : MonoBehaviour
     public float minVelocity;
     #endregion
 
-    #region Player States
+    #region Friction
     [Header("Friction Values")]
     public float friction;
     public float groundFriction;
@@ -63,22 +64,21 @@ public class TestMoveThree : MonoBehaviour
     public float slidingFriction;
     #endregion
 
-    #region Player States
+    #region In Air
     [Header("In Air Variables")]
     public float inAirControl;
     #endregion
 
-    #region Player States
+    #region Gravity
     [Header("Gravity Variables")]
     public float initialGravity;
     public float gravityRate;
     public float maxGravity;
     public float jumpingInitialGravity;
-    public float jumpingGravityRate;
     #endregion
 
-    #region Player States
-    [Header("Jump Mrchanic Variables")]
+    #region Jump
+    [Header("Jump Variables")]
     public float jumpBuffer;
     float _jumpBuffer;
     public float jumpStrength;
@@ -91,8 +91,19 @@ public class TestMoveThree : MonoBehaviour
     float _coyoteTimer;
     #endregion
 
+    #region Crouch
+    [Header("Crouch Variables")]
+    public bool crouchBuffer;
+    #endregion
 
-    public Vector3 actualForward;
+    #region Slide
+    [Header("Slide Variables")]
+    public float velocityToSlide;
+    public float slideForce;
+    #endregion
+
+
+    Vector3 actualForward;
     Vector3 actualRight;
 
     Vector3 totalVelocityToAdd;
@@ -107,27 +118,29 @@ public class TestMoveThree : MonoBehaviour
     {
         capCollider = GetComponent<CapsuleCollider>();
         rb = GetComponent<Rigidbody>();
+        moveCamera = GetComponent<MoveCamera>();
         fixedUpdate = new WaitForFixedUpdate();
         groundCheckDistance = capCollider.height * .5f - capCollider.radius;
         friction = inAirFriction;
         g = initialGravity;
+        playerState = PlayerState.InAir;
         //Time.timeScale = .1f;
     }
 
     void Update()
     {
+        crouchBuffer = Input.GetKey(KeyCode.LeftControl);
+
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
-            //previousState = playerState;
-            //playerState = PlayerState.Sprinting;
-            isSprinting = true;
+            isSprinting = (isCrouching) ? false : true;
         }
         speedIncrease = (isSprinting) ? sprintSpeedIncrease : walkSpeedIncrease;
         maxVelocity = (isSprinting)? maxSprintVelocity : maxWalkVelocity;
 
         if (Input.GetKey(KeyCode.W)) z = speedIncrease;
         else if (Input.GetKey(KeyCode.S)) z = -speedIncrease;
-        else  z = 0;                             // we check if it's grounded given that in the air the z and x values should be changing
+        else  z = 0;                             
         if (Input.GetKey(KeyCode.D)) x = speedIncrease;
         else if (Input.GetKey(KeyCode.A)) x = -speedIncrease;
         else x = 0;
@@ -143,14 +156,13 @@ public class TestMoveThree : MonoBehaviour
     {
         GroundCheck();
         Move();
+        Crouch();
         HandleJumpInput();
         ApplyGravity();
         rb.velocity += totalVelocityToAdd;
-        if (rb.velocity.magnitude < minVelocity && x == 0 && z == 0 && (isGrounded))
+        if (rb.velocity.magnitude < minVelocity && x == 0 && z == 0 && (isGrounded))        //If the player stops moving set its maxVelocity to walkingSpeed and set its rb velocity to 0
         {
             rb.velocity = Vector3.zero;
-            //previousState = playerState;
-            //playerState = PlayerState.Walking;
             isSprinting = false;
         }
     }
@@ -168,9 +180,10 @@ public class TestMoveThree : MonoBehaviour
         if (groundCheck && !isGrounded)
         {
             rb.velocity = rb.velocity - Vector3.up * rb.velocity.y;
-
-            if (actualForward.y != 0)rb.velocity = (actualRight.normalized * x + actualForward.normalized * z) * rb.velocity.magnitude;
-
+            if (actualForward.y != 0)rb.velocity = (actualRight* x + actualForward* z).normalized * rb.velocity.magnitude;          //This is to prevent the weird glitch where the player bounces on slopes if they land on them without jumping
+            friction = groundFriction;
+            previousState = playerState;
+            playerState = PlayerState.Grounded;
         }
         if (isGrounded && !groundCheck)
         {
@@ -186,9 +199,6 @@ public class TestMoveThree : MonoBehaviour
         if (groundCheck)
         {
             g = 0;
-            friction = groundFriction;
-            previousState = playerState;
-            playerState = PlayerState.Grounded;
             //airStrafe = initialAirStrafe;
             //_inAirJumps = inAirJumps;
             //_climbingCooldown = 0;
@@ -211,6 +221,7 @@ public class TestMoveThree : MonoBehaviour
             newForwardandRight = (transform.right * x + transform.forward * z);
             if (z != 0 || x != 0) 
             {
+                if (playerState == PlayerState.Jumping) totalVelocityToAdd += newForwardandRight.normalized * inAirControl;  
                 rb.velocity = newForwardandRight.normalized * currentForwardAndRight.magnitude * .25f + currentForwardAndRight * .75f + rb.velocity.y * Vector3.up;
             } 
 
@@ -226,11 +237,10 @@ public class TestMoveThree : MonoBehaviour
             {
                 totalVelocityToAdd += newForwardandRight;
             }
-            else
+            else if(playerState != PlayerState.Sliding)
             {
-
                 if ((z == 0 && x == 0) || (pvX < 0 && x > 0) || (x < 0 && pvX > 0) || (pvZ < 0 && z > 0) || (z < 0 && pvZ > 0)) rb.velocity *= .99f; //Decrease 
-                else if (rb.velocity.magnitude < maxVelocity + .01f) rb.velocity = newForwardandRight.normalized * maxVelocity;
+                else if (rb.velocity.magnitude < maxVelocity + 1f) rb.velocity = newForwardandRight.normalized * maxVelocity;
                 totalVelocityToAdd = Vector3.zero;
             }
 
@@ -243,6 +253,31 @@ public class TestMoveThree : MonoBehaviour
             pvZ = z;
         }
 
+    }
+    private void Crouch()
+    {
+        //Crouch
+        if (!isCrouching && crouchBuffer)
+        {
+            capCollider.height *= .5f;
+            capCollider.center += Vector3.up * -.5f;
+            isCrouching = true;
+            moveCamera.AdjustCameraHeight(true);
+
+            if (isGrounded && playerState != PlayerState.Sliding && rb.velocity.magnitude > velocityToSlide) StartCoroutine(SlideCoroutine());
+
+        }
+        //Stand Up
+        if (isCrouching && !crouchBuffer)
+        {
+            if (!Physics.Raycast(transform.position - newForwardandRight.normalized * capCollider.radius, Vector3.up, capCollider.height + .01f)) //Checks that there are no obstacles on top of the player so they can stand up
+            {
+                capCollider.height *= 2f;
+                capCollider.center += Vector3.up * .5f;
+                isCrouching = false;
+                moveCamera.AdjustCameraHeight(false);
+            }
+        }
     }
     private void HandleJumpInput()
     {
@@ -270,7 +305,6 @@ public class TestMoveThree : MonoBehaviour
             if (g > maxGravity) g *= gravityRate;
         //}
     }
-
     private IEnumerator JumpCoroutine()
     {
         _jumpBuffer = 0;
@@ -297,7 +331,6 @@ public class TestMoveThree : MonoBehaviour
 
         if(playerState != PlayerState.Grounded)
         {
-            print("happened");
             _highestPointHoldTimer = highestPointHoldTime;
             g = 0;
             rb.velocity -= rb.velocity.y * Vector3.up;
@@ -310,5 +343,35 @@ public class TestMoveThree : MonoBehaviour
         }
         previousState = playerState;
         if(!isGrounded)playerState = PlayerState.InAir;
+    }
+    private IEnumerator SlideCoroutine()
+    {
+        friction = slidingFriction;
+        previousState = playerState;
+        playerState = PlayerState.Sliding;
+        totalVelocityToAdd += currentForwardAndRight * slideForce;
+        maxVelocity = maxWalkVelocity;
+        isSprinting = false;
+        while (rb.velocity.magnitude > maxVelocity)
+        {
+            rb.velocity = newForwardandRight.normalized * rb.velocity.magnitude * .01f + rb.velocity * .99f;
+            if (!isGrounded)
+            {
+                friction = inAirFriction;
+                previousState = PlayerState.Sliding;
+                yield break;
+            }
+            if (!crouchBuffer)
+            {
+                if (rb.velocity.magnitude > maxWalkVelocity) isSprinting = true; 
+                previousState = playerState;
+                playerState = PlayerState.Grounded;
+                yield break;
+            }
+            yield return fixedUpdate;
+        }
+        friction = groundFriction;
+        previousState = playerState;
+        playerState = PlayerState.Grounded;
     }
 }
