@@ -213,6 +213,7 @@ public class TestMoveThree : MonoBehaviour
             previousState = playerState;
             playerState = PlayerState.Grounded;
             g = 0;
+            onFakeSlope = false;
         }
         if (isGrounded && !groundCheck)
         {
@@ -226,8 +227,7 @@ public class TestMoveThree : MonoBehaviour
             friction = inAirFriction;
         }
         isGrounded = groundCheck;
-        if (isGrounded) feetCheck = Physics.SphereCast(transform.position - Vector3.up * .5f, capCollider.radius, rb.velocity.normalized, out feetHit, .2f);
-        if (!feetCheck) onFakeSlope = false;
+        if (isGrounded) feetCheck = Physics.SphereCast(transform.position - Vector3.up * .5f, capCollider.radius, rb.velocity.normalized, out feetHit, .3f);
         if (feetCheck && !onFakeSlope)
         {
             onFakeSlope = true;
