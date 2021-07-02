@@ -37,6 +37,7 @@ public class TestMoveThree : MonoBehaviour
     public bool isSprinting;
     public bool isJumping;
     public bool isCrouching;
+    public bool onFakeSlope;
     public PlayerState playerState;
     public PlayerState previousState;
     #endregion
@@ -66,6 +67,7 @@ public class TestMoveThree : MonoBehaviour
 
     #region In Air
     [Header("In Air Variables")]
+    [Range(0, 1)]
     public float inAirControl;
     #endregion
 
@@ -83,6 +85,7 @@ public class TestMoveThree : MonoBehaviour
     float _jumpBuffer;
     public float jumpStrength;
     public float jumpStregthDecreaser;
+    public float jumpInAirForce;
     public float highestPointHoldTime;
     float _highestPointHoldTimer;
     public float justJumpedCooldown;
@@ -94,23 +97,41 @@ public class TestMoveThree : MonoBehaviour
     #region Crouch
     [Header("Crouch Variables")]
     public bool crouchBuffer;
+    public bool topIsClear;
     #endregion
 
     #region Slide
     [Header("Slide Variables")]
     public float velocityToSlide;
     public float slideForce;
+    [Range(0,1)]
+    public float slideControl;
     #endregion
 
+    #region Climbing Checks
+    [Space]
+    public bool feetCheck;
+    public bool kneesCheck;
+    public bool topCheck;
+    public bool forwardCheck;
+    #endregion
 
+    #region Vectors
     Vector3 actualForward;
     Vector3 actualRight;
+    public Vector3 fakeSlopeDirection;
 
     Vector3 totalVelocityToAdd;
     Vector3 newForwardandRight;
     Vector3 currentForwardAndRight;
+    #endregion
 
+    #region Raycast hits
     RaycastHit hit;
+    RaycastHit forwardHit;
+    RaycastHit feetHit;
+    public RaycastHit [] feetHits;
+    #endregion
 
     WaitForFixedUpdate fixedUpdate;
 
@@ -150,6 +171,8 @@ public class TestMoveThree : MonoBehaviour
         {
             _jumpBuffer = jumpBuffer;
         }
+
+        if (Input.GetKeyDown(KeyCode.KeypadEnter)) Time.timeScale = 1;
     }
 
     private void FixedUpdate()
@@ -164,13 +187,18 @@ public class TestMoveThree : MonoBehaviour
         {
             rb.velocity = Vector3.zero;
             isSprinting = false;
+            previousState = playerState;
+            playerState = PlayerState.NotMoving;
         }
+        ClimbingChecks();
+        Debug.DrawLine(transform.position, transform.position + actualForward.normalized * 5, Color.red);
+        Debug.DrawLine(transform.position, transform.position + actualRight.normalized * 5, Color.red);
     }
     private void GroundCheck()
     {
         if(_coyoteTimer> 0)_coyoteTimer -= Time.fixedDeltaTime;
         //groundCheck = (_justJumpedCooldown <= 0) ? Physics.SphereCast(transform.position, capCollider.radius + 0.01f, -transform.up, out hit, groundCheckDistance) : false;
-        groundCheck = Physics.SphereCast(transform.position, capCollider.radius + 0.01f, -transform.up, out hit, groundCheckDistance);
+        groundCheck = Physics.SphereCast(transform.position, capCollider.radius, -transform.up, out hit, groundCheckDistance + 0.01f);
         totalVelocityToAdd = Vector3.zero;
         newForwardandRight = Vector3.zero;
 
@@ -184,6 +212,7 @@ public class TestMoveThree : MonoBehaviour
             friction = groundFriction;
             previousState = playerState;
             playerState = PlayerState.Grounded;
+            g = 0;
         }
         if (isGrounded && !groundCheck)
         {
@@ -196,16 +225,41 @@ public class TestMoveThree : MonoBehaviour
             _coyoteTimer = coyoteTime;
             friction = inAirFriction;
         }
-        if (groundCheck)
+        isGrounded = groundCheck;
+        if (isGrounded) feetCheck = Physics.SphereCast(transform.position - Vector3.up * .5f, capCollider.radius, rb.velocity.normalized, out feetHit, .2f);
+        if (!feetCheck) onFakeSlope = false;
+        if (feetCheck && !onFakeSlope)
         {
+            onFakeSlope = true;
+            ////Debug.DrawLine(feetHit.point, feetHit.point + ((transform.position - Vector3.up) - feetHit.point).normalized * feetHit.distance, Color.red);
+            ////Debug.DrawLine(feetHit.point, feetHit.point + feetHit.normal * 5, Color.red);
+            //Vector3 bottomOfPlayer = transform.position - Vector3.up ;
+            //fakeSlopeDirection = feetHit.point - bottomOfPlayer;
+            //Vector3 fakeSlopeNormal = (bottomOfPlayer + fakeSlopeDirection * .5f) - (feetHit.point - (Vector3.up * fakeSlopeDirection.y));
+            //Debug.DrawLine(bottomOfPlayer, bottomOfPlayer + fakeSlopeDirection, Color.red);
+            //Debug.DrawLine((feetHit.point - (Vector3.up * fakeSlopeDirection.y)), (feetHit.point - (Vector3.up * fakeSlopeDirection.y)) + fakeSlopeNormal, Color.red);
+            //actualForward = Vector3.Cross(feetHit.point - (transform.position - Vector3.up), -transform.right);
+            //actualRight = Vector3.Cross(feetHit.point - (transform.position - Vector3.up), transform.forward);
+            //Time.timeScale = 0;
+            transform.position = new Vector3(transform.position.x, feetHit.point.y + 1f, transform.position.z);
             g = 0;
-            //airStrafe = initialAirStrafe;
-            //_inAirJumps = inAirJumps;
-            //_climbingCooldown = 0;
         }
 
+    }
+    private void ClimbingChecks()
+    {   
+        feetHits = Physics.SphereCastAll(transform.position - Vector3.up* .5f, capCollider.radius, rb.velocity.normalized, .5f);
 
-        isGrounded = groundCheck;
+        //topCheck = (Physics.Raycast(transform.position + Vector3.up * capCollider.height * .5f, playerState == PlayerState.Climbing ? -forwardHit.normal : transform.forward, capCollider.radius + .1f));
+
+        //forwardCheck = (Physics.Raycast(transform.position, playerState == PlayerState.Climbing ? -forwardHit.normal : transform.forward, capCollider.radius + .1f));
+        //for (int x = 0; x < feetHits.Length; x++)
+        //{
+
+            
+        //print(feetHit.normal);
+        //    print(x + " " + hit.normal);
+        //} 
 
     }
     private void Move()
@@ -221,8 +275,8 @@ public class TestMoveThree : MonoBehaviour
             newForwardandRight = (transform.right * x + transform.forward * z);
             if (z != 0 || x != 0) 
             {
-                if (playerState == PlayerState.Jumping) totalVelocityToAdd += newForwardandRight.normalized * inAirControl;  
-                rb.velocity = newForwardandRight.normalized * currentForwardAndRight.magnitude * .25f + currentForwardAndRight * .75f + rb.velocity.y * Vector3.up;
+                if (playerState == PlayerState.Jumping) totalVelocityToAdd += newForwardandRight.normalized * jumpInAirForce;  
+                rb.velocity = newForwardandRight.normalized * currentForwardAndRight.magnitude * inAirControl + currentForwardAndRight * (1f - inAirControl) + rb.velocity.y * Vector3.up;
             } 
 
             //}
@@ -256,6 +310,7 @@ public class TestMoveThree : MonoBehaviour
     }
     private void Crouch()
     {
+        topIsClear = !Physics.Raycast(transform.position - newForwardandRight.normalized * capCollider.radius, Vector3.up, capCollider.height + .01f); // Check if thee's nothing blocking the player from standing up
         //Crouch
         if (!isCrouching && crouchBuffer)
         {
@@ -270,7 +325,7 @@ public class TestMoveThree : MonoBehaviour
         //Stand Up
         if (isCrouching && !crouchBuffer)
         {
-            if (!Physics.Raycast(transform.position - newForwardandRight.normalized * capCollider.radius, Vector3.up, capCollider.height + .01f)) //Checks that there are no obstacles on top of the player so they can stand up
+            if (topIsClear) //Checks that there are no obstacles on top of the player so they can stand up
             {
                 capCollider.height *= 2f;
                 capCollider.center += Vector3.up * .5f;
@@ -285,7 +340,7 @@ public class TestMoveThree : MonoBehaviour
         if(_jumpBuffer <= 0 ) _jumpBuffer = 0;
         //if (!isClimbing)
         //{
-            if (_jumpBuffer > 0 && (isGrounded || _coyoteTimer > 0) && playerState!=PlayerState.Jumping) StartCoroutine(JumpCoroutine());
+            if (_jumpBuffer > 0 && (isGrounded || _coyoteTimer > 0) && playerState!=PlayerState.Jumping && topIsClear) StartCoroutine(JumpCoroutine());
             //else if (_inAirJumps > 0 && jumpBuffer > 0)
             //{
             //    _inAirJumps--;
@@ -304,6 +359,37 @@ public class TestMoveThree : MonoBehaviour
             }
             if (g > maxGravity) g *= gravityRate;
         //}
+    }
+    private IEnumerator SlideCoroutine()
+    {
+        friction = slidingFriction;
+        previousState = playerState;
+        playerState = PlayerState.Sliding;
+        totalVelocityToAdd += currentForwardAndRight * slideForce;
+        maxVelocity = maxWalkVelocity;
+        isSprinting = false;
+        while (rb.velocity.magnitude > maxVelocity)
+        {
+            rb.velocity = newForwardandRight.normalized * rb.velocity.magnitude * slideControl + rb.velocity * (1f - slideControl);
+            if (!isGrounded)
+            {
+                friction = inAirFriction;
+                previousState = PlayerState.Sliding;
+                isSprinting = true;
+                yield break;
+            }
+            if (!crouchBuffer)
+            {
+                if (rb.velocity.magnitude > maxWalkVelocity) isSprinting = true;
+                previousState = playerState;
+                playerState = PlayerState.Grounded;
+                yield break;
+            }
+            yield return fixedUpdate;
+        }
+        friction = groundFriction;
+        previousState = playerState;
+        playerState = PlayerState.Grounded;
     }
     private IEnumerator JumpCoroutine()
     {
@@ -343,35 +429,5 @@ public class TestMoveThree : MonoBehaviour
         }
         previousState = playerState;
         if(!isGrounded)playerState = PlayerState.InAir;
-    }
-    private IEnumerator SlideCoroutine()
-    {
-        friction = slidingFriction;
-        previousState = playerState;
-        playerState = PlayerState.Sliding;
-        totalVelocityToAdd += currentForwardAndRight * slideForce;
-        maxVelocity = maxWalkVelocity;
-        isSprinting = false;
-        while (rb.velocity.magnitude > maxVelocity)
-        {
-            rb.velocity = newForwardandRight.normalized * rb.velocity.magnitude * .01f + rb.velocity * .99f;
-            if (!isGrounded)
-            {
-                friction = inAirFriction;
-                previousState = PlayerState.Sliding;
-                yield break;
-            }
-            if (!crouchBuffer)
-            {
-                if (rb.velocity.magnitude > maxWalkVelocity) isSprinting = true; 
-                previousState = playerState;
-                playerState = PlayerState.Grounded;
-                yield break;
-            }
-            yield return fixedUpdate;
-        }
-        friction = groundFriction;
-        previousState = playerState;
-        playerState = PlayerState.Grounded;
     }
 }
