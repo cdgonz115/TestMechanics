@@ -37,7 +37,7 @@ public class TestMoveThree : MonoBehaviour
     public bool isSprinting;
     public bool isJumping;
     public bool isCrouching;
-    public bool onFakeSlope;
+    public bool onFakeGround;
     public PlayerState playerState;
     public PlayerState previousState;
     #endregion
@@ -112,8 +112,10 @@ public class TestMoveThree : MonoBehaviour
     [Space]
     public bool feetCheck;
     public bool kneesCheck;
-    public bool topCheck;
+    public bool headCheck;
     public bool forwardCheck;
+    public float fakeGroundTime;
+    float _fakeGroundTimer;
     #endregion
 
     #region Vectors
@@ -121,20 +123,20 @@ public class TestMoveThree : MonoBehaviour
     Vector3 actualRight;
     public Vector3 fakeSlopeDirection;
 
-    Vector3 totalVelocityToAdd;
-    Vector3 newForwardandRight;
-    Vector3 currentForwardAndRight;
+    public Vector3 totalVelocityToAdd;
+    public Vector3 newForwardandRight;
+    public Vector3 currentForwardAndRight;
     #endregion
 
     #region Raycast hits
     RaycastHit hit;
     RaycastHit forwardHit;
     RaycastHit feetHit;
-    public RaycastHit [] feetHits;
     #endregion
 
     WaitForFixedUpdate fixedUpdate;
 
+    bool check;
     void Start()
     {
         capCollider = GetComponent<CapsuleCollider>();
@@ -172,7 +174,7 @@ public class TestMoveThree : MonoBehaviour
             _jumpBuffer = jumpBuffer;
         }
 
-        if (Input.GetKeyDown(KeyCode.KeypadEnter)) Time.timeScale = 1;
+        if (Input.GetKeyDown(KeyCode.KeypadEnter)) check = true;
     }
 
     private void FixedUpdate()
@@ -191,8 +193,8 @@ public class TestMoveThree : MonoBehaviour
             playerState = PlayerState.NotMoving;
         }
         ClimbingChecks();
-        Debug.DrawLine(transform.position, transform.position + actualForward.normalized * 5, Color.red);
-        Debug.DrawLine(transform.position, transform.position + actualRight.normalized * 5, Color.red);
+        //Debug.DrawLine(transform.position, transform.position + actualForward.normalized * 5, Color.red);
+        //Debug.DrawLine(transform.position, transform.position + actualRight.normalized * 5, Color.red);
     }
     private void GroundCheck()
     {
@@ -205,10 +207,20 @@ public class TestMoveThree : MonoBehaviour
         actualForward = Vector3.Cross(hit.normal, -transform.right);
         actualRight = Vector3.Cross(hit.normal, transform.forward);
 
+        if (onFakeGround)
+        {
+            if (groundCheck) onFakeGround = false;
+            else
+            {
+                groundCheck = true;
+                actualForward = transform.forward;
+                actualRight = transform.right;
+            } 
+        }
         if (groundCheck && !isGrounded)
         {
             rb.velocity = rb.velocity - Vector3.up * rb.velocity.y;
-            if (actualForward.y != 0)rb.velocity = (actualRight* x + actualForward* z).normalized * rb.velocity.magnitude;          //This is to prevent the weird glitch where the player bounces on slopes if they land on them without jumping
+            if (!onFakeGround && hit.normal.y != 1)rb.velocity = (actualRight* x + actualForward* z).normalized * rb.velocity.magnitude;          //This is to prevent the weird glitch where the player bounces on slopes if they land on them without jumping
             friction = groundFriction;
             previousState = playerState;
             playerState = PlayerState.Grounded;
@@ -226,40 +238,26 @@ public class TestMoveThree : MonoBehaviour
             friction = inAirFriction;
         }
         isGrounded = groundCheck;
-        if (isGrounded) feetCheck = Physics.SphereCast(transform.position - Vector3.up * .5f, capCollider.radius, rb.velocity.normalized, out feetHit, .2f);
-        if (!feetCheck) onFakeSlope = false;
-        if (feetCheck && !onFakeSlope)
-        {
-            onFakeSlope = true;
-            ////Debug.DrawLine(feetHit.point, feetHit.point + ((transform.position - Vector3.up) - feetHit.point).normalized * feetHit.distance, Color.red);
-            ////Debug.DrawLine(feetHit.point, feetHit.point + feetHit.normal * 5, Color.red);
-            //Vector3 bottomOfPlayer = transform.position - Vector3.up ;
-            //fakeSlopeDirection = feetHit.point - bottomOfPlayer;
-            //Vector3 fakeSlopeNormal = (bottomOfPlayer + fakeSlopeDirection * .5f) - (feetHit.point - (Vector3.up * fakeSlopeDirection.y));
-            //Debug.DrawLine(bottomOfPlayer, bottomOfPlayer + fakeSlopeDirection, Color.red);
-            //Debug.DrawLine((feetHit.point - (Vector3.up * fakeSlopeDirection.y)), (feetHit.point - (Vector3.up * fakeSlopeDirection.y)) + fakeSlopeNormal, Color.red);
-            //actualForward = Vector3.Cross(feetHit.point - (transform.position - Vector3.up), -transform.right);
-            //actualRight = Vector3.Cross(feetHit.point - (transform.position - Vector3.up), transform.forward);
-            //Time.timeScale = 0;
-            transform.position = new Vector3(transform.position.x, feetHit.point.y + 1f, transform.position.z);
-            g = 0;
-        }
-
     }
     private void ClimbingChecks()
     {   
-        feetHits = Physics.SphereCastAll(transform.position - Vector3.up* .5f, capCollider.radius, rb.velocity.normalized, .5f);
+        if (isGrounded) feetCheck = Physics.SphereCast(transform.position - Vector3.up * .5f, capCollider.radius + .1f, rb.velocity.normalized, out feetHit, isSprinting ? .6f : .3f);
+        //topCheck = (Physics.Raycast(Camera.main.transform.position + Vector3.up * .25f, (playerState == PlayerState.Climbing) ? -forwardHit.normal : transform.forward, capCollider.radius + .1f));
 
-        //topCheck = (Physics.Raycast(transform.position + Vector3.up * capCollider.height * .5f, playerState == PlayerState.Climbing ? -forwardHit.normal : transform.forward, capCollider.radius + .1f));
-
-        //forwardCheck = (Physics.Raycast(transform.position, playerState == PlayerState.Climbing ? -forwardHit.normal : transform.forward, capCollider.radius + .1f));
-        //for (int x = 0; x < feetHits.Length; x++)
-        //{
-
-            
-        //print(feetHit.normal);
-        //    print(x + " " + hit.normal);
-        //} 
+        forwardCheck = (Physics.Raycast(transform.position, (playerState == PlayerState.Climbing) ? -forwardHit.normal : transform.forward, capCollider.radius + .1f));
+        if (feetCheck && !onFakeGround)
+        {
+            kneesCheck = (Physics.Raycast(transform.position - Vector3.up * capCollider.height * .25f, transform.forward, capCollider.radius + (isSprinting ? .7f : .4f)));
+            if (!kneesCheck && playerState == PlayerState.Grounded) StartCoroutine(FakeGround());
+            else
+            {
+                //rb.velocity = Vector3.zero;
+                //isSprinting = false;
+                //previousState = playerState;
+                //playerState = PlayerState.NotMoving;
+            }
+            kneesCheck = false;
+        }
 
     }
     private void Move()
@@ -286,6 +284,17 @@ public class TestMoveThree : MonoBehaviour
         else
         {
             newForwardandRight = (actualRight.normalized * x + actualForward.normalized * z);
+            if (hit.normal.y == 1) 
+            {
+                newForwardandRight = new Vector3(newForwardandRight.x, 0, newForwardandRight.z);
+                rb.velocity = (rb.velocity - Vector3.up * rb.velocity.y).normalized * rb.velocity.magnitude;
+            }
+            
+            if (check)
+            {
+                print(newForwardandRight);
+                print(newForwardandRight.normalized);
+            } 
 
             if (rb.velocity.magnitude < maxVelocity)
             {
@@ -306,7 +315,7 @@ public class TestMoveThree : MonoBehaviour
             pvX = x;
             pvZ = z;
         }
-
+        check = false;
     }
     private void Crouch()
     {
@@ -359,6 +368,19 @@ public class TestMoveThree : MonoBehaviour
             }
             if (g > maxGravity) g *= gravityRate;
         //}
+    }
+    private IEnumerator FakeGround()
+    {
+        onFakeGround = true;
+        transform.position = new Vector3(transform.position.x, feetHit.point.y + 1f, transform.position.z);
+        g = 0;
+        _fakeGroundTimer = fakeGroundTime;
+        while (_fakeGroundTimer > 0 && onFakeGround)
+        {
+            _fakeGroundTimer -= Time.fixedDeltaTime;
+            yield return fixedUpdate;
+        }
+        onFakeGround = false;
     }
     private IEnumerator SlideCoroutine()
     {

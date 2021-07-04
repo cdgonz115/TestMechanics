@@ -4022,7 +4022,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1380475377}
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -14.45, y: 1.08, z: -45.09}
+  m_LocalPosition: {x: -24.13, y: 1, z: -43.67}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1737461204}
@@ -4045,6 +4045,7 @@ MonoBehaviour:
   isSprinting: 0
   isJumping: 0
   isCrouching: 0
+  onFakeGround: 0
   playerState: 0
   previousState: 0
   walkSpeedIncrease: 1
@@ -4079,6 +4080,11 @@ MonoBehaviour:
   kneesCheck: 0
   topCheck: 0
   forwardCheck: 0
+  fakeGroundTime: 0.1
+  fakeSlopeDirection: {x: 0, y: 0, z: 0}
+  totalVelocityToAdd: {x: 0, y: 0, z: 0}
+  newForwardandRight: {x: 0, y: 0, z: 0}
+  currentForwardAndRight: {x: 0, y: 0, z: 0}
 --- !u!114 &1380475384
 MonoBehaviour:
   m_ObjectHideFlags: 0
