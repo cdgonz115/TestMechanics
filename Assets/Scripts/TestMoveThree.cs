@@ -42,6 +42,11 @@ public class TestMoveThree : MonoBehaviour
     public PlayerState previousState;
     #endregion
 
+    #region General
+    [Header("General")]
+    public float maxSlope;
+    #endregion
+
     #region Acceleration
     [Header("Acceleration")]
     public float walkSpeedIncrease;
@@ -119,13 +124,12 @@ public class TestMoveThree : MonoBehaviour
     #endregion
 
     #region Vectors
-    Vector3 actualForward;
-    Vector3 actualRight;
-    public Vector3 fakeSlopeDirection;
+    Vector3 groundedForward;
+    Vector3 groundedRight;
 
-    public Vector3 totalVelocityToAdd;
-    public Vector3 newForwardandRight;
-    public Vector3 currentForwardAndRight;
+    Vector3 totalVelocityToAdd;
+    Vector3 newForwardandRight;
+    Vector3 currentForwardAndRight;
     #endregion
 
     #region Raycast hits
@@ -201,11 +205,20 @@ public class TestMoveThree : MonoBehaviour
         if(_coyoteTimer> 0)_coyoteTimer -= Time.fixedDeltaTime;
         //groundCheck = (_justJumpedCooldown <= 0) ? Physics.SphereCast(transform.position, capCollider.radius + 0.01f, -transform.up, out hit, groundCheckDistance) : false;
         groundCheck = Physics.SphereCast(transform.position, capCollider.radius, -transform.up, out hit, groundCheckDistance + 0.01f);
+        print(Vector3.Angle(hit.normal, Vector3.up));
+        if (Vector3.Angle(hit.normal, Vector3.up) > maxSlope)
+        {
+            groundCheck = false;
+            previousState = playerState;
+            playerState = PlayerState.InAir;
+            g = initialGravity;
+
+        }
         totalVelocityToAdd = Vector3.zero;
         newForwardandRight = Vector3.zero;
 
-        actualForward = Vector3.Cross(hit.normal, -transform.right);
-        actualRight = Vector3.Cross(hit.normal, transform.forward);
+        groundedForward = Vector3.Cross(hit.normal, -transform.right);
+        groundedRight = Vector3.Cross(hit.normal, transform.forward);
 
         if (onFakeGround)
         {
@@ -213,14 +226,14 @@ public class TestMoveThree : MonoBehaviour
             else
             {
                 groundCheck = true;
-                actualForward = transform.forward;
-                actualRight = transform.right;
+                groundedForward = transform.forward;
+                groundedRight = transform.right;
             } 
         }
         if (groundCheck && (playerState == PlayerState.Jumping || playerState == PlayerState.InAir))
         {
             rb.velocity = rb.velocity - Vector3.up * rb.velocity.y;
-            if (!onFakeGround && hit.normal.y != 1)rb.velocity = (actualRight* x + actualForward* z).normalized * rb.velocity.magnitude;          //This is to prevent the weird glitch where the player bounces on slopes if they land on them without jumping
+            if (!onFakeGround && hit.normal.y != 1)rb.velocity = (groundedRight* x + groundedForward* z).normalized * rb.velocity.magnitude;          //This is to prevent the weird glitch where the player bounces on slopes if they land on them without jumping
             friction = groundFriction;
             previousState = playerState;
             playerState = PlayerState.Grounded;
@@ -283,7 +296,7 @@ public class TestMoveThree : MonoBehaviour
         }
         else
         {
-            newForwardandRight = (actualRight.normalized * x + actualForward.normalized * z);
+            newForwardandRight = (groundedRight.normalized * x + groundedForward.normalized * z);
             if (hit.normal.y == 1) 
             {
                 newForwardandRight = new Vector3(newForwardandRight.x, 0, newForwardandRight.z);
