@@ -217,7 +217,7 @@ public class TestMoveThree : MonoBehaviour
                 actualRight = transform.right;
             } 
         }
-        if (groundCheck && !isGrounded)
+        if (groundCheck && (playerState == PlayerState.Jumping || playerState == PlayerState.InAir))
         {
             rb.velocity = rb.velocity - Vector3.up * rb.velocity.y;
             if (!onFakeGround && hit.normal.y != 1)rb.velocity = (actualRight* x + actualForward* z).normalized * rb.velocity.magnitude;          //This is to prevent the weird glitch where the player bounces on slopes if they land on them without jumping
@@ -241,7 +241,7 @@ public class TestMoveThree : MonoBehaviour
     }
     private void ClimbingChecks()
     {   
-        if (isGrounded) feetCheck = Physics.SphereCast(transform.position - Vector3.up * .5f, capCollider.radius + .1f, rb.velocity.normalized, out feetHit, isSprinting ? .6f : .3f);
+        if (playerState == PlayerState.Grounded) feetCheck = Physics.SphereCast(transform.position - Vector3.up * .5f, capCollider.radius + .1f, rb.velocity.normalized, out feetHit, isSprinting ? .6f : .3f);
         //topCheck = (Physics.Raycast(Camera.main.transform.position + Vector3.up * .25f, (playerState == PlayerState.Climbing) ? -forwardHit.normal : transform.forward, capCollider.radius + .1f));
 
         forwardCheck = (Physics.Raycast(transform.position, (playerState == PlayerState.Climbing) ? -forwardHit.normal : transform.forward, capCollider.radius + .1f));
