@@ -4048,6 +4048,7 @@ MonoBehaviour:
   onFakeGround: 0
   playerState: 0
   previousState: 0
+  maxSlope: 60
   walkSpeedIncrease: 1
   sprintSpeedIncrease: 2
   speedIncrease: 0
@@ -4078,13 +4079,9 @@ MonoBehaviour:
   slideControl: 0.025
   feetCheck: 0
   kneesCheck: 0
-  topCheck: 0
+  headCheck: 0
   forwardCheck: 0
   fakeGroundTime: 0.1
-  fakeSlopeDirection: {x: 0, y: 0, z: 0}
-  totalVelocityToAdd: {x: 0, y: 0, z: 0}
-  newForwardandRight: {x: 0, y: 0, z: 0}
-  currentForwardAndRight: {x: 0, y: 0, z: 0}
 --- !u!114 &1380475384
 MonoBehaviour:
   m_ObjectHideFlags: 0
