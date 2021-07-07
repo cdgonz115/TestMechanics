@@ -4022,7 +4022,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1380475377}
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -24.13, y: 1, z: -43.67}
+  m_LocalPosition: {x: -4.04, y: 1.944, z: -36.82}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1737461204}
@@ -4077,11 +4077,21 @@ MonoBehaviour:
   velocityToSlide: 13
   slideForce: 1.1
   slideControl: 0.025
-  feetCheck: 0
+  feetSphereCheck: 0
   kneesCheck: 0
+  fakeGroundTime: 0.1
+  feetCheck: 0
   headCheck: 0
   forwardCheck: 0
-  fakeGroundTime: 0.1
+  negativeVelocityToClimb: 0
+  climbingTime: 0
+  climbingForce: 10
+  initialClimbingGravity: 0
+  climbingGravity: 0
+  climbingGravityMultiplier: 0
+  climbingStrafe: 0
+  climbingStrafeDecreaser: 0
+  climbingCooldown: 0
 --- !u!114 &1380475384
 MonoBehaviour:
   m_ObjectHideFlags: 0

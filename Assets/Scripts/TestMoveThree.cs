@@ -115,13 +115,37 @@ public class TestMoveThree : MonoBehaviour
 
     #region Climbing Checks
     [Space]
-    public bool feetCheck;
+    public bool feetSphereCheck;
     public bool kneesCheck;
-    public bool headCheck;
-    public bool forwardCheck;
     public float fakeGroundTime;
     float _fakeGroundTimer;
+
+    public bool feetCheck;
+    public bool headCheck;
+    public bool forwardCheck;
     #endregion
+
+    #region Vault
+    [Header("Vault Variables")]
+    public float negativeVelocityToClimb;
+    public float climbingTime;
+    float _climbingTime;
+    public float climbingForce;
+    float _climbingForce;
+    public float initialClimbingGravity;
+    public float climbingGravity;
+    public float climbingGravityMultiplier;
+    public float climbingStrafe;
+    float _climbingStrafe;
+    public float climbingStrafeDecreaser;
+    public float climbingCooldown;
+    float _climbingCooldown;
+    #endregion
+
+    //#region Vault
+    //[Header("Vault Variables")]
+    //public float va
+    //#endregion
 
     #region Vectors
     Vector3 groundedForward;
@@ -140,7 +164,6 @@ public class TestMoveThree : MonoBehaviour
 
     WaitForFixedUpdate fixedUpdate;
 
-    bool check;
     void Start()
     {
         capCollider = GetComponent<CapsuleCollider>();
@@ -177,8 +200,6 @@ public class TestMoveThree : MonoBehaviour
         {
             _jumpBuffer = jumpBuffer;
         }
-
-        if (Input.GetKeyDown(KeyCode.KeypadEnter)) check = true;
     }
 
     private void FixedUpdate()
@@ -193,10 +214,9 @@ public class TestMoveThree : MonoBehaviour
         {
             rb.velocity = Vector3.zero;
             isSprinting = false;
-            previousState = playerState;
-            playerState = PlayerState.NotMoving;
         }
         ClimbingChecks();
+        HandleVault();
         //Debug.DrawLine(transform.position, transform.position + actualForward.normalized * 5, Color.red);
         //Debug.DrawLine(transform.position, transform.position + actualRight.normalized * 5, Color.red);
     }
@@ -205,14 +225,16 @@ public class TestMoveThree : MonoBehaviour
         if(_coyoteTimer> 0)_coyoteTimer -= Time.fixedDeltaTime;
         //groundCheck = (_justJumpedCooldown <= 0) ? Physics.SphereCast(transform.position, capCollider.radius + 0.01f, -transform.up, out hit, groundCheckDistance) : false;
         groundCheck = Physics.SphereCast(transform.position, capCollider.radius, -transform.up, out hit, groundCheckDistance + 0.01f);
-        print(Vector3.Angle(hit.normal, Vector3.up));
         if (Vector3.Angle(hit.normal, Vector3.up) > maxSlope)
         {
-            groundCheck = false;
-            previousState = playerState;
-            playerState = PlayerState.InAir;
-            g = initialGravity;
-
+            if(!isGrounded)
+            {
+                groundCheck = false;
+                previousState = playerState;
+                playerState = PlayerState.InAir;
+                g = initialGravity;
+            }
+            
         }
         totalVelocityToAdd = Vector3.zero;
         newForwardandRight = Vector3.zero;
@@ -253,25 +275,26 @@ public class TestMoveThree : MonoBehaviour
         isGrounded = groundCheck;
     }
     private void ClimbingChecks()
-    {   
-        if (playerState == PlayerState.Grounded) feetCheck = Physics.SphereCast(transform.position - Vector3.up * .5f, capCollider.radius + .1f, rb.velocity.normalized, out feetHit, isSprinting ? .6f : .3f);
-        //topCheck = (Physics.Raycast(Camera.main.transform.position + Vector3.up * .25f, (playerState == PlayerState.Climbing) ? -forwardHit.normal : transform.forward, capCollider.radius + .1f));
+    {
+        float maxDistance = capCollider.radius * (1 + ((isSprinting)?(rb.velocity.magnitude / maxSprintVelocity): 0) );
+        if (playerState == PlayerState.Grounded) feetSphereCheck = Physics.SphereCast(transform.position - Vector3.up * .5f, capCollider.radius + .01f, rb.velocity.normalized, out feetHit, maxDistance);
 
-        forwardCheck = (Physics.Raycast(transform.position, (playerState == PlayerState.Climbing) ? -forwardHit.normal : transform.forward, capCollider.radius + .1f));
-        if (feetCheck && !onFakeGround)
+        headCheck = (Physics.Raycast(Camera.main.transform.position + Vector3.up * .25f, transform.forward, capCollider.radius + .1f));
+        //Debug.DrawLine(transform.position - Vector3.up * capCollider.height * .24f, (transform.position - Vector3.up * capCollider.height * .24f) + transform.forward * 5, Color.red);
+        forwardCheck = (Physics.Raycast(transform.position, transform.forward, capCollider.radius + .1f));
+        
+        if (feetSphereCheck && !onFakeGround)
         {
-            kneesCheck = (Physics.Raycast(transform.position - Vector3.up * capCollider.height * .25f, transform.forward, capCollider.radius + (isSprinting ? .7f : .4f)));
-            if (!kneesCheck && playerState == PlayerState.Grounded) StartCoroutine(FakeGround());
-            else
-            {
-                //rb.velocity = Vector3.zero;
-                //isSprinting = false;
-                //previousState = playerState;
-                //playerState = PlayerState.NotMoving;
-            }
-            kneesCheck = false;
+            kneesCheck = Physics.Raycast(transform.position - Vector3.up * capCollider.height * .24f, transform.forward, maxDistance + capCollider.radius);
+            if (!kneesCheck && playerState == PlayerState.Grounded && (x != 0 || z != 0))StartCoroutine(FakeGround());
         }
-
+        else if (feetHit.collider && playerState == PlayerState.Grounded && !onFakeGround && feetHit.distance < capCollider.radius + .5f)
+        {
+            print("working");
+            rb.velocity = Vector3.zero;
+            isSprinting = false;
+        }
+        kneesCheck = false;
     }
     private void Move()
     {
@@ -302,12 +325,6 @@ public class TestMoveThree : MonoBehaviour
                 newForwardandRight = new Vector3(newForwardandRight.x, 0, newForwardandRight.z);
                 rb.velocity = (rb.velocity - Vector3.up * rb.velocity.y).normalized * rb.velocity.magnitude;
             }
-            
-            if (check)
-            {
-                print(newForwardandRight);
-                print(newForwardandRight.normalized);
-            } 
 
             if (rb.velocity.magnitude < maxVelocity)
             {
@@ -328,7 +345,6 @@ public class TestMoveThree : MonoBehaviour
             pvX = x;
             pvZ = z;
         }
-        check = false;
     }
     private void Crouch()
     {
@@ -381,6 +397,11 @@ public class TestMoveThree : MonoBehaviour
             }
             if (g > maxGravity) g *= gravityRate;
         //}
+    }
+
+    private void HandleVault()
+    {
+        if (forwardCheck && !headCheck && z > 0) StartCoroutine(VaultCoroutine());
     }
     private IEnumerator FakeGround()
     {
@@ -464,5 +485,26 @@ public class TestMoveThree : MonoBehaviour
         }
         previousState = playerState;
         if(!isGrounded)playerState = PlayerState.InAir;
+    }
+    private IEnumerator VaultCoroutine()
+    {
+        print("vaulted");
+        previousState = playerState;
+        playerState = PlayerState.Climbing;
+        rb.velocity = Vector3.up * climbingForce;
+        float height = Camera.main.transform.position.y;
+        Physics.BoxCast(transform.position - transform.forward.normalized * capCollider.radius * .5f, Vector3.one * capCollider.radius, transform.forward, out forwardHit, Quaternion.identity, 1f);
+        feetCheck = (Physics.Raycast(transform.position - Vector3.up * capCollider.height * .5f, transform.forward, capCollider.radius + .1f));
+        while (feetCheck)
+        {
+            feetCheck = (Physics.Raycast(transform.position - Vector3.up * capCollider.height * .5f, transform.forward, capCollider.radius + .1f));
+            rb.velocity += Vector3.up;
+            yield return fixedUpdate;
+        }
+        feetCheck = false;
+        previousState = playerState;
+        if (!isGrounded) playerState = PlayerState.InAir;
+        rb.velocity = -forwardHit.normal * 10;
+
     }
 }
