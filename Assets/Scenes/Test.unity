@@ -4046,7 +4046,7 @@ MonoBehaviour:
   isJumping: 0
   isCrouching: 0
   onFakeGround: 0
-  playerState: 0
+  playerState: 6
   previousState: 0
   maxSlope: 60
   walkSpeedIncrease: 1

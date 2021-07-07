@@ -288,12 +288,12 @@ public class TestMoveThree : MonoBehaviour
             kneesCheck = Physics.Raycast(transform.position - Vector3.up * capCollider.height * .24f, transform.forward, maxDistance + capCollider.radius);
             if (!kneesCheck && playerState == PlayerState.Grounded && (x != 0 || z != 0))StartCoroutine(FakeGround());
         }
-        else if (feetHit.collider && playerState == PlayerState.Grounded && !onFakeGround && feetHit.distance < capCollider.radius + .5f)
-        {
-            print("working");
-            rb.velocity = Vector3.zero;
-            isSprinting = false;
-        }
+        //else if (feetHit.collider && playerState == PlayerState.Grounded && !onFakeGround && feetHit.distance < capCollider.radius + .5f)
+        //{
+        //    print("working");
+        //    rb.velocity = Vector3.zero;
+        //    isSprinting = false;
+        //}
         kneesCheck = false;
     }
     private void Move()
