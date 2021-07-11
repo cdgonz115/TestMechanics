@@ -74,6 +74,8 @@ public class TestMoveThree : MonoBehaviour
     [Header("In Air Variables")]
     [Range(0, 1)]
     public float inAirControl;
+    public int inAirJumps;
+    private int _inAirJumps;
     #endregion
 
     #region Gravity
@@ -91,8 +93,6 @@ public class TestMoveThree : MonoBehaviour
     public float jumpStrength;
     public float jumpStregthDecreaser;
     public float jumpInAirStrength;
-    public int inAirJumps;
-    private int _inAirJumps;
     public float highestPointHoldTime;
     float _highestPointHoldTimer;
     public float justJumpedCooldown;
@@ -323,8 +323,6 @@ public class TestMoveThree : MonoBehaviour
                 } 
 
             }
-
-            //Debug.DrawLine(transform.position, transform.position + newForwardandRight.normalized * 5, Color.red);
         }
         else
         {
@@ -386,11 +384,11 @@ public class TestMoveThree : MonoBehaviour
         if(_jumpBuffer <= 0 ) _jumpBuffer = 0;
         if (playerState != PlayerState.Climbing)
         {
-            if (_jumpBuffer > 0 && (isGrounded || _coyoteTimer > 0) && playerState!=PlayerState.Jumping && topIsClear) StartCoroutine(JumpCoroutine());
+            if (_jumpBuffer > 0 && (isGrounded || _coyoteTimer > 0) && playerState!=PlayerState.Jumping && topIsClear) StartCoroutine(JumpCoroutine(false));
             else if (playerState == PlayerState.InAir && _inAirJumps > 0 && _jumpBuffer > 0)
             {
                 _inAirJumps--;
-                StartCoroutine(JumpCoroutine());
+                StartCoroutine(JumpCoroutine(true));
             }
         }
         if (_jumpBuffer > 0) _jumpBuffer -= Time.fixedDeltaTime;
@@ -461,8 +459,9 @@ public class TestMoveThree : MonoBehaviour
         previousState = playerState;
         playerState = PlayerState.Grounded;
     }
-    private IEnumerator JumpCoroutine()
+    private IEnumerator JumpCoroutine(bool inAirJump)
     {
+        //print("started");
         _jumpBuffer = 0;
         previousState = playerState;
         playerState = PlayerState.Jumping;
@@ -470,19 +469,19 @@ public class TestMoveThree : MonoBehaviour
         g = jumpingInitialGravity;
         _justJumpedCooldown = justJumpedCooldown;
         totalVelocityToAdd += newForwardandRight;
-        rb.velocity -= Vector3.up * rb.velocity.y;
+        if (inAirJump && (x!=0 || z!=0)) rb.velocity = newForwardandRight.normalized *  ((currentForwardAndRight.magnitude< maxSprintVelocity)? maxSprintVelocity:currentForwardAndRight.magnitude); 
+        else rb.velocity -= rb.velocity.y * Vector3.up;
         while (rb.velocity.y >= 0f && playerState!=PlayerState.Grounded)
         {
             y -= jumpStregthDecreaser;
             totalVelocityToAdd += Vector3.up * y;
             yield return fixedUpdate;
         }
-
         if(playerState != PlayerState.Grounded)
         {
             _highestPointHoldTimer = highestPointHoldTime;
             g = 0;
-            rb.velocity -= rb.velocity.y * Vector3.up;
+            rb.velocity -= Vector3.up * rb.velocity.y;
             while (_highestPointHoldTimer > 0)
             {
                 _highestPointHoldTimer -= Time.fixedDeltaTime; 
@@ -531,6 +530,9 @@ public class TestMoveThree : MonoBehaviour
             {
                 rb.velocity += Vector3.up * wallJumpHeightStrenght + forwardHit.normal * wallJumpNormalStrength ;
                 g = jumpingInitialGravity;
+                _jumpBuffer = 0;
+                _justJumpedCooldown = justJumpedCooldown;
+                _climbingCooldown = climbingCooldown;
                 previousState = playerState;
                 playerState = PlayerState.InAir;
                 yield break;
