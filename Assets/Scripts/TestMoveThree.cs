@@ -143,6 +143,8 @@ public class TestMoveThree : MonoBehaviour
     public float climbingStrafe;
     float _climbingStrafe;
     public float climbStrafeDecreaser;
+    public float maxClimbStrafeVelocity;
+    public float climbingStrafeFriction;
     public float endOfClimbJumpStrength;
     public float climbingCooldown;
     float _climbingCooldown;
@@ -150,7 +152,8 @@ public class TestMoveThree : MonoBehaviour
 
     #region WallJump
     [Header("WallJump Variables")]
-    public float wallJumpStrenght;
+    public float wallJumpHeightStrenght;
+    public float wallJumpNormalStrength;
     #endregion
 
     #region Vectors
@@ -160,6 +163,7 @@ public class TestMoveThree : MonoBehaviour
     Vector3 totalVelocityToAdd;
     Vector3 newForwardandRight;
     Vector3 currentForwardAndRight;
+    Vector3 velocityAtCollision;
     #endregion
 
     #region Raycast hits
@@ -292,6 +296,7 @@ public class TestMoveThree : MonoBehaviour
         headCheck = (Physics.Raycast(Camera.main.transform.position + Vector3.up * .25f, transform.forward, capCollider.radius + .1f));
         //Debug.DrawLine(transform.position - Vector3.up * capCollider.height * .24f, (transform.position - Vector3.up * capCollider.height * .24f) + transform.forward * 5, Color.red);
         forwardCheck = (Physics.Raycast(transform.position, transform.forward, capCollider.radius + .1f));
+        if (forwardCheck && currentForwardAndRight.magnitude > 1) velocityAtCollision = currentForwardAndRight;
         
         if (feetSphereCheck && !onFakeGround)
         {
@@ -496,7 +501,6 @@ public class TestMoveThree : MonoBehaviour
     }
     private IEnumerator VaultCoroutine()
     {
-        print("vault");
         previousState = playerState;
         playerState = PlayerState.Vaulting;
         rb.velocity = Vector3.up * vaultClimbStrength;
@@ -521,25 +525,24 @@ public class TestMoveThree : MonoBehaviour
         playerState = PlayerState.Climbing;
         _climbingTime = climbingDuration;
         _justJumpedCooldown = 0;
-        //rb.velocity += Vector3.up * (climbingForce - rb.velocity.y);
         _climbingGravity = initialClimbingGravity;
         Physics.BoxCast(transform.position - transform.forward.normalized * capCollider.radius * .5f, Vector3.one * capCollider.radius, transform.forward, out forwardHit, Quaternion.identity, 1f);
         _climbingStrafe = climbingStrafe;
-        float angleOfEntrance = Vector3.Angle(currentForwardAndRight, -forwardHit.normal);
+        Vector3 playerOnWallRightDirection = Vector3.Cross(forwardHit.normal, Vector3.up).normalized;
+        Vector3 originalHorizontalClimbingDirection = Vector3.Project(velocityAtCollision, playerOnWallRightDirection);
+        rb.velocity = originalHorizontalClimbingDirection;
         while (!isGrounded && forwardCheck && playerState == PlayerState.Climbing && _climbingTime > 0 )
         {
             if (_jumpBuffer > 0)
             {
-                float wallBounceStrength = currentForwardAndRight.magnitude;
-
-                rb.velocity = forwardHit.normal * wallJumpStrenght + Vector3.Cross(currentForwardAndRight, Vector3.up).normalized * wallBounceStrength;                
-                _climbingCooldown = climbingCooldown;
-                StartCoroutine(JumpCoroutine());
+                rb.velocity += Vector3.up * wallJumpHeightStrenght + forwardHit.normal * wallJumpNormalStrength ;
+                g = jumpingInitialGravity;
+                previousState = playerState;
+                playerState = PlayerState.InAir;
                 yield break;
             }
-            rb.velocity += Vector3.up * ((z > 0) ? (rb.velocity.y > maxClimbingVelocity ? 0 : climbAcceleration) : -_climbingGravity);
-            //rb.velocity += Vector3.up * ((z>0)? (rb.velocity.y > maxClimbingVelocity? 0: climbAcceleration): ((angleOfEntrance>25)? 0:-_climbingGravity));
-            rb.velocity += Vector3.Cross(forwardHit.normal, Vector3.up).normalized * x * _climbingStrafe;
+            rb.velocity += Vector3.up * ((z > 0) ? (rb.velocity.y > maxClimbingVelocity ? 0 : climbAcceleration) : (originalHorizontalClimbingDirection.magnitude > 7.5f)? 0: -_climbingGravity);
+            rb.velocity += (currentForwardAndRight.magnitude<maxClimbStrafeVelocity)?playerOnWallRightDirection * x * _climbingStrafe: Vector3.zero - currentForwardAndRight * climbingStrafeFriction;
             _climbingGravity *= climbingGravityMultiplier;
             _climbingTime -= Time.fixedDeltaTime;
             _climbingStrafe -= climbStrafeDecreaser;
