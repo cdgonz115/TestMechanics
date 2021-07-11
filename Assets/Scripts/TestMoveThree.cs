@@ -91,6 +91,8 @@ public class TestMoveThree : MonoBehaviour
     public float jumpStrength;
     public float jumpStregthDecreaser;
     public float jumpInAirStrength;
+    public int inAirJumps;
+    private int _inAirJumps;
     public float highestPointHoldTime;
     float _highestPointHoldTimer;
     public float justJumpedCooldown;
@@ -236,8 +238,8 @@ public class TestMoveThree : MonoBehaviour
     private void GroundCheck()
     {
         if(_coyoteTimer> 0)_coyoteTimer -= Time.fixedDeltaTime;
-        //groundCheck = (_justJumpedCooldown <= 0) ? Physics.SphereCast(transform.position, capCollider.radius + 0.01f, -transform.up, out hit, groundCheckDistance) : false;
-        groundCheck = Physics.SphereCast(transform.position, capCollider.radius, -transform.up, out hit, groundCheckDistance + 0.01f);
+        if (_justJumpedCooldown > 0) _justJumpedCooldown -= Time.fixedDeltaTime;
+        groundCheck = (_justJumpedCooldown <= 0) ? Physics.SphereCast(transform.position, capCollider.radius, -transform.up, out hit, groundCheckDistance + 0.01f) : false;
         if (Vector3.Angle(hit.normal, Vector3.up) > maxSlope)
         {
             if(!isGrounded)
@@ -274,6 +276,7 @@ public class TestMoveThree : MonoBehaviour
             previousState = playerState;
             playerState = PlayerState.Grounded;
             g = 0;
+            _inAirJumps = inAirJumps;
         }
         if (isGrounded && !groundCheck)
         {
@@ -292,9 +295,7 @@ public class TestMoveThree : MonoBehaviour
     {
         float maxDistance = capCollider.radius * (1 + ((isSprinting)?(rb.velocity.magnitude / maxSprintVelocity): 0) );
         if (playerState == PlayerState.Grounded) feetSphereCheck = Physics.SphereCast(transform.position - Vector3.up * .5f, capCollider.radius + .01f, rb.velocity.normalized, out feetHit, maxDistance);
-
         headCheck = (Physics.Raycast(Camera.main.transform.position + Vector3.up * .25f, transform.forward, capCollider.radius + .1f));
-        //Debug.DrawLine(transform.position - Vector3.up * capCollider.height * .24f, (transform.position - Vector3.up * capCollider.height * .24f) + transform.forward * 5, Color.red);
         forwardCheck = (Physics.Raycast(transform.position, transform.forward, capCollider.radius + .1f));
         if (forwardCheck && currentForwardAndRight.magnitude > 1) velocityAtCollision = currentForwardAndRight;
         
@@ -303,12 +304,6 @@ public class TestMoveThree : MonoBehaviour
             kneesCheck = Physics.Raycast(transform.position - Vector3.up * capCollider.height * .24f, transform.forward, maxDistance + capCollider.radius);
             if (!kneesCheck && playerState == PlayerState.Grounded && (x != 0 || z != 0))StartCoroutine(FakeGround());
         }
-        //else if (feetHit.collider && playerState == PlayerState.Grounded && !onFakeGround && feetHit.distance < capCollider.radius + .5f)
-        //{
-        //    print("working");
-        //    rb.velocity = Vector3.zero;
-        //    isSprinting = false;
-        //}
         kneesCheck = false;
     }
     private void Move()
@@ -324,7 +319,6 @@ public class TestMoveThree : MonoBehaviour
                 newForwardandRight = (transform.right * x + transform.forward * z);
                 if (z != 0 || x != 0) 
                 {
-                    if (playerState == PlayerState.Jumping) totalVelocityToAdd += newForwardandRight.normalized * jumpInAirStrength;  
                     rb.velocity = newForwardandRight.normalized * currentForwardAndRight.magnitude * inAirControl + currentForwardAndRight * (1f - inAirControl) + rb.velocity.y * Vector3.up;
                 } 
 
@@ -393,11 +387,11 @@ public class TestMoveThree : MonoBehaviour
         if (playerState != PlayerState.Climbing)
         {
             if (_jumpBuffer > 0 && (isGrounded || _coyoteTimer > 0) && playerState!=PlayerState.Jumping && topIsClear) StartCoroutine(JumpCoroutine());
-            //else if (_inAirJumps > 0 && jumpBuffer > 0)
-            //{
-            //    _inAirJumps--;
-            //    StartCoroutine(JumpCoroutine());
-            //}
+            else if (playerState == PlayerState.InAir && _inAirJumps > 0 && _jumpBuffer > 0)
+            {
+                _inAirJumps--;
+                StartCoroutine(JumpCoroutine());
+            }
         }
         if (_jumpBuffer > 0) _jumpBuffer -= Time.fixedDeltaTime;
     }
