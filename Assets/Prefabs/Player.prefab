@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 8225854368876441689}
   - component: {fileID: 8225854368876441686}
   m_Layer: 10
-  m_Name: Capsule
+  m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -29,7 +29,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8225854368876441680}
-  m_LocalRotation: {x: -0, y: 0.99991554, z: -0, w: -0.0129994}
+  m_LocalRotation: {x: 0, y: 0.9999155, z: -0, w: -0.013002331}
   m_LocalPosition: {x: -55.91, y: 3.7, z: -79.13}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -162,6 +162,7 @@ MonoBehaviour:
   inAirFriction: 0.004
   slidingFriction: 0.02
   inAirControl: 0.25
+  inAirJumps: 1
   initialGravity: -0.55
   gravityRate: 1.008
   maxGravity: -39.2
@@ -170,7 +171,6 @@ MonoBehaviour:
   jumpStrength: 6.5
   jumpStregthDecreaser: 0.05
   jumpInAirStrength: 0
-  inAirJumps: 1
   highestPointHoldTime: 0.05
   justJumpedCooldown: 0.1
   coyoteTime: 0.15

@@ -200,7 +200,7 @@ public class TestMoveThree : MonoBehaviour
             isSprinting = (isCrouching) ? false : true;
         }
         speedIncrease = (isSprinting) ? sprintSpeedIncrease : walkSpeedIncrease;
-        maxVelocity = (isSprinting)? maxSprintVelocity : maxWalkVelocity;
+        maxVelocity = (isSprinting && !isCrouching)? maxSprintVelocity : maxWalkVelocity;
 
         if (Input.GetKey(KeyCode.W)) z = speedIncrease;
         else if (Input.GetKey(KeyCode.S)) z = -speedIncrease;
@@ -223,17 +223,15 @@ public class TestMoveThree : MonoBehaviour
         Crouch();
         HandleJumpInput();
         ApplyGravity();
+        ClimbingChecks();
+        HandleVault();
         rb.velocity += totalVelocityToAdd;
         if (rb.velocity.magnitude < minVelocity && x == 0 && z == 0 && (isGrounded))        //If the player stops moving set its maxVelocity to walkingSpeed and set its rb velocity to 0
         {
             rb.velocity = Vector3.zero;
             isSprinting = false;
         }
-        ClimbingChecks();
-        HandleVault();
-        HandleClimb();
-        //Debug.DrawLine(transform.position, transform.position + actualForward.normalized * 5, Color.red);
-        //Debug.DrawLine(transform.position, transform.position + actualRight.normalized * 5, Color.red);
+        //HandleClimb();
     }
 
     private void GroundCheck()
@@ -295,8 +293,7 @@ public class TestMoveThree : MonoBehaviour
         if (playerState == PlayerState.Grounded) feetSphereCheck = Physics.SphereCast(transform.position - Vector3.up * .5f, capCollider.radius + .01f, rb.velocity.normalized, out feetHit, maxDistance);
         headCheck = Physics.Raycast(Camera.main.transform.position + Vector3.up * .25f, transform.forward, capCollider.radius + .1f);
         forwardCheck = (Physics.Raycast(transform.position, transform.forward, capCollider.radius + .1f));  //forwardCheck = Physics.Raycast(transform.position, transform.forward, capCollider.radius + ((slope >= 70? capCollider.radius:.1f)));
-        if (forwardCheck && currentForwardAndRight.magnitude > 1) velocityAtCollision = currentForwardAndRight;
-        
+        if (forwardCheck && currentForwardAndRight.magnitude > 1) velocityAtCollision = currentForwardAndRight;        
         if (feetSphereCheck && !onFakeGround)
         {
             kneesCheck = Physics.Raycast(transform.position - Vector3.up * capCollider.height * .24f, transform.forward, maxDistance + capCollider.radius);
@@ -361,9 +358,6 @@ public class TestMoveThree : MonoBehaviour
             capCollider.center += Vector3.up * -.5f;
             isCrouching = true;
             moveCamera.AdjustCameraHeight(true);
-
-            if (isGrounded && playerState != PlayerState.Sliding && rb.velocity.magnitude > velocityToSlide) StartCoroutine(SlideCoroutine());
-
         }
         //Stand Up
         if (isCrouching && !crouchBuffer)
@@ -411,12 +405,6 @@ public class TestMoveThree : MonoBehaviour
         if (_climbingCooldown > 0) _climbingCooldown -= Time.fixedDeltaTime;
         if (playerState == PlayerState.InAir && forwardCheck && rb.velocity.y > negativeVelocityToClimb && (z > 0 || currentForwardAndRight.magnitude > 0f) && _climbingCooldown <= 0)
             StartCoroutine(ClimbCoroutine());
-
-        //Experimentation for climbing on a slanted wall
-
-        //if (playerState == PlayerState.InAir  && rb.velocity.y > negativeVelocityToClimb && (z > 0 || currentForwardAndRight.magnitude > 0f) && _climbingCooldown <= 0)
-        //    if(forwardCheck) StartCoroutine(ClimbCoroutine(false));
-        //    else if(slope >= 70) StartCoroutine(ClimbCoroutine(true));
     }
     private IEnumerator FakeGround()
     {
@@ -556,56 +544,5 @@ public class TestMoveThree : MonoBehaviour
         previousState = playerState;
         if (!isGrounded) playerState = PlayerState.InAir;
         else rb.velocity = -Vector3.up * rb.velocity.y;
-
     }
-
-    //Experimentation for climbing on a slanted wall
-
-    //private IEnumerator ClimbCoroutine(bool slantedWall)
-    //{
-    //    print(slantedWall);
-    //    previousState = playerState;
-    //    playerState = PlayerState.Climbing;
-    //    _climbingTime = climbingDuration;
-    //    _justJumpedCooldown = 0;
-    //    _climbingGravity = initialClimbingGravity;
-    //    Physics.BoxCast(transform.position - transform.forward.normalized * capCollider.radius * .5f, Vector3.one * capCollider.radius, transform.forward, out forwardHit, Quaternion.identity, 1f);
-    //    _climbingStrafe = climbingStrafe;
-    //    Vector3 playerOnWallRightDirection = Vector3.Cross(forwardHit.normal, Vector3.up).normalized;
-    //    Vector3 originalHorizontalClimbingDirection = Vector3.Project(velocityAtCollision, playerOnWallRightDirection);
-    //    Vector3 upwardDirection = Vector3.Cross(hit.normal, Vector3.right).normalized;
-    //    rb.velocity = originalHorizontalClimbingDirection;
-    //    while (!isGrounded && playerState == PlayerState.Climbing && _climbingTime > 0 )
-    //    {
-    //        if (_jumpBuffer > 0)
-    //        {
-    //            rb.velocity += Vector3.up * wallJumpHeightStrenght + forwardHit.normal * wallJumpNormalStrength ;
-    //            g = jumpingInitialGravity;
-    //            _jumpBuffer = 0;
-    //            _justJumpedCooldown = justJumpedCooldown;
-    //            _climbingCooldown = climbingCooldown;
-    //            previousState = playerState;
-    //            playerState = PlayerState.InAir;
-    //            yield break;
-    //        }
-    //        rb.velocity += upwardDirection * ((z > 0) ? (rb.velocity.y > maxClimbingVelocity ? 0 : climbAcceleration) : (originalHorizontalClimbingDirection.magnitude > 7.5f)? 0: -_climbingGravity);
-    //        rb.velocity += (currentForwardAndRight.magnitude<maxClimbStrafeVelocity)?playerOnWallRightDirection * x * _climbingStrafe: Vector3.zero - currentForwardAndRight * climbingStrafeFriction;
-    //        _climbingGravity *= climbingGravityMultiplier;
-    //        _climbingTime -= Time.fixedDeltaTime;
-    //        _climbingStrafe -= climbStrafeDecreaser;
-    //        yield return fixedUpdate;
-    //    }
-    //    if (playerState != PlayerState.Vaulting)
-    //    {
-    //        rb.velocity += Vector3.up + Vector3.Cross(forwardHit.normal, Vector3.up).normalized * x + forwardHit.normal * endOfClimbJumpStrength;
-    //    } 
-    //    _climbingCooldown = climbingCooldown;
-    //    previousState = playerState;
-    //    if (!isGrounded) playerState = PlayerState.InAir;
-    //    else
-    //    {
-    //        //playerState = PlayerState.Grounded;
-    //        rb.velocity = -Vector3.up * rb.velocity.y;
-    //    }
-    //}
 }
