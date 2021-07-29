@@ -42060,11 +42060,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8225854368876441686, guid: 84edb829044563e40a96a9579f6a350c, type: 3}
       propertyPath: maxClimbCheckDistance
-      value: 0.5
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 8225854368876441686, guid: 84edb829044563e40a96a9579f6a350c, type: 3}
       propertyPath: minClimbSlope
       value: 65
+      objectReference: {fileID: 0}
+    - target: {fileID: 8225854368876441686, guid: 84edb829044563e40a96a9579f6a350c, type: 3}
+      propertyPath: maxWalkVelocity
+      value: 7.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8225854368876441686, guid: 84edb829044563e40a96a9579f6a350c, type: 3}
+      propertyPath: maxSprintVelocity
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 8225854368876441687, guid: 84edb829044563e40a96a9579f6a350c, type: 3}
       propertyPath: m_LocalPosition.x
