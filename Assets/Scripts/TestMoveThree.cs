@@ -378,7 +378,7 @@ public class TestMoveThree : MonoBehaviour
 
         }
         //Stand Up
-        if (isCrouching && !crouchBuffer)
+        if (isCrouching && !crouchBuffer && playerState != PlayerState.Sliding)
         {
             if (topIsClear) //Checks that there are no obstacles on top of the player so they can stand up
             {
@@ -457,6 +457,7 @@ public class TestMoveThree : MonoBehaviour
         isSprinting = false;
         while (rb.velocity.magnitude > maxVelocity)
         {
+            if (playerState == PlayerState.Jumping) yield break;
             rb.velocity = newForwardandRight.normalized * rb.velocity.magnitude * slideControl + rb.velocity * (1f - slideControl);
             if (!isGrounded)
             {
@@ -465,13 +466,13 @@ public class TestMoveThree : MonoBehaviour
                 isSprinting = true;
                 yield break;
             }
-            if (!crouchBuffer)
-            {
-                if (rb.velocity.magnitude > maxWalkVelocity) isSprinting = true;
-                previousState = playerState;
-                playerState = PlayerState.Grounded;
-                yield break;
-            }
+            //if (!crouchBuffer)
+            //{
+            //    if (rb.velocity.magnitude > maxWalkVelocity) isSprinting = true;
+            //    previousState = playerState;
+            //    playerState = PlayerState.Grounded;
+            //    yield break;
+            //}
             yield return fixedUpdate;
         }
         friction = groundFriction;
@@ -507,6 +508,7 @@ public class TestMoveThree : MonoBehaviour
             }
             g = initialGravity;
         }
+        if (rb.velocity.magnitude >= maxSprintVelocity) isSprinting = true;
         previousState = playerState;
         if (!isGrounded) playerState = PlayerState.InAir;
     }
