@@ -45,7 +45,7 @@ public class TestMoveThree : MonoBehaviour
     #region General
     [Header("General")]
     public float maxSlope;
-    float slope;
+    public float slope;
     #endregion
 
     #region Acceleration
@@ -112,7 +112,7 @@ public class TestMoveThree : MonoBehaviour
     [Header("Slide Variables")]
     public float velocityToSlide;
     public float slideForce;
-    [Range(0,1)]
+    [Range(0, 1)]
     public float slideControl;
     #endregion
 
@@ -134,6 +134,7 @@ public class TestMoveThree : MonoBehaviour
     #region Vault
     [Header("Vault Variables")]
     public float vaultClimbStrength;
+    public float vaultEndStrength;
     #endregion
 
     #region Climb
@@ -152,6 +153,7 @@ public class TestMoveThree : MonoBehaviour
     public float maxClimbStrafeVelocity;
     public float climbingStrafeFriction;
     public float endOfClimbJumpStrength;
+    public float endOfClimbJumpHeight;
     public float climbingCooldown;
     float _climbingCooldown;
     #endregion
@@ -178,7 +180,7 @@ public class TestMoveThree : MonoBehaviour
     RaycastHit feetHit;
     #endregion
 
-     private WaitForFixedUpdate fixedUpdate;
+    private WaitForFixedUpdate fixedUpdate;
     #endregion
 
     void Start()
@@ -203,11 +205,11 @@ public class TestMoveThree : MonoBehaviour
             isSprinting = (isCrouching) ? false : true;
         }
         speedIncrease = (isSprinting) ? sprintSpeedIncrease : walkSpeedIncrease;
-        maxVelocity = (isSprinting)? maxSprintVelocity : maxWalkVelocity;
+        maxVelocity = (isSprinting) ? maxSprintVelocity : maxWalkVelocity;
 
         if (Input.GetKey(KeyCode.W)) z = speedIncrease;
         else if (Input.GetKey(KeyCode.S)) z = -speedIncrease;
-        else  z = 0;                             
+        else z = 0;
         if (Input.GetKey(KeyCode.D)) x = speedIncrease;
         else if (Input.GetKey(KeyCode.A)) x = -speedIncrease;
         else x = 0;
@@ -233,22 +235,22 @@ public class TestMoveThree : MonoBehaviour
             isSprinting = false;
         }
         ClimbingChecks();
-        HandleVault();
         HandleClimb();
+        HandleVault();
         //Debug.DrawLine(transform.position, transform.position + actualForward.normalized * 5, Color.red);
         //Debug.DrawLine(transform.position, transform.position + actualRight.normalized * 5, Color.red);
     }
 
     private void GroundCheck()
     {
-        if(_coyoteTimer> 0)_coyoteTimer -= Time.fixedDeltaTime;
+        if (_coyoteTimer > 0) _coyoteTimer -= Time.fixedDeltaTime;
         if (_justJumpedCooldown > 0) _justJumpedCooldown -= Time.fixedDeltaTime;
         groundCheck = (_justJumpedCooldown <= 0) ? Physics.SphereCast(transform.position, capCollider.radius, -transform.up, out hit, groundCheckDistance + 0.01f) : false;
         slope = Vector3.Angle(hit.normal, Vector3.up);
         if (slope > maxSlope)
         {
             groundCheck = false;
-            if (playerState != PlayerState.Climbing && playerState!=PlayerState.Jumping && playerState!=PlayerState.InAir)
+            if (playerState != PlayerState.Climbing && playerState != PlayerState.Jumping && playerState != PlayerState.InAir)
             {
                 previousState = playerState;
                 playerState = PlayerState.InAir;
@@ -269,12 +271,12 @@ public class TestMoveThree : MonoBehaviour
                 groundCheck = true;
                 groundedForward = transform.forward;
                 groundedRight = transform.right;
-            } 
+            }
         }
         if (groundCheck && (playerState == PlayerState.Jumping || playerState == PlayerState.InAir || playerState == PlayerState.Climbing))
         {
             rb.velocity = rb.velocity - Vector3.up * rb.velocity.y;
-            if (!onFakeGround && hit.normal.y != 1)rb.velocity = (groundedRight* x + groundedForward* z).normalized * rb.velocity.magnitude;          //This is to prevent the weird glitch where the player bounces on slopes if they land on them without jumping
+            if (!onFakeGround && hit.normal.y != 1) rb.velocity = (groundedRight * x + groundedForward * z).normalized * rb.velocity.magnitude;          //This is to prevent the weird glitch where the player bounces on slopes if they land on them without jumping
             friction = groundFriction;
             _climbingCooldown = 0;
             previousState = playerState;
@@ -297,20 +299,20 @@ public class TestMoveThree : MonoBehaviour
     }
     private void ClimbingChecks()
     {
-        float maxDistance = capCollider.radius * (1 + ((isSprinting)?(rb.velocity.magnitude / maxSprintVelocity): 0) );
+        float maxDistance = capCollider.radius * (1 + ((isSprinting) ? (rb.velocity.magnitude / maxSprintVelocity) : 0));
         if (playerState == PlayerState.Grounded) feetSphereCheck = Physics.SphereCast(transform.position - Vector3.up * .5f, capCollider.radius + .01f, rb.velocity.normalized, out feetHit, maxDistance);
         headCheck = Physics.Raycast(Camera.main.transform.position + Vector3.up * .25f, transform.forward, capCollider.radius + ((slope >= minClimbSlope) ? maxClimbCheckDistance * 2 : minClimbCheckDistance));
-        forwardCheck = Physics.Raycast(transform.position, transform.forward, capCollider.radius + ((slope >= minClimbSlope)? maxClimbCheckDistance: minClimbCheckDistance));  //forwardCheck = Physics.Raycast(transform.position, transform.forward, capCollider.radius + ((slope >= 70? capCollider.radius:.1f)));
-        if (forwardCheck && currentForwardAndRight.magnitude > 1) 
+        forwardCheck = Physics.Raycast(transform.position, transform.forward, capCollider.radius + ((slope >= minClimbSlope) ? maxClimbCheckDistance : minClimbCheckDistance));  //forwardCheck = Physics.Raycast(transform.position, transform.forward, capCollider.radius + ((slope >= 70? capCollider.radius:.1f)));
+        if (forwardCheck && currentForwardAndRight.magnitude > 1)
         {
             velocityAtCollision = currentForwardAndRight;
-            if(playerState != PlayerState.Climbing)rb.velocity = Vector3.zero;              //Avoid bouncing
-        } 
-        
+            //if (playerState != PlayerState.Climbing) rb.velocity = Vector3.zero;              //Avoid bouncing
+        }
+
         if (feetSphereCheck && !onFakeGround)
         {
             kneesCheck = Physics.Raycast(transform.position - Vector3.up * capCollider.height * .24f, transform.forward, maxDistance + capCollider.radius);
-            if (!kneesCheck && playerState == PlayerState.Grounded && (x != 0 || z != 0))StartCoroutine(FakeGround());
+            if (!kneesCheck && playerState == PlayerState.Grounded && (x != 0 || z != 0)) StartCoroutine(FakeGround());
         }
         kneesCheck = false;
     }
@@ -325,17 +327,17 @@ public class TestMoveThree : MonoBehaviour
                 rb.velocity -= currentForwardAndRight * friction;
 
                 newForwardandRight = (transform.right * x + transform.forward * z);
-                if (z != 0 || x != 0) 
+                if (z != 0 || x != 0)
                 {
                     rb.velocity = newForwardandRight.normalized * currentForwardAndRight.magnitude * inAirControl + currentForwardAndRight * (1f - inAirControl) + rb.velocity.y * Vector3.up;
-                } 
+                }
 
             }
         }
         else
         {
             newForwardandRight = (groundedRight.normalized * x + groundedForward.normalized * z);
-            if (hit.normal.y == 1) 
+            if (hit.normal.y == 1)
             {
                 newForwardandRight = new Vector3(newForwardandRight.x, 0, newForwardandRight.z);
                 rb.velocity = (rb.velocity - Vector3.up * rb.velocity.y).normalized * rb.velocity.magnitude;
@@ -345,7 +347,7 @@ public class TestMoveThree : MonoBehaviour
             {
                 totalVelocityToAdd += newForwardandRight;
             }
-            else if(playerState != PlayerState.Sliding)
+            else if (playerState != PlayerState.Sliding)
             {
                 if ((z == 0 && x == 0) || (pvX < 0 && x > 0) || (x < 0 && pvX > 0) || (pvZ < 0 && z > 0) || (z < 0 && pvZ > 0)) rb.velocity *= .99f; //Decrease 
                 else if (rb.velocity.magnitude < maxVelocity + 1f) rb.velocity = newForwardandRight.normalized * maxVelocity;
@@ -389,10 +391,10 @@ public class TestMoveThree : MonoBehaviour
     }
     private void HandleJumpInput()
     {
-        if(_jumpBuffer <= 0 ) _jumpBuffer = 0;
+        if (_jumpBuffer <= 0) _jumpBuffer = 0;
         if (playerState != PlayerState.Climbing)
         {
-            if (_jumpBuffer > 0 && (isGrounded || _coyoteTimer > 0) && playerState!=PlayerState.Jumping && topIsClear) StartCoroutine(JumpCoroutine(false));
+            if (_jumpBuffer > 0 && (isGrounded || _coyoteTimer > 0) && playerState != PlayerState.Jumping && topIsClear) StartCoroutine(JumpCoroutine(false));
             else if (playerState == PlayerState.InAir && _inAirJumps > 0 && _jumpBuffer > 0)
             {
                 _inAirJumps--;
@@ -414,13 +416,22 @@ public class TestMoveThree : MonoBehaviour
     }
     private void HandleVault()
     {
-        if (playerState == PlayerState.InAir && forwardCheck && !headCheck && z > 0) StartCoroutine(VaultCoroutine());
+        if ((playerState == PlayerState.InAir || (playerState == PlayerState.Climbing && slope == 0)) && forwardCheck && !headCheck && z > 0)
+        {
+            previousState = playerState;
+            playerState = PlayerState.Vaulting;
+            StartCoroutine(VaultCoroutine());
+        }
     }
     private void HandleClimb()
     {
         if (_climbingCooldown > 0) _climbingCooldown -= Time.fixedDeltaTime;
         if (playerState == PlayerState.InAir && forwardCheck && rb.velocity.y > negativeVelocityToClimb && (z > 0 || currentForwardAndRight.magnitude > 0f) && _climbingCooldown <= 0)
+        {
+            previousState = playerState;
+            playerState = PlayerState.Climbing;
             StartCoroutine(ClimbCoroutine());
+        }
 
     }
     private IEnumerator FakeGround()
@@ -476,38 +487,36 @@ public class TestMoveThree : MonoBehaviour
         g = jumpingInitialGravity;
         _justJumpedCooldown = justJumpedCooldown;
         totalVelocityToAdd += newForwardandRight;
-        if (inAirJump && (x!=0 || z!=0)) rb.velocity = newForwardandRight.normalized *  ((currentForwardAndRight.magnitude< maxSprintVelocity)? maxSprintVelocity:currentForwardAndRight.magnitude); 
+        if (inAirJump && (x != 0 || z != 0)) rb.velocity = newForwardandRight.normalized * ((currentForwardAndRight.magnitude < maxSprintVelocity) ? maxSprintVelocity : currentForwardAndRight.magnitude);
         else rb.velocity -= rb.velocity.y * Vector3.up;
-        while (rb.velocity.y >= 0f && playerState!=PlayerState.Grounded)
+        while (rb.velocity.y >= 0f && playerState != PlayerState.Grounded)
         {
             y -= jumpStregthDecreaser;
             totalVelocityToAdd += Vector3.up * y;
             yield return fixedUpdate;
         }
-        if(playerState != PlayerState.Grounded)
+        if (playerState != PlayerState.Grounded)
         {
             _highestPointHoldTimer = highestPointHoldTime;
             g = 0;
             rb.velocity -= Vector3.up * rb.velocity.y;
             while (_highestPointHoldTimer > 0)
             {
-                _highestPointHoldTimer -= Time.fixedDeltaTime; 
+                _highestPointHoldTimer -= Time.fixedDeltaTime;
                 yield return fixedUpdate;
             }
             g = initialGravity;
         }
         previousState = playerState;
-        if(!isGrounded)playerState = PlayerState.InAir;
+        if (!isGrounded) playerState = PlayerState.InAir;
     }
     private IEnumerator VaultCoroutine()
     {
-        previousState = playerState;
-        playerState = PlayerState.Vaulting;
         rb.velocity = Vector3.up * vaultClimbStrength;
         float height = Camera.main.transform.position.y;
         Physics.BoxCast(transform.position - transform.forward.normalized * capCollider.radius * .5f, Vector3.one * capCollider.radius, transform.forward, out forwardHit, Quaternion.identity, 1f);
         feetCheck = (Physics.Raycast(transform.position - Vector3.up * capCollider.height * .5f, transform.forward, capCollider.radius + .1f));
-        while ((transform.position.y - capCollider.height * .5)<height )
+        while ((transform.position.y - capCollider.height * .5) < height)
         {
             //feetCheck = (Physics.Raycast(transform.position - Vector3.up * capCollider.height * .5f, transform.forward, capCollider.radius + .1f));
             rb.velocity += Vector3.up * .05f;
@@ -516,13 +525,11 @@ public class TestMoveThree : MonoBehaviour
         feetCheck = false;
         previousState = playerState;
         if (!isGrounded) playerState = PlayerState.InAir;
-        rb.velocity = -forwardHit.normal * 10;
+        rb.velocity = -forwardHit.normal * vaultEndStrength;
 
     }
     private IEnumerator ClimbCoroutine()
     {
-        previousState = playerState;
-        playerState = PlayerState.Climbing;
         _climbingTime = climbingDuration;
         _justJumpedCooldown = 0;
         _climbingGravity = initialClimbingGravity;
@@ -530,7 +537,7 @@ public class TestMoveThree : MonoBehaviour
         _climbingStrafe = climbingStrafe;
         Vector3 playerOnWallRightDirection = Vector3.Cross(forwardHit.normal, Vector3.up).normalized;
         Vector3 originalHorizontalClimbingDirection = Vector3.Project(velocityAtCollision, playerOnWallRightDirection);
-        Vector3 upwardDirection = (slope == 0)? Vector3.up : -Vector3.Cross(hit.normal, playerOnWallRightDirection).normalized;
+        Vector3 upwardDirection = (slope == 0) ? Vector3.up : -Vector3.Cross(hit.normal, playerOnWallRightDirection).normalized;
         rb.velocity = originalHorizontalClimbingDirection;
         while (!isGrounded && forwardCheck && playerState == PlayerState.Climbing && _climbingTime > 0)
         {
@@ -553,10 +560,8 @@ public class TestMoveThree : MonoBehaviour
 
             yield return fixedUpdate;
         }
-        if (playerState != PlayerState.Vaulting)
-        {
-            rb.velocity += Vector3.up + Vector3.Cross(forwardHit.normal, Vector3.up).normalized * x + forwardHit.normal * endOfClimbJumpStrength;
-        }
+        if (playerState == PlayerState.Vaulting) yield break;
+        rb.velocity += Vector3.up * endOfClimbJumpHeight + playerOnWallRightDirection * x + forwardHit.normal * endOfClimbJumpStrength;
         _climbingCooldown = climbingCooldown;
         previousState = playerState;
         if (!isGrounded) playerState = PlayerState.InAir;

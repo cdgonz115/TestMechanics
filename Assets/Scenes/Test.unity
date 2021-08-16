@@ -42054,6 +42054,18 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 8225854368876441683, guid: 84edb829044563e40a96a9579f6a350c, type: 3}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8225854368876441683, guid: 84edb829044563e40a96a9579f6a350c, type: 3}
+      propertyPath: m_IsKinematic
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8225854368876441683, guid: 84edb829044563e40a96a9579f6a350c, type: 3}
+      propertyPath: m_CollisionDetection
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 8225854368876441686, guid: 84edb829044563e40a96a9579f6a350c, type: 3}
       propertyPath: minClimbCheckDistance
       value: 0.1
@@ -42074,17 +42086,29 @@ PrefabInstance:
       propertyPath: maxSprintVelocity
       value: 15
       objectReference: {fileID: 0}
+    - target: {fileID: 8225854368876441686, guid: 84edb829044563e40a96a9579f6a350c, type: 3}
+      propertyPath: vaultEndStrength
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8225854368876441686, guid: 84edb829044563e40a96a9579f6a350c, type: 3}
+      propertyPath: endOfClimbJumpStrength
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8225854368876441686, guid: 84edb829044563e40a96a9579f6a350c, type: 3}
+      propertyPath: inAirControl
+      value: 0.021
+      objectReference: {fileID: 0}
     - target: {fileID: 8225854368876441687, guid: 84edb829044563e40a96a9579f6a350c, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -76.58
+      value: -37.76
       objectReference: {fileID: 0}
     - target: {fileID: 8225854368876441687, guid: 84edb829044563e40a96a9579f6a350c, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.97
+      value: 10.6
       objectReference: {fileID: 0}
     - target: {fileID: 8225854368876441687, guid: 84edb829044563e40a96a9579f6a350c, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -68.44
+      value: -78
       objectReference: {fileID: 0}
     - target: {fileID: 8225854368876441687, guid: 84edb829044563e40a96a9579f6a350c, type: 3}
       propertyPath: m_LocalRotation.x
