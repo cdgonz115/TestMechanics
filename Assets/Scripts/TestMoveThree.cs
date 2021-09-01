@@ -180,8 +180,22 @@ public class TestMoveThree : MonoBehaviour
     RaycastHit feetHit;
     #endregion
 
+    #region Other
     private WaitForFixedUpdate fixedUpdate;
+    public delegate void ExternalMovement();
+    public event ExternalMovement externalMovementEvent;
+    public static TestMoveThree singleton;
     #endregion
+
+    #endregion
+
+    private void Awake()
+    {
+        if (singleton == null)
+            singleton = this;
+        else
+            Destroy(gameObject);
+    }
 
     void Start()
     {
@@ -237,6 +251,9 @@ public class TestMoveThree : MonoBehaviour
         ClimbingChecks();
         HandleClimb();
         HandleVault();
+        PerformExternalMovement();
+        //print(rb.velocity + " after");
+        
         //Debug.DrawLine(transform.position, transform.position + actualForward.normalized * 5, Color.red);
         //Debug.DrawLine(transform.position, transform.position + actualRight.normalized * 5, Color.red);
     }
@@ -414,6 +431,10 @@ public class TestMoveThree : MonoBehaviour
             if (g > maxGravity) g *= gravityRate;
         }
     }
+    public void SetInitialGravity(float value)
+    {
+        g = value;
+    }
     private void HandleVault()
     {
         if ((playerState == PlayerState.InAir || (playerState == PlayerState.Climbing && slope == 0)) && forwardCheck && !headCheck && z > 0)
@@ -433,6 +454,10 @@ public class TestMoveThree : MonoBehaviour
             StartCoroutine(ClimbCoroutine());
         }
 
+    }
+    private void PerformExternalMovement()
+    {
+        if (externalMovementEvent != null) externalMovementEvent();
     }
     private IEnumerator FakeGround()
     {
