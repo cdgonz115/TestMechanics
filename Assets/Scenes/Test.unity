@@ -4879,9 +4879,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   indicator: {fileID: 1194264447}
   maxDistance: 50
+  timeToReachTarget: 2
   rb: {fileID: 0}
   force: 2
-  launched: 0
   cooldown: 2
   onCooldown: 0
 --- !u!4 &284489866 stripped

@@ -6,19 +6,26 @@ public class Dishonored_Launch : MonoBehaviour
 {
     public GameObject indicator;
     public float maxDistance;
+    public float timeToReachTarget;
     public Rigidbody rb;
     public float force;
     private Vector3 launchDestination;
     public float cooldown = 2;
     public bool onCooldown;
+    private float xzFrictionCompesator;
+    private float calculatedYVelocityLost = -15.25889f;
     // Start is called before the first frame update
     void Start()
     {
         indicator.transform.position = Vector3.zero;
         rb = GetComponent<Rigidbody>();
+        TestMoveThree.singleton.setVariablesOnOtherScripts += SetVariablesDependentOnMovementScript;
+        TestMoveThree.singleton.playerJustLanded += ResetAbility;
     }
-
-    // Update is called once per frame
+    void SetVariablesDependentOnMovementScript()
+    {
+        xzFrictionCompesator = Mathf.Pow(1.0f - TestMoveThree.singleton.inAirFriction, timeToReachTarget * 50); 
+    }
     void Update()
     {
         RaycastHit hit;
@@ -38,20 +45,23 @@ public class Dishonored_Launch : MonoBehaviour
         }
 
     }
-    private IEnumerator Cooldown()
-    {
-        yield return new WaitForSeconds(cooldown);
-        onCooldown = false;
-    }
+    public void ResetAbility() => onCooldown = false;
     public void PerformLaunch()
     {
-        //print(rb.velocity + " Before");
-        Vector3 vector3 = (launchDestination - transform.position) * force;
-        //print(vector3 + "Velocity being added");
-        rb.velocity = vector3 + new Vector3( rb.velocity.x, 0, rb.velocity.z);
+        Vector3 direction = (launchDestination - transform.position);
+        float yDistance = direction.y;
+        Vector3 forceVector = direction - Vector3.up * yDistance;
+        forceVector = forceVector / xzFrictionCompesator;
+        forceVector.y = yDistance - calculatedYVelocityLost;
+
+        rb.velocity = forceVector + new Vector3( rb.velocity.x, 0, rb.velocity.z);
         TestMoveThree.singleton.SetInitialGravity(TestMoveThree.singleton.initialGravity);
         onCooldown = true;
-        StartCoroutine(Cooldown());
         TestMoveThree.singleton.externalMovementEvent -= PerformLaunch;
+    }
+    private void OnDestroy()
+    {
+        TestMoveThree.singleton.setVariablesOnOtherScripts -= SetVariablesDependentOnMovementScript;
+        TestMoveThree.singleton.playerJustLanded += ResetAbility;
     }
 }

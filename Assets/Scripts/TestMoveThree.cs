@@ -180,10 +180,17 @@ public class TestMoveThree : MonoBehaviour
     RaycastHit feetHit;
     #endregion
 
-    #region Other
-    private WaitForFixedUpdate fixedUpdate;
+    #region Events and delegates
     public delegate void ExternalMovement();
     public event ExternalMovement externalMovementEvent;
+    public delegate void SetVariablesDepentOnScript();
+    public event SetVariablesDepentOnScript setVariablesOnOtherScripts;
+    public delegate void PlayerBecameGrounded();
+    public event PlayerBecameGrounded playerJustLanded;
+    #endregion
+
+    #region Other
+    private WaitForFixedUpdate fixedUpdate;
     public static TestMoveThree singleton;
     #endregion
 
@@ -207,6 +214,7 @@ public class TestMoveThree : MonoBehaviour
         friction = inAirFriction;
         g = initialGravity;
         playerState = PlayerState.InAir;
+        StartCoroutine(SetDependentVariablesDelay());
         //Time.timeScale = .1f;
     }
 
@@ -292,6 +300,7 @@ public class TestMoveThree : MonoBehaviour
         }
         if (groundCheck && (playerState == PlayerState.Jumping || playerState == PlayerState.InAir || playerState == PlayerState.Climbing))
         {
+            if (playerJustLanded != null) playerJustLanded();
             rb.velocity = rb.velocity - Vector3.up * rb.velocity.y;
             if (!onFakeGround && hit.normal.y != 1) rb.velocity = (groundedRight * x + groundedForward * z).normalized * rb.velocity.magnitude;          //This is to prevent the weird glitch where the player bounces on slopes if they land on them without jumping
             friction = groundFriction;
@@ -594,5 +603,11 @@ public class TestMoveThree : MonoBehaviour
         if (!isGrounded) playerState = PlayerState.InAir;
         else rb.velocity = -Vector3.up * rb.velocity.y;
         g = initialGravity;
+    }
+
+    private IEnumerator SetDependentVariablesDelay()
+    {
+        yield return new WaitForSeconds(.5f);
+        if (setVariablesOnOtherScripts != null) setVariablesOnOtherScripts();
     }
 }
