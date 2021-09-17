@@ -522,7 +522,11 @@ public class TestMoveThree : MonoBehaviour
         g = jumpingInitialGravity;
         _justJumpedCooldown = justJumpedCooldown;
         totalVelocityToAdd += newForwardandRight;
-        if (inAirJump && (x != 0 || z != 0)) rb.velocity = newForwardandRight.normalized * ((currentForwardAndRight.magnitude < maxSprintVelocity) ? maxSprintVelocity : currentForwardAndRight.magnitude);
+        if (inAirJump)
+        {
+            if ((x != 0 || z != 0)) rb.velocity = newForwardandRight.normalized * ((currentForwardAndRight.magnitude < maxSprintVelocity) ? maxSprintVelocity : currentForwardAndRight.magnitude);
+            else rb.velocity = Vector3.zero ;
+        }
         else rb.velocity -= rb.velocity.y * Vector3.up;
         while (rb.velocity.y >= 0f && playerState != PlayerState.Grounded)
         {
