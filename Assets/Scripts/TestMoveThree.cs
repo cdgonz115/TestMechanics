@@ -393,27 +393,35 @@ public class TestMoveThree : MonoBehaviour
     {
         topIsClear = !Physics.Raycast(transform.position - newForwardandRight.normalized * capCollider.radius, Vector3.up, capCollider.height + .01f); // Check if thee's nothing blocking the player from standing up
         //Crouch
-        if (!isCrouching && crouchBuffer)
+        if (isGrounded)
         {
-            capCollider.height *= .5f;
-            capCollider.center += Vector3.up * -.5f;
-            isCrouching = true;
-            moveCamera.AdjustCameraHeight(true);
-
-            if (isGrounded && playerState != PlayerState.Sliding && rb.velocity.magnitude > velocityToSlide) StartCoroutine(SlideCoroutine());
-
-        }
-        //Stand Up
-        if (isCrouching && !crouchBuffer && playerState != PlayerState.Sliding)
-        {
-            if (topIsClear) //Checks that there are no obstacles on top of the player so they can stand up
+            if (!isCrouching && crouchBuffer)
             {
-                capCollider.height *= 2f;
-                capCollider.center += Vector3.up * .5f;
-                isCrouching = false;
-                moveCamera.AdjustCameraHeight(false);
+                capCollider.height *= .5f;
+                capCollider.center += Vector3.up * -.5f;
+                isCrouching = true;
+                moveCamera.AdjustCameraHeight(true);
+
+                if (playerState != PlayerState.Sliding && rb.velocity.magnitude > velocityToSlide) StartCoroutine(SlideCoroutine());
+
+            }
+            //Stand Up
+            if (isCrouching && !crouchBuffer && playerState != PlayerState.Sliding)
+            {
+                if (topIsClear) //Checks that there are no obstacles on top of the player so they can stand up
+                {
+                    capCollider.height *= 2f;
+                    capCollider.center += Vector3.up * .5f;
+                    isCrouching = false;
+                    moveCamera.AdjustCameraHeight(false);
+                }
             }
         }
+        else if(crouchBuffer &&  playerState!=PlayerState.Jumping)
+        {
+            GetComponent<DownLunge>().LungeDown(rb);
+        }
+
     }
     private void HandleJumpInput()
     {
@@ -440,6 +448,8 @@ public class TestMoveThree : MonoBehaviour
             if (g > maxGravity) g *= gravityRate;
         }
     }
+
+    public void SetInitialGravity() => g = initialGravity;
     public void SetInitialGravity(float value)
     {
         g = value;
