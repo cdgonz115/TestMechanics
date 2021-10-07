@@ -235,10 +235,10 @@
     "m_CustomColors": {
         "m_SerializableColors": []
     },
-    "m_SourceType": 0,
+    "m_SourceType": 1,
     "m_FunctionName": "MainLight",
     "m_FunctionSource": "3c3072aa8dbc893458b7a028265c939d",
-    "m_FunctionBody": "#if SHADERGRAPH_PREVIEW\r\n\tDirection = half3(0.5, 0.5, 0);\r\n\tColor = 1;\r\n#else\r\n\tLight light = GetMainLight();\r\n\tDirection = light.direction;\r\n\tColor = light.color;\r\n#endif"
+    "m_FunctionBody": "#if SHADERGRAPH_PREVIEW\r\n   Direction = float3(0.5, 0.5, 0.0);\r\n   Color = 1.0;\r\n   DistanceAtten = 1.0;\r\n   ShadowAtten = 1.0;\r\n#else\r\n#if SHADOWS_SCREEN\r\n   float4 clipPos = TransformWorldToHClip(WorldPos);\r\n   float4 shadowCoord = ComputeScreenPos(clipPos);\r\n#else\r\n   float4 shadowCoord = TransformWorldToShadowCoord(WorldPos);\r\n#endif\r\n   Light mainLight = GetMainLight(shadowCoord);\r\n   Direction = mainLight.direction;\r\n   Color = mainLight.color;\r\n   DistanceAtten = mainLight.distanceAttenuation;\r\n   ShadowAtten = mainLight.shadowAttenuation;\r\n#endif"
 }
 
 {

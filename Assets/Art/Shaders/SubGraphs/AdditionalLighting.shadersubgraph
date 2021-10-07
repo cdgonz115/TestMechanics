@@ -689,10 +689,10 @@
     "m_CustomColors": {
         "m_SerializableColors": []
     },
-    "m_SourceType": 0,
+    "m_SourceType": 1,
     "m_FunctionName": "AdditionalLights",
     "m_FunctionSource": "3c3072aa8dbc893458b7a028265c939d",
-    "m_FunctionBody": "Enter function body here..."
+    "m_FunctionBody": "float3 diffuseColor = 0.0;\r\n    float3 specularColor = 0.0;\r\n\r\n#ifndef SHADERGRAPH_PREVIEW\r\n    Smoothness = exp2(10.0 * Smoothness + 1.0);\r\n    WorldNormal = normalize(WorldNormal);\r\n    WorldView = SafeNormalize(WorldView);\r\n    float pixelLightCount = GetAdditionalLightsCount();\r\n    for (float i = 0.0; i < pixelLightCount; ++i)\r\n    {\r\n        Light light = GetAdditionalLight(i, WorldPosition);\r\n        float3 attenuatedLightColor = light.color * (light.distanceAttenuation * light.shadowAttenuation);\r\n        diffuseColor += LightingLambert(attenuatedLightColor, light.direction, WorldNormal);\r\n        specularColor += LightingSpecular(attenuatedLightColor, light.direction, WorldNormal, WorldView, float4(SpecColor, 0.0), Smoothness);\r\n    }\r\n#endif\r\n\r\n    Diffuse = diffuseColor;\r\n    Specular = specularColor;"
 }
 
 {

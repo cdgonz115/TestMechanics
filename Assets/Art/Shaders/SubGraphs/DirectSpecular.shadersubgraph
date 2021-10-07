@@ -308,7 +308,7 @@
     "m_SourceType": 0,
     "m_FunctionName": "DirectSpecular",
     "m_FunctionSource": "3c3072aa8dbc893458b7a028265c939d",
-    "m_FunctionBody": "Enter function body here..."
+    "m_FunctionBody": "Smoothness = exp2(10.0 * Smoothness + 1.0);\r\nWorldNormal = normalize(WorldNormal);\r\nWorldView = SafeNormalize(WorldView);\r\nOut = LightingSpecular(Color, Direction, WorldNormal, WorldView, float4(Specular, 0.0), Smoothness);"
 }
 
 {

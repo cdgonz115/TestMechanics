@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Green
-  m_Shader: {fileID: -6465566751694194690, guid: 34197d354004b1749b4c8175a2cf5ff7, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 10ae5e6f5b625904eb419c14374bc37c, type: 3}
   m_ShaderKeywords: _SPECULAR_SETUP
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -77,8 +77,10 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - Toon_Ramp_Offset: 0.2
-    - Toon_Ramp_Smoothness: 0
+    - Metallic: 0
+    - Smoothness: 0.63
+    - Toon_Ramp_Offset: 0.57
+    - Toon_Ramp_Smoothness: 0.17
     - Vector1_23527E4B: 0
     - Vector1_3FC8252B: 0.9
     - Vector1_8F01D656: 0
@@ -114,10 +116,10 @@ Material:
     - Color_945BF65D: {r: 0.025364906, g: 0.05660379, b: 0.037501354, a: 0}
     - Color_B1E921F5: {r: 1, g: 1, b: 1, a: 0}
     - Color_D4742AB9: {r: 0.7924528, g: 0.7924528, b: 0.7924528, a: 0}
-    - Toon_Ramp_Tinting: {r: 0.006541462, g: 0.46226418, b: 0.04941367, a: 0}
+    - Toon_Ramp_Tinting: {r: 0.066037714, g: 0.066037714, b: 0.066037714, a: 0}
     - Vector4_8FFC8A12: {r: 1, g: 1, b: 1, a: 0}
     - _BaseColor: {r: 0.14173195, g: 0.6132076, b: 0.2508185, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.14431292, g: 0.21698111, b: 0.15090382, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _Specular: {r: 1, g: 1, b: 1, a: 0}
