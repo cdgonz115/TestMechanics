@@ -135,6 +135,7 @@ public class TestMoveThree : MonoBehaviour
     [Header("Vault Variables")]
     public float vaultClimbStrength;
     public float vaultEndStrength;
+    public float vaultDuration = .5f;
     #endregion
 
     #region Climb
@@ -241,6 +242,13 @@ public class TestMoveThree : MonoBehaviour
         {
             _jumpBuffer = jumpBuffer;
         }
+
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            if (Time.timeScale == 1f) Time.timeScale = .1f;
+            else Time.timeScale = 1;
+        }
+        else if (Input.GetKeyDown(KeyCode.Q)) Time.timeScale = 0;
     }
 
     private void FixedUpdate()
@@ -257,7 +265,7 @@ public class TestMoveThree : MonoBehaviour
             isSprinting = false;
         }
         ClimbingChecks();
-        HandleClimb();
+        //HandleClimb();
         HandleVault();
         PerformExternalMovement();
         //print(rb.velocity + " after");
@@ -566,16 +574,18 @@ public class TestMoveThree : MonoBehaviour
         float height = Camera.main.transform.position.y;
         Physics.BoxCast(transform.position - transform.forward.normalized * capCollider.radius * .5f, Vector3.one * capCollider.radius, transform.forward, out forwardHit, Quaternion.identity, 1f);
         feetCheck = (Physics.Raycast(transform.position - Vector3.up * capCollider.height * .5f, transform.forward, capCollider.radius + .1f));
-        while ((transform.position.y - capCollider.height * .5) < height)
+        while ((transform.position.y - capCollider.height * .5) < height && rb.velocity.y > 0)
         {
             //feetCheck = (Physics.Raycast(transform.position - Vector3.up * capCollider.height * .5f, transform.forward, capCollider.radius + .1f));
-            rb.velocity += Vector3.up * .05f;
+            rb.velocity += .05f* Vector3.up;
             yield return fixedUpdate;
         }
         feetCheck = false;
         previousState = playerState;
         if (!isGrounded) playerState = PlayerState.InAir;
-        rb.velocity = -forwardHit.normal * vaultEndStrength;
+        rb.velocity = ((forwardHit.normal.magnitude ==0)? transform.forward : -forwardHit.normal) * vaultEndStrength;
+        print(rb.velocity);
+        //Time.timeScale = 0;
 
     }
     private IEnumerator ClimbCoroutine()
