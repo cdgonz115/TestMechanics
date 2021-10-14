@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Walls
-  m_Shader: {fileID: -6465566751694194690, guid: 8052c2f205a8b1140ae4750416dfcb5f, type: 3}
+  m_Name: Walls 1
+  m_Shader: {fileID: -6465566751694194690, guid: 10ae5e6f5b625904eb419c14374bc37c, type: 3}
   m_ShaderKeywords: _SPECULAR_SETUP
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -81,7 +81,6 @@ Material:
     - Smoothness: 0.63
     - Toon_Ramp_Offset: 0.57
     - Toon_Ramp_Smoothness: 0.17
-    - UseXandY: 0
     - Vector1_3FC8252B: 0.95
     - Vector1_8FB5F906: 0.92
     - Vector1_D83FCA93: 0.5
@@ -112,21 +111,14 @@ Material:
     - _WorkflowMode: 0
     - _ZWrite: 1
     m_Colors:
-    - CloseColor: {r: 1, g: 1, b: 1, a: 0}
     - Color_945BF65D: {r: 0.42352942, g: 0.6862745, b: 0.7490196, a: 0}
     - Color_B1E921F5: {r: 1, g: 1, b: 1, a: 0}
     - Color_D4742AB9: {r: 0.60942507, g: 0.648574, b: 0.7830189, a: 0}
-    - FarColor: {r: 0, g: 0, b: 0, a: 0}
-    - LeftColor: {r: 1, g: 1, b: 1, a: 0}
-    - Left_Color: {r: 1, g: 1, b: 1, a: 0}
-    - RightColor: {r: 0, g: 0, b: 0, a: 0}
-    - Right_Color: {r: 0, g: 0, b: 0, a: 0}
     - Toon_Ramp_Tinting: {r: 0.4061054, g: 0.47945678, b: 0.509434, a: 0}
     - Vector4_8FFC8A12: {r: 1, g: 1, b: 1, a: 0}
     - _BaseColor: {r: 0.6886792, g: 0.6886792, b: 0.6886792, a: 1}
-    - _Color: {r: 0.9150943, g: 0.26046982, b: 0.06474723, a: 1}
+    - _Color: {r: 0, g: 0.47245184, b: 0.9056604, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _PlayerPosition: {r: 0, g: 0, b: 0, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _Specular: {r: 1, g: 1, b: 1, a: 0}
   m_BuildTextureStacks: []
