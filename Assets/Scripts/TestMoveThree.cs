@@ -29,6 +29,7 @@ public class TestMoveThree : MonoBehaviour
 
     float scrollWheelDelta;
     float groundCheckDistance;
+    float distanceToGround;
     #endregion
 
     #region Player States
@@ -265,7 +266,7 @@ public class TestMoveThree : MonoBehaviour
             isSprinting = false;
         }
         ClimbingChecks();
-        //HandleClimb();
+        HandleClimb();
         HandleVault();
         PerformExternalMovement();
         //print(rb.velocity + " after");
@@ -330,6 +331,12 @@ public class TestMoveThree : MonoBehaviour
             friction = inAirFriction;
         }
         isGrounded = groundCheck;
+        RaycastHit test;
+        if (!isGrounded)
+        {
+            Physics.SphereCast(transform.position, .5f, -transform.up, out test, 50);
+            distanceToGround = test.distance;
+        }
     }
     private void ClimbingChecks()
     {
@@ -425,8 +432,9 @@ public class TestMoveThree : MonoBehaviour
                 }
             }
         }
-        else if(crouchBuffer &&  playerState!=PlayerState.Jumping)
+        else if(crouchBuffer &&  playerState!=PlayerState.Jumping && distanceToGround > 5 && !isGrounded)
         {
+            print("calling it looser");
             GetComponent<DownLunge>().LungeDown(rb);
         }
 
@@ -584,7 +592,7 @@ public class TestMoveThree : MonoBehaviour
         previousState = playerState;
         if (!isGrounded) playerState = PlayerState.InAir;
         rb.velocity = ((forwardHit.normal.magnitude ==0)? transform.forward : -forwardHit.normal) * vaultEndStrength;
-        print(rb.velocity);
+        //print(rb.velocity);
         //Time.timeScale = 0;
 
     }
