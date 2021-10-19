@@ -14,6 +14,7 @@ public class ShootProjectile : MonoBehaviour
         {
             GameObject projectile = Instantiate(projecTilePrefab,transform.position + Vector3.up * .5f, transform.rotation);
             projectile.transform.forward = Camera.main.transform.forward;
+            projectile.GetComponent<ProjectilePlatform>().direction = Camera.main.transform.forward;
             projectile.GetComponent<Rigidbody>().velocity = projectile.transform.forward * projectileSpeed;
         }
     }
