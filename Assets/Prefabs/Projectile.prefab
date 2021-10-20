@@ -26,7 +26,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5766703818466593161}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -0, y: 0, z: -1.393}
+  m_LocalPosition: {x: 0, y: 0, z: -1.32}
   m_LocalScale: {x: 0.5, y: 1, z: 0.5}
   m_Children: []
   m_Father: {fileID: 5338936180590200646}
@@ -94,8 +94,8 @@ GameObject:
   - component: {fileID: 8546989075590969930}
   - component: {fileID: 5136476852079693181}
   - component: {fileID: 9121185520941602187}
-  - component: {fileID: 5418335306682392416}
-  - component: {fileID: 4312946825365505461}
+  - component: {fileID: 6244196335644191206}
+  - component: {fileID: -6199307705097827740}
   m_Layer: 11
   m_Name: Projectile
   m_TagString: Untagged
@@ -112,7 +112,7 @@ Transform:
   m_GameObject: {fileID: 7478180411689632201}
   m_LocalRotation: {x: -0, y: -0.7071068, z: -0, w: 0.7071068}
   m_LocalPosition: {x: -209.35977, y: 6.37, z: -23.812866}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_Children:
   - {fileID: 6926245216960291889}
   m_Father: {fileID: 0}
@@ -181,7 +181,22 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
---- !u!54 &5418335306682392416
+--- !u!114 &6244196335644191206
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7478180411689632201}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f2e8ff34409f694397bfeb5c4539213, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  wall: {fileID: 62035592242287664, guid: fac799b27b997534c8a0718cc08b7134, type: 3}
+  direction: {x: 0, y: 0, z: 0}
+  lifetime: 5
+--- !u!54 &-6199307705097827740
 Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -197,18 +212,3 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 112
   m_CollisionDetection: 2
---- !u!114 &4312946825365505461
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7478180411689632201}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1f2e8ff34409f694397bfeb5c4539213, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  wall: {fileID: 62035592242287664, guid: fac799b27b997534c8a0718cc08b7134, type: 3}
-  direction: {x: 0, y: 0, z: 0}
-  lifetime: 5
