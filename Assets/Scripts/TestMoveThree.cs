@@ -177,7 +177,7 @@ public class TestMoveThree : MonoBehaviour
     #endregion
 
     #region Raycast hits
-    RaycastHit hit;
+    [HideInInspector]public RaycastHit hit;
     RaycastHit forwardHit;
     RaycastHit feetHit;
     #endregion
@@ -434,7 +434,6 @@ public class TestMoveThree : MonoBehaviour
         }
         else if(crouchBuffer &&  playerState!=PlayerState.Jumping && distanceToGround > 5 && !isGrounded)
         {
-            print("calling it looser");
             GetComponent<DownLunge>().LungeDown(rb);
         }
 

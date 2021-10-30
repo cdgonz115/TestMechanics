@@ -7,7 +7,10 @@ public class ProjectilePlatform : MonoBehaviour
     public float despawnTimer;
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.tag == "Player") StartCoroutine(Despawn());
+        if (collision.gameObject.tag == "Player")
+        {
+            StartCoroutine(Despawn());
+        } 
     }
 
     IEnumerator Despawn()

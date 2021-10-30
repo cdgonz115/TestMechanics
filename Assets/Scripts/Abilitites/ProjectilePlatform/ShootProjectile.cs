@@ -24,6 +24,9 @@ public class ShootProjectile : MonoBehaviour
             projectile.GetComponent<Rigidbody>().velocity = projectile.transform.forward * projectileSpeed;
         }
     }
-    void ResetAbility() => used = false;
+    void ResetAbility()
+    {
+        if(!TestMoveThree.singleton.hit.collider.gameObject.CompareTag("SpawnablePlatform"))used = false;
+    }
 
 }
