@@ -352,8 +352,10 @@ public class TestMoveThree : MonoBehaviour
 
         if (feetSphereCheck && !onFakeGround)
         {
-            kneesCheck = Physics.Raycast(transform.position - Vector3.up * capCollider.height * .24f, transform.forward, maxDistance + capCollider.radius);
-            if (!kneesCheck && playerState == PlayerState.Grounded && (x != 0 || z != 0)) StartCoroutine(FakeGround());
+            Vector3 direction = feetHit.point - (transform.position - Vector3.up * .5f);
+            float dist = direction.magnitude;
+            kneesCheck = Physics.Raycast(transform.position - Vector3.up * capCollider.height * .24f, (direction - rb.velocity.y * Vector3.up), dist);
+            if (!kneesCheck && playerState == PlayerState.Grounded && (x != 0 || z != 0)) StartCoroutine(FakeGround()); 
         }
         kneesCheck = false;
     }
