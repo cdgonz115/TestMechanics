@@ -315,7 +315,8 @@ public class TestMoveThree : MonoBehaviour
             timeSinceGrounded = 0;
             if (playerJustLanded != null) playerJustLanded();
             rb.velocity = rb.velocity - Vector3.up * rb.velocity.y;
-            if (!onFakeGround && hit.normal.y != 1) rb.velocity = (groundedRight * x + groundedForward * z).normalized * rb.velocity.magnitude;          //This is to prevent the weird glitch where the player bounces on slopes if they land on them without jumping
+            float angleOfSurfaceAndVelocity= Vector3.Angle(rb.velocity, (hit.normal - Vector3.up * hit.normal.y));
+            if (!onFakeGround && hit.normal.y != 1 && angleOfSurfaceAndVelocity < 5 && z>0) rb.velocity = (groundedRight * x + groundedForward * z).normalized * rb.velocity.magnitude;          //This is to prevent the weird glitch where the player bounces on slopes if they land on them without jumping
             friction = groundFriction;
             _climbingCooldown = 0;
             previousState = playerState;
