@@ -5,17 +5,29 @@ using UnityEngine;
 public class ProjectilePlatform : MonoBehaviour
 {
     public float despawnTimer;
-    private void OnCollisionEnter(Collision collision)
+    public GameObject parent;
+    public static ProjectilePlatform singleton;
+    private void Awake()
     {
-        if (collision.gameObject.tag == "Player")
-        {
-            StartCoroutine(Despawn());
-        } 
+        if (singleton == null)
+            singleton = this;
+        else
+            Destroy(gameObject);
+    }
+    private void OnEnable()
+    {
+        parent = transform.parent.gameObject;
     }
 
-    IEnumerator Despawn()
+    public void PlayerStepedOnPlatform() => StartCoroutine(Disable());
+    IEnumerator Disable()
     {
         yield return new WaitForSeconds(despawnTimer);
-        Destroy(gameObject);
+        DisablePlatform();
+    }
+    public void DisablePlatform()
+    {
+        transform.parent = parent.transform;
+        gameObject.SetActive(false);
     }
 }
