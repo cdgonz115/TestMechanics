@@ -70,6 +70,7 @@ public class TestMoveThree : MonoBehaviour
     public float groundFriction;
     public float inAirFriction;
     public float slidingFriction;
+    public float downwardSlideAcceleration;
     #endregion
 
     #region In Air
@@ -113,6 +114,7 @@ public class TestMoveThree : MonoBehaviour
     [Header("Slide Variables")]
     public float velocityToSlide;
     public float slideForce;
+    public float downwardSlideForce;
     [Range(0, 1)]
     public float slideControl;
     #endregion
@@ -510,10 +512,11 @@ public class TestMoveThree : MonoBehaviour
     }
     private IEnumerator SlideCoroutine()
     {
-        friction = slidingFriction;
+        float angle = Vector3.Angle(rb.velocity, Vector3.up);
+        friction = (angle>90)?downwardSlideAcceleration:slidingFriction;
         previousState = playerState;
         playerState = PlayerState.Sliding;
-        totalVelocityToAdd += currentForwardAndRight * slideForce;
+        totalVelocityToAdd += rb.velocity * ((angle > 90) ? downwardSlideForce:slideForce);
         maxVelocity = maxWalkVelocity;
         isSprinting = false;
         while (rb.velocity.magnitude > maxVelocity)
