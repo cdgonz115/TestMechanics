@@ -77,6 +77,7 @@ public class TestMoveThree : MonoBehaviour
     [Header("In Air Variables")]
     [Range(0, 1)]
     public float inAirControl;
+    public float timeSinceGrounded;
     public int inAirJumps;
     private int _inAirJumps;
     #endregion
@@ -311,6 +312,7 @@ public class TestMoveThree : MonoBehaviour
         }
         if (groundCheck && (playerState == PlayerState.Jumping || playerState == PlayerState.InAir || playerState == PlayerState.Climbing))
         {
+            timeSinceGrounded = 0;
             if (playerJustLanded != null) playerJustLanded();
             rb.velocity = rb.velocity - Vector3.up * rb.velocity.y;
             if (!onFakeGround && hit.normal.y != 1) rb.velocity = (groundedRight * x + groundedForward * z).normalized * rb.velocity.magnitude;          //This is to prevent the weird glitch where the player bounces on slopes if they land on them without jumping
@@ -334,10 +336,11 @@ public class TestMoveThree : MonoBehaviour
         }
         isGrounded = groundCheck;
         RaycastHit test;
-        if (!isGrounded)
+        if (!isGrounded)                                                                        //This is just for the downward launch, should be removed for jsut mvoement script 
         {
             Physics.SphereCast(transform.position, .5f, -transform.up, out test, 50);
             distanceToGround = test.distance;
+            timeSinceGrounded += Time.fixedDeltaTime;
         }
     }
     private void ClimbingChecks()
@@ -436,7 +439,7 @@ public class TestMoveThree : MonoBehaviour
                 }
             }
         }
-        else if(crouchBuffer &&  playerState!=PlayerState.Jumping && distanceToGround > 5 && !isGrounded)
+        else if(crouchBuffer &&  playerState==PlayerState.InAir && timeSinceGrounded >.3f && distanceToGround > 5)
         {
             GetComponent<DownLunge>().LungeDown(rb);
         }
@@ -467,7 +470,6 @@ public class TestMoveThree : MonoBehaviour
             if (g > maxGravity) g *= gravityRate;
         }
     }
-
     public void SetInitialGravity() => g = initialGravity;
     public void SetInitialGravity(float value)
     {
