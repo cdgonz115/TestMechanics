@@ -26,7 +26,10 @@ public class ShootProjectile : MonoBehaviour
     }
     void ResetAbility()
     {
-        if(!TestMoveThree.singleton.hit.collider.gameObject.CompareTag("SpawnablePlatform"))used = false;
+        if (TestMoveThree.singleton.hit.collider)
+        {
+            if (!TestMoveThree.singleton.hit.collider.gameObject.CompareTag("SpawnablePlatform")) used = false;
+        }
     }
 
 }
