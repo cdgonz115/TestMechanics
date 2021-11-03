@@ -43101,6 +43101,10 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8225854368876441686, guid: 84edb829044563e40a96a9579f6a350c, type: 3}
+      propertyPath: inAirJumps
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8225854368876441686, guid: 84edb829044563e40a96a9579f6a350c, type: 3}
       propertyPath: inAirControl
       value: 0.021
       objectReference: {fileID: 0}
@@ -43113,8 +43117,16 @@ PrefabInstance:
       value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: 8225854368876441686, guid: 84edb829044563e40a96a9579f6a350c, type: 3}
+      propertyPath: climbingStrafe
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8225854368876441686, guid: 84edb829044563e40a96a9579f6a350c, type: 3}
       propertyPath: maxWalkVelocity
       value: 7.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8225854368876441686, guid: 84edb829044563e40a96a9579f6a350c, type: 3}
+      propertyPath: jumpInAirControl
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 8225854368876441686, guid: 84edb829044563e40a96a9579f6a350c, type: 3}
       propertyPath: vaultEndStrength
@@ -43130,7 +43142,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8225854368876441686, guid: 84edb829044563e40a96a9579f6a350c, type: 3}
       propertyPath: endOfClimbJumpHeight
-      value: 2
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 8225854368876441686, guid: 84edb829044563e40a96a9579f6a350c, type: 3}
       propertyPath: maxClimbCheckDistance
@@ -43142,7 +43154,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8225854368876441686, guid: 84edb829044563e40a96a9579f6a350c, type: 3}
       propertyPath: endOfClimbJumpStrength
-      value: 10
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8225854368876441686, guid: 84edb829044563e40a96a9579f6a350c, type: 3}
       propertyPath: downwardSlidingFriction

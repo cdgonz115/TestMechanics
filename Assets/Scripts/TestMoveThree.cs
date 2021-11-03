@@ -80,6 +80,7 @@ public class TestMoveThree : MonoBehaviour
     public float timeSinceGrounded;
     public int inAirJumps;
     private int _inAirJumps;
+    private float airControl;
     #endregion
 
     #region Gravity
@@ -97,6 +98,7 @@ public class TestMoveThree : MonoBehaviour
     public float jumpStrength;
     public float jumpStregthDecreaser;
     public float jumpInAirStrength;
+    public float jumpInAirControl;
     public float highestPointHoldTime;
     float _highestPointHoldTimer;
     public float justJumpedCooldown;
@@ -220,6 +222,7 @@ public class TestMoveThree : MonoBehaviour
         g = initialGravity;
         playerState = PlayerState.InAir;
         StartCoroutine(SetDependentVariablesDelay());
+        airControl = inAirControl;
         //Time.timeScale = .1f;
     }
 
@@ -378,7 +381,7 @@ public class TestMoveThree : MonoBehaviour
                 newForwardandRight = (transform.right * x + transform.forward * z);
                 if (z != 0 || x != 0)
                 {
-                    rb.velocity = newForwardandRight.normalized * currentForwardAndRight.magnitude * inAirControl + currentForwardAndRight * (1f - inAirControl) + rb.velocity.y * Vector3.up;
+                    rb.velocity = newForwardandRight.normalized * currentForwardAndRight.magnitude * airControl + currentForwardAndRight * (1f - airControl) + rb.velocity.y * Vector3.up;
                 }
 
             }
@@ -555,6 +558,7 @@ public class TestMoveThree : MonoBehaviour
         g = jumpingInitialGravity;
         _justJumpedCooldown = justJumpedCooldown;
         totalVelocityToAdd += newForwardandRight;
+        airControl = jumpInAirControl;
         if (inAirJump)
         {
             if ((x != 0 || z != 0)) rb.velocity = newForwardandRight.normalized * ((currentForwardAndRight.magnitude < maxSprintVelocity) ? maxSprintVelocity : currentForwardAndRight.magnitude);
@@ -579,6 +583,7 @@ public class TestMoveThree : MonoBehaviour
             }
             g = initialGravity;
         }
+        airControl = inAirControl;
         if (rb.velocity.magnitude >= maxSprintVelocity) isSprinting = true;
         previousState = playerState;
         if (!isGrounded) playerState = PlayerState.InAir;
@@ -642,8 +647,14 @@ public class TestMoveThree : MonoBehaviour
         if (!isGrounded) playerState = PlayerState.InAir;
         else rb.velocity = -Vector3.up * rb.velocity.y;
         g = initialGravity;
+        StartCoroutine(EndOfClimbAirControl());
     }
-
+    private IEnumerator EndOfClimbAirControl()
+    {
+        airControl = jumpInAirControl;
+        yield return new WaitForSeconds(.5f);
+        airControl = inAirControl;
+    }
     private IEnumerator SetDependentVariablesDelay()
     {
         yield return new WaitForSeconds(.5f);
