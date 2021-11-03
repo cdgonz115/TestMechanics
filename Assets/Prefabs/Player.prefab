@@ -167,8 +167,10 @@ MonoBehaviour:
   groundFriction: 0.1
   inAirFriction: 0.004
   slidingFriction: 0.02
+  downwardSlideAcceleration: 0
   inAirControl: 0.021
-  inAirJumps: 1
+  timeSinceGrounded: 0
+  inAirJumps: 0
   initialGravity: -0.55
   gravityRate: 1.008
   maxGravity: -39.2
@@ -177,6 +179,7 @@ MonoBehaviour:
   jumpStrength: 6.5
   jumpStregthDecreaser: 0.05
   jumpInAirStrength: 0
+  jumpInAirControl: 0.1
   highestPointHoldTime: 0.05
   justJumpedCooldown: 0.1
   coyoteTime: 0.15
@@ -184,6 +187,7 @@ MonoBehaviour:
   topIsClear: 0
   velocityToSlide: 13
   slideForce: 1.1
+  downwardSlideForce: 1.05
   slideControl: 0.025
   feetSphereCheck: 0
   kneesCheck: 0
@@ -203,12 +207,12 @@ MonoBehaviour:
   maxClimbingVelocity: 10
   initialClimbingGravity: 0.5
   climbingGravityMultiplier: 1.005
-  climbingStrafe: 0.1
+  climbingStrafe: 0.3
   climbStrafeDecreaser: 0.001
   maxClimbStrafeVelocity: 5
   climbingStrafeFriction: 0.01
-  endOfClimbJumpStrength: 10
-  endOfClimbJumpHeight: 2
+  endOfClimbJumpStrength: 3
+  endOfClimbJumpHeight: 4
   climbingCooldown: 2
   wallJumpHeightStrenght: 5
   wallJumpNormalStrength: 5
