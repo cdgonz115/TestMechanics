@@ -170,7 +170,7 @@ MonoBehaviour:
   downwardSlideAcceleration: 0
   inAirControl: 0.021
   timeSinceGrounded: 0
-  inAirJumps: 0
+  inAirJumps: 1
   initialGravity: -0.55
   gravityRate: 1.008
   maxGravity: -39.2

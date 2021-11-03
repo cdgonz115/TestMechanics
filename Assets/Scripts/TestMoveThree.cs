@@ -179,6 +179,8 @@ public class TestMoveThree : MonoBehaviour
     Vector3 newForwardandRight;
     Vector3 currentForwardAndRight;
     Vector3 velocityAtCollision;
+
+    Vector3 lastViablePosition;
     #endregion
 
     #region Raycast hits
@@ -315,6 +317,7 @@ public class TestMoveThree : MonoBehaviour
         }
         if (groundCheck && (playerState == PlayerState.Jumping || playerState == PlayerState.InAir || playerState == PlayerState.Climbing))
         {
+            lastViablePosition = transform.position;
             timeSinceGrounded = 0;
             if (playerJustLanded != null) playerJustLanded();
             rb.velocity = rb.velocity - Vector3.up * rb.velocity.y;
@@ -659,5 +662,13 @@ public class TestMoveThree : MonoBehaviour
     {
         yield return new WaitForSeconds(.5f);
         if (setVariablesOnOtherScripts != null) setVariablesOnOtherScripts();
+    }
+
+    public void ResetPosition()
+    {
+        rb.velocity = Vector3.zero;
+        g = 0;
+        transform.position = lastViablePosition;
+
     }
 }
