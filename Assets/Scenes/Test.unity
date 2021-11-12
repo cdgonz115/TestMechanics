@@ -43007,6 +43007,8 @@ GameObject:
   - component: {fileID: 1869006581600355674}
   - component: {fileID: 1869006581600355664}
   - component: {fileID: 1869006581600355680}
+  - component: {fileID: 1869006581600355679}
+  - component: {fileID: 1869006581600355681}
   m_Layer: 10
   m_Name: PlayerTest
   m_TagString: Player
@@ -43110,6 +43112,22 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 28
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
+--- !u!114 &1869006581600355679
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1869006581600355673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1cb2da6ad5504074a987b65b39408ff7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  crouchBuffer: 0
+  topIsClear: 0
+  isCrouching: 0
+  moveCamera: {fileID: 0}
 --- !u!114 &1869006581600355680
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -43122,6 +43140,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1bcb3b03fb9f64d439270526532577e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rb: {fileID: 0}
+  capCollider: {fileID: 0}
+  crouchingMechanic: {fileID: 0}
+  jumpingMechanic: {fileID: 0}
+  x: 0
+  z: 0
+  g: 0
   blockGroundCheck: 0
   blockSprinting: 0
   isGrounded: 0
@@ -43147,6 +43172,33 @@ MonoBehaviour:
   gravityRate: 1.008
   maxGravity: -39.2
   fakeGroundTime: 0.1
+  totalVelocityToAdd: {x: 0, y: 0, z: 0}
+  newForwardandRight: {x: 0, y: 0, z: 0}
+  currentForwardAndRight: {x: 0, y: 0, z: 0}
+--- !u!114 &1869006581600355681
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1869006581600355673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 495fabb091228f54ba1dae5a78cf83f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  jumpBuffer: 0.2
+  jumpStrength: 6.5
+  jumpStregthDecreaser: 0.05
+  jumpInAirStrength: 0
+  jumpInAirControl: 0.1
+  jumpingInitialGravity: -0.3
+  highestPointHoldTime: 0.05
+  justJumpedCooldown: 0.1
+  _justJumpedCooldown: 0
+  coyoteTime: 0.15
+  _coyoteTimer: 0
+  inAirJumps: 1
 --- !u!4 &2457878030250253318
 Transform:
   m_ObjectHideFlags: 0
