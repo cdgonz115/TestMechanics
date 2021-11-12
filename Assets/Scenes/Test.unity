@@ -43139,6 +43139,7 @@ MonoBehaviour:
   maxVelocity: 0
   minVelocity: 0.1
   groundFriction: 0.1
+  inAirFriction: 0.004
   friction: 0
   inAirControl: 0.21
   airControl: 0

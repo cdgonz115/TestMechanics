@@ -15,14 +15,16 @@ public class BaseMovement : MonoBehaviour
 {
     #region Variables
     #region Components
-    private Rigidbody rb;
-    private CapsuleCollider capCollider;
+    [HideInInspector] public Rigidbody rb;
+    [HideInInspector] public CapsuleCollider capCollider;
+    [HideInInspector] public CrouchingMechanic crouchingMechanic;
+    [HideInInspector] public JumpingMechanic jumpingMechanic;
     #endregion
 
     #region Primitive Variables
-    float x, z;
+    [HideInInspector]public float x, z;
+    [HideInInspector] public float g; 
     float pvX, pvZ;
-    float g;
 
     float groundCheckDistance;
     #endregion
@@ -66,6 +68,7 @@ public class BaseMovement : MonoBehaviour
     #region Friction
     [Header("Friction Values")]
     public float groundFriction;
+    public float inAirFriction;
     public float friction;
     #endregion
 
@@ -94,9 +97,9 @@ public class BaseMovement : MonoBehaviour
     Vector3 groundedForward;
     Vector3 groundedRight;
 
-    Vector3 totalVelocityToAdd;
-    Vector3 newForwardandRight;
-    Vector3 currentForwardAndRight;
+    [HideInInspector] public Vector3 totalVelocityToAdd;
+    [HideInInspector] public Vector3 newForwardandRight;
+    [HideInInspector] public Vector3 currentForwardAndRight;
     Vector3 velocityAtCollision;
 
     Vector3 lastViablePosition;
@@ -110,10 +113,14 @@ public class BaseMovement : MonoBehaviour
     #region Events and delegates
     public delegate void PlayerBecameGrounded();
     public event PlayerBecameGrounded playerJustLanded;
+    public delegate void BeforeApplied();
+    public event PlayerBecameGrounded beforeVelocityIsAppliedEvent;
+    public delegate void AfterApplied();
+    public event PlayerBecameGrounded afterVelocityIsAppliedEvent;
     #endregion
 
     #region Other
-    private WaitForFixedUpdate fixedUpdate;
+    [HideInInspector] public WaitForFixedUpdate fixedUpdate;
     public static BaseMovement singleton;
     #endregion
 
@@ -131,9 +138,11 @@ public class BaseMovement : MonoBehaviour
     {
         capCollider = GetComponent<CapsuleCollider>();
         rb = GetComponent<Rigidbody>();
+        if (GetComponent<CrouchingMechanic>()) crouchingMechanic = GetComponent<CrouchingMechanic>();
+        if (GetComponent<JumpingMechanic>()) jumpingMechanic = GetComponent<JumpingMechanic>();
         fixedUpdate = new WaitForFixedUpdate();
         groundCheckDistance = capCollider.height * .5f - capCollider.radius;
-        friction = groundFriction;
+        friction = inAirFriction;
         g = initialGravity;
         playerState = PlayerState.InAir;
         airControl = inAirControl;
@@ -141,7 +150,6 @@ public class BaseMovement : MonoBehaviour
 
     void Update()
     {
-        //crouchBuffer = Input.GetKey(KeyCode.LeftControl);
 
         if (Input.GetKeyDown(KeyCode.LeftShift))isSprinting = !blockSprinting;
 
@@ -173,20 +181,27 @@ public class BaseMovement : MonoBehaviour
     {
         GroundCheck();
         Move();
+        if (crouchingMechanic) crouchingMechanic.Crouch();
+        if (crouchingMechanic) jumpingMechanic.HandleJumpInput();
         ApplyGravity();
+        if (beforeVelocityIsAppliedEvent != null) beforeVelocityIsAppliedEvent();
         rb.velocity += totalVelocityToAdd;
         if (rb.velocity.magnitude < minVelocity && x == 0 && z == 0 && (isGrounded))        //If the player stops moving set its maxVelocity to walkingSpeed and set its rb velocity to 0
         {
             rb.velocity = Vector3.zero;
             isSprinting = false;
         }
+        if (afterVelocityIsAppliedEvent != null) afterVelocityIsAppliedEvent();
     }
 
     private void GroundCheck()
     {
-        //if (_coyoteTimer > 0) _coyoteTimer -= Time.fixedDeltaTime;
-        //if (_justJumpedCooldown > 0) _justJumpedCooldown -= Time.fixedDeltaTime;
-        groundCheck = (blockGroundCheck) ? false: Physics.SphereCast(transform.position, capCollider.radius, -transform.up, out hit, groundCheckDistance + 0.01f);
+        if (jumpingMechanic)
+        {
+            if (jumpingMechanic._coyoteTimer > 0) jumpingMechanic._coyoteTimer -= Time.fixedDeltaTime;
+            if (jumpingMechanic._justJumpedCooldown > 0) jumpingMechanic._justJumpedCooldown -= Time.fixedDeltaTime;
+        }
+        groundCheck = (jumpingMechanic._justJumpedCooldown <= 0) ? Physics.SphereCast(transform.position, capCollider.radius, -transform.up, out hit, groundCheckDistance + 0.01f) : false;
         surfaceSlope = Vector3.Angle(hit.normal, Vector3.up);
         if (surfaceSlope > maxSlope)
         {
@@ -240,8 +255,8 @@ public class BaseMovement : MonoBehaviour
                 playerState = PlayerState.InAir;
                 g = initialGravity;
             }
+            friction = inAirFriction;
             //_coyoteTimer = coyoteTime;
-            //friction = inAirFriction;
         }
         isGrounded = groundCheck;
 
