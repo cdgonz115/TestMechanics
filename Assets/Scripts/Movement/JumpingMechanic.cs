@@ -2,9 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class JumpingMechanic : MonoBehaviour
+public class JumpingMechanic : MonoBehaviour, AdditionToBaseMovement
 {
-
     public static JumpingMechanic singleton;
     float y;
 
@@ -38,9 +37,10 @@ public class JumpingMechanic : MonoBehaviour
     private void Start()
     {
         BaseMovement.singleton.playerJustLanded += PlayerLanded;
+        BaseMovement.singleton.playerLeftGround += PlayerLeftGround;
     }
     // Update is called once per frame
-    void Update()
+    public void UpdateMechanic()
     {
         scrollWheelDelta = Input.GetAxis("Mouse ScrollWheel");
         if (Input.GetKeyDown(KeyCode.Space) || scrollWheelDelta > 0)
@@ -54,7 +54,7 @@ public class JumpingMechanic : MonoBehaviour
         if (_jumpBuffer <= 0) _jumpBuffer = 0;
         if (BaseMovement.singleton.playerState != PlayerState.Climbing)
         {
-            if (_jumpBuffer > 0 && (BaseMovement.singleton.isGrounded || _coyoteTimer > 0) && BaseMovement.singleton.playerState != PlayerState.Jumping && CrouchingMechanic.singleton.topIsClear) StartCoroutine(JumpCoroutine(false));
+            if (_jumpBuffer > 0 && (BaseMovement.singleton.isGrounded || _coyoteTimer > 0) && BaseMovement.singleton.playerState != PlayerState.Jumping && (BaseMovement.singleton.crouchingMechanic?CrouchingMechanic.singleton.topIsClear:true)) StartCoroutine(JumpCoroutine(false));
             else if (BaseMovement.singleton.playerState == PlayerState.InAir && _inAirJumps > 0 && _jumpBuffer > 0)
             {
                 _inAirJumps--;
@@ -103,4 +103,5 @@ public class JumpingMechanic : MonoBehaviour
         if (!BaseMovement.singleton.isGrounded) BaseMovement.singleton.playerState = PlayerState.InAir;
     }
     public void PlayerLanded() => _inAirJumps = inAirJumps;
+    public void PlayerLeftGround() => _coyoteTimer = coyoteTime;
 }

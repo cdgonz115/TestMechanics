@@ -43127,6 +43127,7 @@ MonoBehaviour:
   crouchBuffer: 0
   topIsClear: 0
   isCrouching: 0
+  canSlide: 1
   moveCamera: {fileID: 0}
 --- !u!114 &1869006581600355680
 MonoBehaviour:
@@ -43147,8 +43148,6 @@ MonoBehaviour:
   x: 0
   z: 0
   g: 0
-  blockGroundCheck: 0
-  blockSprinting: 0
   isGrounded: 0
   isSprinting: 0
   onFakeGround: 0

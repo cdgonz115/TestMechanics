@@ -29,11 +29,6 @@ public class BaseMovement : MonoBehaviour
     float groundCheckDistance;
     #endregion
 
-    #region Override Movement Script
-    [HideInInspector] public bool blockGroundCheck;
-    [HideInInspector] public bool blockSprinting;
-    #endregion
-
     #region Player States
     [Header("Player States")]
     public bool isGrounded;
@@ -113,10 +108,8 @@ public class BaseMovement : MonoBehaviour
     #region Events and delegates
     public delegate void PlayerBecameGrounded();
     public event PlayerBecameGrounded playerJustLanded;
-    public delegate void BeforeApplied();
-    public event PlayerBecameGrounded beforeVelocityIsAppliedEvent;
-    public delegate void AfterApplied();
-    public event PlayerBecameGrounded afterVelocityIsAppliedEvent;
+    public delegate void PlayerLeftTheGround();
+    public event PlayerLeftTheGround playerLeftGround;
     #endregion
 
     #region Other
@@ -150,8 +143,9 @@ public class BaseMovement : MonoBehaviour
 
     void Update()
     {
-
-        if (Input.GetKeyDown(KeyCode.LeftShift))isSprinting = !blockSprinting;
+        if (crouchingMechanic) crouchingMechanic.UpdateMechanic();
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+            if (crouchingMechanic) isSprinting = (crouchingMechanic.isCrouching ? false : true);
 
         speedIncrease = (isSprinting) ? sprintSpeedIncrease : walkSpeedIncrease;
         maxVelocity = (isSprinting) ? maxSprintVelocity : maxWalkVelocity;
@@ -163,11 +157,7 @@ public class BaseMovement : MonoBehaviour
         else if (Input.GetKey(KeyCode.A)) x = -speedIncrease;
         else x = 0;
 
-        //scrollWheelDelta = Input.GetAxis("Mouse ScrollWheel");
-        //if (Input.GetKeyDown(KeyCode.Space) || scrollWheelDelta > 0)
-        //{
-        //    _jumpBuffer = jumpBuffer;
-        //}
+        if (jumpingMechanic) jumpingMechanic.UpdateMechanic();
 
         if (Input.GetKeyDown(KeyCode.E))
         {
@@ -181,17 +171,15 @@ public class BaseMovement : MonoBehaviour
     {
         GroundCheck();
         Move();
-        if (crouchingMechanic) crouchingMechanic.Crouch();
-        if (crouchingMechanic) jumpingMechanic.HandleJumpInput();
+        if (crouchingMechanic) crouchingMechanic.HandleCrouchInput();
+        if (jumpingMechanic) jumpingMechanic.HandleJumpInput();
         ApplyGravity();
-        if (beforeVelocityIsAppliedEvent != null) beforeVelocityIsAppliedEvent();
         rb.velocity += totalVelocityToAdd;
         if (rb.velocity.magnitude < minVelocity && x == 0 && z == 0 && (isGrounded))        //If the player stops moving set its maxVelocity to walkingSpeed and set its rb velocity to 0
         {
             rb.velocity = Vector3.zero;
             isSprinting = false;
         }
-        if (afterVelocityIsAppliedEvent != null) afterVelocityIsAppliedEvent();
     }
 
     private void GroundCheck()
@@ -201,7 +189,7 @@ public class BaseMovement : MonoBehaviour
             if (jumpingMechanic._coyoteTimer > 0) jumpingMechanic._coyoteTimer -= Time.fixedDeltaTime;
             if (jumpingMechanic._justJumpedCooldown > 0) jumpingMechanic._justJumpedCooldown -= Time.fixedDeltaTime;
         }
-        groundCheck = (jumpingMechanic._justJumpedCooldown <= 0) ? Physics.SphereCast(transform.position, capCollider.radius, -transform.up, out hit, groundCheckDistance + 0.01f) : false;
+        groundCheck = (!jumpingMechanic || jumpingMechanic._justJumpedCooldown <= 0) ? Physics.SphereCast(transform.position, capCollider.radius, -transform.up, out hit, groundCheckDistance + 0.01f) : false;
         surfaceSlope = Vector3.Angle(hit.normal, Vector3.up);
         if (surfaceSlope > maxSlope)
         {
@@ -244,7 +232,6 @@ public class BaseMovement : MonoBehaviour
             previousState = playerState;
             playerState = PlayerState.Grounded;
             g = 0;
-            //_inAirJumps = inAirJumps;
         }
         //Player just left the ground
         if (isGrounded && !groundCheck)
@@ -256,7 +243,7 @@ public class BaseMovement : MonoBehaviour
                 g = initialGravity;
             }
             friction = inAirFriction;
-            //_coyoteTimer = coyoteTime;
+            if (playerLeftGround != null) playerLeftGround();
         }
         isGrounded = groundCheck;
 

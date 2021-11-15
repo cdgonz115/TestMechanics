@@ -2,13 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CrouchingMechanic : MonoBehaviour
+public class CrouchingMechanic : MonoBehaviour, AdditionToBaseMovement
 {
     public static CrouchingMechanic singleton;
     public bool crouchBuffer;
     public bool topIsClear;
     public bool isCrouching;
+    public bool canSlide;
     public MoveCamera moveCamera;
+    private SlideMechanic slideMechanic;
     private void Awake()
     {
         if (singleton == null)
@@ -16,9 +18,17 @@ public class CrouchingMechanic : MonoBehaviour
         else
             Destroy(gameObject);
     }
-    void Start()=> moveCamera = GetComponent<MoveCamera>();
-    void Update() => crouchBuffer = Input.GetKey(KeyCode.LeftControl);
-    public void Crouch()
+    void Start() 
+    {
+        moveCamera = GetComponent<MoveCamera>();
+        if (canSlide)
+        {
+            if(!GetComponent<SlideMechanic>()) gameObject.AddComponent(typeof(SlideMechanic));
+            slideMechanic = GetComponent<SlideMechanic>();
+        }
+    }
+    public void UpdateMechanic() => crouchBuffer = Input.GetKey(KeyCode.LeftControl);
+    public void HandleCrouchInput()
     {
         topIsClear = !Physics.Raycast(transform.position - BaseMovement.singleton.newForwardandRight.normalized * BaseMovement.singleton.capCollider.radius, Vector3.up, BaseMovement.singleton.capCollider.height + .01f); // Check if thee's nothing blocking the player from standing up
         
@@ -29,11 +39,11 @@ public class CrouchingMechanic : MonoBehaviour
             {
                 BaseMovement.singleton.capCollider.height *= .5f;
                 BaseMovement.singleton.capCollider.center += Vector3.up * -.5f;
-                BaseMovement.singleton.blockSprinting = true;
                 isCrouching = true;
                 moveCamera.AdjustCameraHeight(true);
 
-                //if (BaseMovement.singleton.playerState != PlayerState.Sliding && BaseMovement.singleton.rb.velocity.magnitude > velocityToSlide) StartCoroutine(SlideCoroutine());
+                if(canSlide )
+                    if (BaseMovement.singleton.playerState != PlayerState.Sliding && BaseMovement.singleton.rb.velocity.magnitude > slideMechanic.velocityToSlide) StartCoroutine(slideMechanic.SlideCoroutine());
 
             }
             //Stand Up
@@ -44,7 +54,6 @@ public class CrouchingMechanic : MonoBehaviour
                     BaseMovement.singleton.capCollider.height *= 2f;
                     BaseMovement.singleton.capCollider.center += Vector3.up * .5f;
                     isCrouching = false;
-                    BaseMovement.singleton.blockSprinting = false;
                     moveCamera.AdjustCameraHeight(false);
                 }
             }
