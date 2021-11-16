@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class JumpingMechanic : MonoBehaviour, AdditionToBaseMovement
+public class JumpingMechanic : MonoBehaviour, MovementRequiresInput
 {
     public static JumpingMechanic singleton;
     float y;

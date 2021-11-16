@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CrouchingMechanic : MonoBehaviour, AdditionToBaseMovement
+public class CrouchingMechanic : MonoBehaviour, MovementRequiresInput
 {
     public static CrouchingMechanic singleton;
     public bool crouchBuffer;
