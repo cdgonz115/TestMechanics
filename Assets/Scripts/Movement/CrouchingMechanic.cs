@@ -42,7 +42,8 @@ public class CrouchingMechanic : MonoBehaviour, MovementRequiresInput
                 isCrouching = true;
                 moveCamera.AdjustCameraHeight(true);
 
-                if(canSlide )
+                //Sliding Mechanic
+                if(canSlide)
                     if (BaseMovement.singleton.playerState != PlayerState.Sliding && BaseMovement.singleton.rb.velocity.magnitude > slideMechanic.velocityToSlide) StartCoroutine(slideMechanic.SlideCoroutine());
 
             }

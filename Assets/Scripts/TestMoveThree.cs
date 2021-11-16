@@ -277,10 +277,6 @@ public class TestMoveThree : MonoBehaviour
         HandleClimb();
         HandleVault();
         PerformExternalMovement();
-        //print(rb.velocity + " after");
-        
-        //Debug.DrawLine(transform.position, transform.position + actualForward.normalized * 5, Color.red);
-        //Debug.DrawLine(transform.position, transform.position + actualRight.normalized * 5, Color.red);
     }
 
     private void GroundCheck()
