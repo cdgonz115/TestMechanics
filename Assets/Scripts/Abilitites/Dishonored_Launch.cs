@@ -55,7 +55,7 @@ public class Dishonored_Launch : MonoBehaviour
         forceVector.y = yDistance - calculatedYVelocityLost;
 
         rb.velocity = forceVector + new Vector3( rb.velocity.x, 0, rb.velocity.z);
-        TestMoveThree.singleton.SetInitialGravity(TestMoveThree.singleton.initialGravity);
+        TestMoveThree.singleton.SetInitialGravity();
         onCooldown = true;
         TestMoveThree.singleton.externalMovementEvent -= PerformLaunch;
     }

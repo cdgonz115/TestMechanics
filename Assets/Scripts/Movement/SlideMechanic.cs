@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(CrouchingMechanic))]
+[RequireComponent(typeof(CrouchMechanic))]
 public class SlideMechanic : MonoBehaviour
 {
     public float velocityToSlide = 13;
@@ -13,15 +13,18 @@ public class SlideMechanic : MonoBehaviour
     [Range(0, 1)]
     public float slideControl = 0.025f;
 
+    private WaitForFixedUpdate fixedUpdate;
+
     #region Components
-    CrouchingMechanic crouchingMechanic;
+    CrouchMechanic crouchingMechanic;
     Rigidbody rb;
     #endregion
 
     private void Start()
     {
-        crouchingMechanic = GetComponent<CrouchingMechanic>();
+        crouchingMechanic = GetComponent<CrouchMechanic>();
         rb = GetComponent<Rigidbody>();
+        fixedUpdate = new WaitForFixedUpdate();
     }
     public IEnumerator SlideCoroutine()
     {
@@ -50,7 +53,7 @@ public class SlideMechanic : MonoBehaviour
             //    playerState = PlayerState.Grounded;
             //    yield break;
             //}
-            yield return BaseMovement.singleton.fixedUpdate;
+            yield return fixedUpdate;
         }
         BaseMovement.singleton.friction = BaseMovement.singleton.groundFriction;
         BaseMovement.singleton.previousState = BaseMovement.singleton.playerState;

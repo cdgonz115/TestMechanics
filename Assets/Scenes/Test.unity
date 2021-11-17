@@ -43009,6 +43009,8 @@ GameObject:
   - component: {fileID: 1869006581600355680}
   - component: {fileID: 1869006581600355679}
   - component: {fileID: 1869006581600355681}
+  - component: {fileID: 1869006581600355683}
+  - component: {fileID: 1869006581600355682}
   m_Layer: 10
   m_Name: PlayerTest
   m_TagString: Player
@@ -43143,8 +43145,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rb: {fileID: 0}
   capCollider: {fileID: 0}
-  crouchingMechanic: {fileID: 0}
-  jumpingMechanic: {fileID: 0}
+  crouchMechanic: {fileID: 0}
+  jumpMechanic: {fileID: 0}
   x: 0
   z: 0
   g: 0
@@ -43187,6 +43189,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   jumpBuffer: 0.2
+  _jumpBuffer: 0
   jumpStrength: 6.5
   jumpStregthDecreaser: 0.05
   jumpInAirStrength: 0
@@ -43198,6 +43201,57 @@ MonoBehaviour:
   coyoteTime: 0.15
   _coyoteTimer: 0
   inAirJumps: 1
+--- !u!114 &1869006581600355682
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1869006581600355673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a35bdb8cd74a86469b80c44c647f28e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  negativeVelocityToClimb: -45
+  climbingDuration: 1
+  climbAcceleration: 0.5
+  maxClimbingVelocity: 10
+  initialClimbingGravity: 0.5
+  climbingGravityMultiplier: 1.005
+  climbingStrafe: 0.3
+  climbStrafeDecreaser: 0.001
+  maxClimbStrafeVelocity: 5
+  climbingStrafeFriction: 0.01
+  endOfClimbJumpStrength: 3
+  endOfClimbJumpHeight: 4
+  climbingCooldown: 2
+  wallJumpHeightStrenght: 5
+  wallJumpNormalStrength: 5
+--- !u!114 &1869006581600355683
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1869006581600355673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 026d481aebd81b04bb8ea8d8b3bb39bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  feetSphereCheck: 0
+  kneesCheck: 0
+  minClimbCheckDistance: 0
+  maxClimbCheckDistance: 0
+  minClimbSlope: 0
+  feetCheck: 0
+  headCheck: 0
+  forwardCheck: 0
+  vaultClimbStrength: 10
+  vaultEndStrength: 6
+  vaultDuration: 0.8
+  velocityAtCollision: {x: 0, y: 0, z: 0}
 --- !u!4 &2457878030250253318
 Transform:
   m_ObjectHideFlags: 0

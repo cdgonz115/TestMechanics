@@ -474,10 +474,6 @@ public class TestMoveThree : MonoBehaviour
         }
     }
     public void SetInitialGravity() => g = initialGravity;
-    public void SetInitialGravity(float value)
-    {
-        g = value;
-    }
     private void HandleVault()
     {
         if ((playerState == PlayerState.InAir || (playerState == PlayerState.Climbing && slope == 0)) && forwardCheck && !headCheck && z > 0)

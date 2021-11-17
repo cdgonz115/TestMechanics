@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CrouchingMechanic : MonoBehaviour, MovementRequiresInput
+public class CrouchMechanic : MonoBehaviour, MovementRequiresInput
 {
-    public static CrouchingMechanic singleton;
+    public static CrouchMechanic singleton;
     public bool crouchBuffer;
     public bool topIsClear;
     public bool isCrouching;

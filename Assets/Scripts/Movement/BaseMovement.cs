@@ -17,8 +17,9 @@ public class BaseMovement : MonoBehaviour
     #region Components
     [HideInInspector] public Rigidbody rb;
     [HideInInspector] public CapsuleCollider capCollider;
-    [HideInInspector] public CrouchingMechanic crouchingMechanic;
-    [HideInInspector] public JumpingMechanic jumpingMechanic;
+    [HideInInspector] public CrouchMechanic crouchMechanic;
+    [HideInInspector] public JumpMechanic jumpMechanic;
+    [HideInInspector] public VaultMechanic vaultMechanic;
     #endregion
 
     #region Primitive Variables
@@ -102,7 +103,7 @@ public class BaseMovement : MonoBehaviour
 
     #region Raycast hits
     [HideInInspector] public RaycastHit hit;
-    RaycastHit feetHit;
+    [HideInInspector] public RaycastHit feetHit;
     #endregion
 
     #region Events and delegates
@@ -113,7 +114,7 @@ public class BaseMovement : MonoBehaviour
     #endregion
 
     #region Other
-    [HideInInspector] public WaitForFixedUpdate fixedUpdate;
+    private WaitForFixedUpdate fixedUpdate;
     public static BaseMovement singleton;
     #endregion
 
@@ -131,8 +132,9 @@ public class BaseMovement : MonoBehaviour
     {
         capCollider = GetComponent<CapsuleCollider>();
         rb = GetComponent<Rigidbody>();
-        if (GetComponent<CrouchingMechanic>()) crouchingMechanic = GetComponent<CrouchingMechanic>();
-        if (GetComponent<JumpingMechanic>()) jumpingMechanic = GetComponent<JumpingMechanic>();
+        if (GetComponent<CrouchMechanic>()) crouchMechanic = GetComponent<CrouchMechanic>();
+        if (GetComponent<JumpMechanic>()) jumpMechanic = GetComponent<JumpMechanic>();
+        if (GetComponent<VaultMechanic>()) vaultMechanic = GetComponent<VaultMechanic>();
         fixedUpdate = new WaitForFixedUpdate();
         groundCheckDistance = capCollider.height * .5f - capCollider.radius;
         friction = inAirFriction;
@@ -143,9 +145,10 @@ public class BaseMovement : MonoBehaviour
 
     void Update()
     {
-        if (crouchingMechanic) crouchingMechanic.UpdateMechanic();
+        if (crouchMechanic) crouchMechanic.UpdateMechanic();
         if (Input.GetKeyDown(KeyCode.LeftShift))
-            if (crouchingMechanic) isSprinting = (crouchingMechanic.isCrouching ? false : true);
+            if (crouchMechanic) isSprinting = (crouchMechanic.isCrouching ? false : true);
+            else isSprinting = true; 
 
         speedIncrease = (isSprinting) ? sprintSpeedIncrease : walkSpeedIncrease;
         maxVelocity = (isSprinting) ? maxSprintVelocity : maxWalkVelocity;
@@ -157,7 +160,7 @@ public class BaseMovement : MonoBehaviour
         else if (Input.GetKey(KeyCode.A)) x = -speedIncrease;
         else x = 0;
 
-        if (jumpingMechanic) jumpingMechanic.UpdateMechanic();
+        if (jumpMechanic) jumpMechanic.UpdateMechanic();
 
         if (Input.GetKeyDown(KeyCode.E))
         {
@@ -171,8 +174,8 @@ public class BaseMovement : MonoBehaviour
     {
         GroundCheck();
         Move();
-        if (crouchingMechanic) crouchingMechanic.HandleCrouchInput();
-        if (jumpingMechanic) jumpingMechanic.HandleJumpInput();
+        if (crouchMechanic) crouchMechanic.HandleCrouchInput();
+        if (jumpMechanic) jumpMechanic.HandleJumpInput();
         ApplyGravity();
         rb.velocity += totalVelocityToAdd;
         if (rb.velocity.magnitude < minVelocity && x == 0 && z == 0 && (isGrounded))        //If the player stops moving set its maxVelocity to walkingSpeed and set its rb velocity to 0
@@ -180,16 +183,18 @@ public class BaseMovement : MonoBehaviour
             rb.velocity = Vector3.zero;
             isSprinting = false;
         }
+        vaultMechanic.ClimbChecks();
+        vaultMechanic.HandleVault();
     }
 
     private void GroundCheck()
     {
-        if (jumpingMechanic)
+        if (jumpMechanic)
         {
-            if (jumpingMechanic._coyoteTimer > 0) jumpingMechanic._coyoteTimer -= Time.fixedDeltaTime;
-            if (jumpingMechanic._justJumpedCooldown > 0) jumpingMechanic._justJumpedCooldown -= Time.fixedDeltaTime;
+            if (jumpMechanic._coyoteTimer > 0) jumpMechanic._coyoteTimer -= Time.fixedDeltaTime;
+            if (jumpMechanic._justJumpedCooldown > 0) jumpMechanic._justJumpedCooldown -= Time.fixedDeltaTime;
         }
-        groundCheck = (!jumpingMechanic || jumpingMechanic._justJumpedCooldown <= 0) ? Physics.SphereCast(transform.position, capCollider.radius, -transform.up, out hit, groundCheckDistance + 0.01f) : false;
+        groundCheck = (!jumpMechanic || jumpMechanic._justJumpedCooldown <= 0) ? Physics.SphereCast(transform.position, capCollider.radius, -transform.up, out hit, groundCheckDistance + 0.01f) : false;
         surfaceSlope = Vector3.Angle(hit.normal, Vector3.up);
         if (surfaceSlope > maxSlope)
         {
@@ -309,7 +314,6 @@ public class BaseMovement : MonoBehaviour
         }
     }
     public void SetInitialGravity() => g = initialGravity;
-    public void SetInitialGravity(float value) => g = value;
     private void ApplyGravity()
     {
         if (playerState != PlayerState.Climbing)

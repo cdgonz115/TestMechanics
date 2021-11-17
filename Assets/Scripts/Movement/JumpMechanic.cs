@@ -2,14 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class JumpingMechanic : MonoBehaviour, MovementRequiresInput
+public class JumpMechanic : MonoBehaviour, MovementRequiresInput
 {
-    public static JumpingMechanic singleton;
+    public static JumpMechanic singleton;
     float y;
 
     float scrollWheelDelta;
     public float jumpBuffer;
-    float _jumpBuffer;
+    public float _jumpBuffer;
     public float jumpStrength;
     public float jumpStregthDecreaser;
     public float jumpInAirStrength;
@@ -21,11 +21,12 @@ public class JumpingMechanic : MonoBehaviour, MovementRequiresInput
     public float justJumpedCooldown;
     public float _justJumpedCooldown;
     public float coyoteTime;
-    [HideInInspector] public float _coyoteTimer;
+    public float _coyoteTimer;
 
     public int inAirJumps;
     private int _inAirJumps;
-    // Start is called before the first frame update
+
+    private WaitForFixedUpdate fixedUpdate;
 
     private void Awake()
     {
@@ -38,6 +39,7 @@ public class JumpingMechanic : MonoBehaviour, MovementRequiresInput
     {
         BaseMovement.singleton.playerJustLanded += PlayerLanded;
         BaseMovement.singleton.playerLeftGround += PlayerLeftGround;
+        fixedUpdate = new WaitForFixedUpdate();
     }
     // Update is called once per frame
     public void UpdateMechanic()
@@ -54,7 +56,7 @@ public class JumpingMechanic : MonoBehaviour, MovementRequiresInput
         if (_jumpBuffer <= 0) _jumpBuffer = 0;
         if (BaseMovement.singleton.playerState != PlayerState.Climbing)
         {
-            if (_jumpBuffer > 0 && (BaseMovement.singleton.isGrounded || _coyoteTimer > 0) && BaseMovement.singleton.playerState != PlayerState.Jumping && (BaseMovement.singleton.crouchingMechanic?CrouchingMechanic.singleton.topIsClear:true)) StartCoroutine(JumpCoroutine(false));
+            if (_jumpBuffer > 0 && (BaseMovement.singleton.isGrounded || _coyoteTimer > 0) && BaseMovement.singleton.playerState != PlayerState.Jumping && (BaseMovement.singleton.crouchMechanic?CrouchMechanic.singleton.topIsClear:true)) StartCoroutine(JumpCoroutine(false));
             else if (BaseMovement.singleton.playerState == PlayerState.InAir && _inAirJumps > 0 && _jumpBuffer > 0)
             {
                 _inAirJumps--;
@@ -65,12 +67,11 @@ public class JumpingMechanic : MonoBehaviour, MovementRequiresInput
     }
     private IEnumerator JumpCoroutine(bool inAirJump)
     {
-        _jumpBuffer = 0;
+        SetVariablesOnJump();
         BaseMovement.singleton.previousState = BaseMovement.singleton.playerState;
         BaseMovement.singleton.playerState = PlayerState.Jumping;
         y = jumpStrength;
         BaseMovement.singleton.g = jumpingInitialGravity;
-        _justJumpedCooldown = justJumpedCooldown;
         BaseMovement.singleton.totalVelocityToAdd += BaseMovement.singleton.newForwardandRight;
         BaseMovement.singleton.airControl = jumpInAirControl;
         if (inAirJump)
@@ -83,7 +84,7 @@ public class JumpingMechanic : MonoBehaviour, MovementRequiresInput
         {
             y -= jumpStregthDecreaser;
             BaseMovement.singleton.totalVelocityToAdd += Vector3.up * y;
-            yield return BaseMovement.singleton.fixedUpdate;
+            yield return fixedUpdate;
         }
         if (BaseMovement.singleton.playerState != PlayerState.Grounded)
         {
@@ -93,7 +94,7 @@ public class JumpingMechanic : MonoBehaviour, MovementRequiresInput
             while (_highestPointHoldTimer > 0)
             {
                 _highestPointHoldTimer -= Time.fixedDeltaTime;
-                yield return BaseMovement.singleton.fixedUpdate;
+                yield return fixedUpdate;
             }
             BaseMovement.singleton.g = BaseMovement.singleton.initialGravity;
         }
@@ -102,6 +103,12 @@ public class JumpingMechanic : MonoBehaviour, MovementRequiresInput
         BaseMovement.singleton.previousState = BaseMovement.singleton.playerState;
         if (!BaseMovement.singleton.isGrounded) BaseMovement.singleton.playerState = PlayerState.InAir;
     }
+    public void SetVariablesOnJump()
+    {
+        _jumpBuffer = 0;
+        _justJumpedCooldown = justJumpedCooldown;
+    }
     public void PlayerLanded() => _inAirJumps = inAirJumps;
     public void PlayerLeftGround() => _coyoteTimer = coyoteTime;
 }
+
