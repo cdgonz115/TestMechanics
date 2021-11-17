@@ -43147,6 +43147,7 @@ MonoBehaviour:
   capCollider: {fileID: 0}
   crouchMechanic: {fileID: 0}
   jumpMechanic: {fileID: 0}
+  vaultMechanic: {fileID: 0}
   x: 0
   z: 0
   g: 0
@@ -43242,9 +43243,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   feetSphereCheck: 0
   kneesCheck: 0
-  minClimbCheckDistance: 0
-  maxClimbCheckDistance: 0
-  minClimbSlope: 0
+  minClimbCheckDistance: 0.1
+  maxClimbCheckDistance: 0.6
+  minClimbSlope: 65
   feetCheck: 0
   headCheck: 0
   forwardCheck: 0
