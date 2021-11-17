@@ -8,9 +8,9 @@ public class VaultMechanic : MonoBehaviour
     [Space]
     public bool feetSphereCheck;
     public bool kneesCheck;
-    public float minClimbCheckDistance;
-    public float maxClimbCheckDistance;
-    public float minClimbSlope;
+    public float minClimbCheckDistance = .1f;
+    public float maxClimbCheckDistance = .6f;
+    public float minClimbSlope = 65;
 
     public bool feetCheck;
     public bool headCheck;

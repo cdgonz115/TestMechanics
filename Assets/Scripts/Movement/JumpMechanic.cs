@@ -8,22 +8,22 @@ public class JumpMechanic : MonoBehaviour, MovementRequiresInput
     float y;
 
     float scrollWheelDelta;
-    public float jumpBuffer;
+    public float jumpBuffer =.3f;
     public float _jumpBuffer;
-    public float jumpStrength;
-    public float jumpStregthDecreaser;
-    public float jumpInAirStrength;
-    public float jumpInAirControl;
-    public float jumpingInitialGravity;
+    public float jumpStrength = 6.5f;
+    public float jumpStregthDecreaser = .05f;
+    public float jumpInAirStrength = 0;
+    public float jumpInAirControl = .1f;
+    public float jumpingInitialGravity = -.3f;
 
-    public float highestPointHoldTime;
+    public float highestPointHoldTime = .05f;
     float _highestPointHoldTimer;
-    public float justJumpedCooldown;
+    public float justJumpedCooldown =.1f;
     public float _justJumpedCooldown;
-    public float coyoteTime;
+    public float coyoteTime = 0.15f;
     public float _coyoteTimer;
 
-    public int inAirJumps;
+    public int inAirJumps = 0;
     private int _inAirJumps;
 
     private WaitForFixedUpdate fixedUpdate;

@@ -42,50 +42,50 @@ public class BaseMovement : MonoBehaviour
 
     #region General
     [Header("General")]
-    public float maxSlope;
+    public float maxSlope = 60;
     public float surfaceSlope;
     #endregion
 
     #region Acceleration
     [Header("Acceleration")]
-    public float walkSpeedIncrease;
-    public float sprintSpeedIncrease;
+    public float walkSpeedIncrease = 1;
+    public float sprintSpeedIncrease = 2;
     public float speedIncrease;
     #endregion
 
     #region Velocity Caps
     [Header("Velocity Boundaries")]
-    public float maxWalkVelocity;
-    public float maxSprintVelocity;
+    public float maxWalkVelocity = 7.5f;
+    public float maxSprintVelocity = 15;
     public float maxVelocity;
-    public float minVelocity;
+    public float minVelocity =.1f;
     #endregion
 
     #region Friction
     [Header("Friction Values")]
-    public float groundFriction;
-    public float inAirFriction;
+    public float groundFriction = .1f;
+    public float inAirFriction = .004f;
     public float friction;
     #endregion
 
     #region In Air
     [Header("In Air Variables")]
     [Range(0, 1)]
-    public float inAirControl;
+    public float inAirControl = .021f;
     public float airControl;
     #endregion
 
     #region Gravity
     [Header("Gravity Variables")]
-    public float initialGravity;
-    public float gravityRate;
-    public float maxGravity;
+    public float initialGravity = -.55f;
+    public float gravityRate = 1.008f;
+    public float maxGravity = -39.2f;
     #endregion
 
     #region Fake Ground Checks
     private bool feetSphereCheck;
     private bool kneesCheck;
-    public float fakeGroundTime;
+    public float fakeGroundTime = .1f;
     float _fakeGroundTimer;
     #endregion
 
