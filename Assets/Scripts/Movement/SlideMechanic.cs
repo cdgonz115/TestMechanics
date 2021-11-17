@@ -16,13 +16,11 @@ public class SlideMechanic : MonoBehaviour
     private WaitForFixedUpdate fixedUpdate;
 
     #region Components
-    CrouchMechanic crouchingMechanic;
     Rigidbody rb;
     #endregion
 
     private void Start()
     {
-        crouchingMechanic = GetComponent<CrouchMechanic>();
         rb = GetComponent<Rigidbody>();
         fixedUpdate = new WaitForFixedUpdate();
     }
