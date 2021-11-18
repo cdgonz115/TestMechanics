@@ -48,10 +48,11 @@ public partial class PlayerController
         #endregion
 
         #region Fake Ground Checks
-        public bool feetSphereCheck;
-        public bool kneesCheck;
+        [Header("Fake Ground Variables")]
         public float fakeGroundTime = .1f;
-        public float _fakeGroundTimer;
+        [HideInInspector] public float _fakeGroundTimer;
+        [HideInInspector] public bool feetSphereCheck;
+        [HideInInspector] public bool kneesCheck;
         #endregion
 
         #endregion
@@ -130,6 +131,7 @@ public partial class PlayerController
             if (!onFakeGround && hit.normal.y != 1 && angleOfSurfaceAndVelocity < 5 && z > 0)
                 rb.velocity = (groundedRight * x + groundedForward * z).normalized * rb.velocity.magnitude;          //This is to prevent the weird glitch where the player bounces on slopes if they land on them without jumping
             friction = baseMovementVariables.groundFriction;
+            _inAirJumps = jumpVariables.inAirJumps;
             //_climbingCooldown = 0;
             previousState = playerState;
             playerState = PlayerState.Grounded;
@@ -145,6 +147,7 @@ public partial class PlayerController
                 SetInitialGravity();
             }
             friction = baseMovementVariables.inAirFriction;
+            _coyoteTimer = jumpVariables.coyoteTime;
             if (playerLeftGround != null) playerLeftGround();
         }
         isGrounded = groundCheck;

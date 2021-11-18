@@ -13,6 +13,12 @@ public partial class PlayerController : MonoBehaviour
     public bool vaultMechanic;
     #endregion
 
+    #region Additional Mechanics Variables
+    public BaseMovementVariables baseMovementVariables = new BaseMovementVariables();
+    public CrouchVariables crouchVariables = new CrouchVariables();
+    public JumpVariables jumpVariables = new JumpVariables();
+    #endregion
+
     #region Player States
     [Header("Player States")]
     public bool isGrounded;
@@ -27,9 +33,12 @@ public partial class PlayerController : MonoBehaviour
     private float x, z;
     private float g;
     private float pvX, pvZ;
+    private float y;
     #endregion
 
     #region Global Variables
+
+    #region Basic Movement
     private float surfaceSlope;
     private float maxVelocity;
     private float speedIncrease;
@@ -37,9 +46,14 @@ public partial class PlayerController : MonoBehaviour
     private float airControl;
     #endregion
 
-    #region Additional Mechanics Variables
-    public BaseMovementVariables baseMovementVariables = new BaseMovementVariables();
-    public CrouchVariables crouchVariables = new CrouchVariables();
+    #region Jump
+    private float _jumpBuffer;
+    private float _highestPointHoldTimer;
+    private float _justJumpedCooldown;
+    private float _coyoteTimer;
+    private int _inAirJumps;
+    #endregion
+
     #endregion
 
     #region Vectors
@@ -103,9 +117,14 @@ public partial class PlayerController : MonoBehaviour
     {
         GroundCheck();
         Move();
-        HandleCrouchInput();
-        //if (crouchMechanic) crouchMechanic.HandleCrouchInput();
-        //if (jumpMechanic) jumpMechanic.HandleJumpInput();
+        if (crouchMechanic) HandleCrouchInput();
+        if (jumpMechanic) HandleJumpInput();
         ApplyGravity();
+        rb.velocity += totalVelocityToAdd;
+        if (rb.velocity.magnitude < baseMovementVariables.minVelocity && x == 0 && z == 0 && (isGrounded))        //If the player stops moving set its maxVelocity to walkingSpeed and set its rb velocity to 0
+        {
+            rb.velocity = Vector3.zero;
+            isSprinting = false;
+        }
     }
 }
