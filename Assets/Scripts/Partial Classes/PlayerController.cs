@@ -5,7 +5,8 @@ using UnityEngine;
 public partial class PlayerController : MonoBehaviour
 {
     #region Variables
-    #region movementMechanics
+
+    #region Movement Mechanics
     [Header("Additional Mechanics")]
     public bool jumpMechanic;
     public bool crouchMechanic;
@@ -22,7 +23,21 @@ public partial class PlayerController : MonoBehaviour
     public PlayerState previousState;
     #endregion
 
-    #region additionalMechanicsVariables
+    #region Primitive Variables
+    private float x, z;
+    private float g;
+    private float pvX, pvZ;
+    #endregion
+
+    #region Global Variables
+    private float surfaceSlope;
+    private float maxVelocity;
+    private float speedIncrease;
+    private float friction;
+    private float airControl;
+    #endregion
+
+    #region Additional Mechanics Variables
     public BaseMovementVariables baseMovementVariables = new BaseMovementVariables();
     public CrouchVariables crouchVariables = new CrouchVariables();
     #endregion
@@ -71,16 +86,19 @@ public partial class PlayerController : MonoBehaviour
         capCollider = GetComponent<CapsuleCollider>();
         rb = GetComponent<Rigidbody>();
         fixedUpdate = new WaitForFixedUpdate();
+        friction = baseMovementVariables.inAirFriction;
+        airControl = baseMovementVariables.inAirControl;
+        g = baseMovementVariables.initialGravity;
         playerState = PlayerState.InAir;
         baseMovementVariables.StartVariables(capCollider);
     }
 
-    // Update is called once per frame
     void Update()
     {
         CrouchInput();
         MovementInput();
     }
+
     private void FixedUpdate()
     {
         GroundCheck();
