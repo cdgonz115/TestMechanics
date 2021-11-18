@@ -21,7 +21,7 @@ public partial class PlayerController
 
         public int inAirJumps = 0;
     }
-    public void UpdateMechanic()
+    public void JumpInput()
     {
         jumpVariables.scrollWheelDelta = Input.GetAxis("Mouse ScrollWheel");
         if (Input.GetKeyDown(KeyCode.Space) || jumpVariables.scrollWheelDelta > 0)

@@ -12,7 +12,7 @@ public partial class PlayerController
         #region General
         [Header("General")]
         public float maxSlope = 60;
-        private float groundCheckDistance;
+        public float groundCheckDistance;
         #endregion
 
         #region Acceleration
@@ -86,12 +86,12 @@ public partial class PlayerController
     }
     private void GroundCheck()
     {
-        //if (jumpMechanic)
-        //{
-        //    if (jumpMechanic._coyoteTimer > 0) jumpMechanic._coyoteTimer -= Time.fixedDeltaTime;
-        //    if (jumpMechanic._justJumpedCooldown > 0) jumpMechanic._justJumpedCooldown -= Time.fixedDeltaTime;
-        //}
-        //groundCheck = (!jumpMechanic || jumpMechanic._justJumpedCooldown <= 0) ? Physics.SphereCast(transform.position, capCollider.radius, -transform.up, out hit, baseMovementVariables.groundCheckDistance + 0.01f) : false;
+        if (jumpMechanic)
+        {
+            if (_coyoteTimer > 0) jumpVariables.coyoteTime -= Time.fixedDeltaTime;
+            if (jumpVariables.justJumpedCooldown > 0) _justJumpedCooldown -= Time.fixedDeltaTime;
+        }
+        groundCheck = (!jumpMechanic || _justJumpedCooldown <= 0) ? Physics.SphereCast(transform.position, capCollider.radius, -transform.up, out hit, baseMovementVariables.groundCheckDistance + 0.01f) : false;
         surfaceSlope = Vector3.Angle(hit.normal, Vector3.up);
         if (surfaceSlope > baseMovementVariables.maxSlope)
         {

@@ -28756,38 +28756,49 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed2fc54a1dbeac042aab2f2230b91f6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rb: {fileID: 0}
-  capCollider: {fileID: 0}
-  totalVelocityToAdd: {x: 0, y: 0, z: 0}
-  newForwardandRight: {x: 0, y: 0, z: 0}
-  currentForwardAndRight: {x: 0, y: 0, z: 0}
+  jumpMechanic: 0
+  crouchMechanic: 0
+  vaultMechanic: 0
   baseMovementVariables:
-    x: 0
-    z: 0
-    g: 0
-    isGrounded: 0
-    isSprinting: 0
-    onFakeGround: 0
-    playerState: 0
-    previousState: 0
     maxSlope: 60
-    surfaceSlope: 0
+    groundCheckDistance: 0
     walkSpeedIncrease: 1
     sprintSpeedIncrease: 2
-    speedIncrease: 0
     maxWalkVelocity: 7.5
     maxSprintVelocity: 15
-    maxVelocity: 0
     minVelocity: 0.1
     groundFriction: 0.1
     inAirFriction: 0.004
-    friction: 0
     inAirControl: 0.021
-    airControl: 0
     initialGravity: -0.55
     gravityRate: 1.008
     maxGravity: -39.2
     fakeGroundTime: 0.1
+    _fakeGroundTimer: 0
+    feetSphereCheck: 0
+    kneesCheck: 0
+  crouchVariables:
+    crouchBuffer: 0
+    topIsClear: 0
+    isCrouching: 0
+    canSlide: 0
+  jumpVariables:
+    scrollWheelDelta: 0
+    jumpBuffer: 0.3
+    jumpStrength: 6.5
+    jumpStregthDecreaser: 0.05
+    jumpInAirStrength: 0
+    jumpInAirControl: 0.1
+    jumpingInitialGravity: -0.3
+    highestPointHoldTime: 0.05
+    justJumpedCooldown: 0.1
+    coyoteTime: 0.15
+    inAirJumps: 1
+  isGrounded: 0
+  isSprinting: 0
+  onFakeGround: 0
+  playerState: 0
+  previousState: 0
 --- !u!114 &1453785564
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -43634,7 +43645,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!54 &1869006581600355674
 Rigidbody:
   m_ObjectHideFlags: 0

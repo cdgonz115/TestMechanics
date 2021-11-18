@@ -29,8 +29,8 @@ public partial class PlayerController
                 moveCamera.AdjustCameraHeight(true);
 
                 //Sliding Mechanic
-                //if (crouchVariables.canSlide)
-                    //if (playerState != PlayerState.Sliding && rb.velocity.magnitude > slideMechanic.velocityToSlide) StartCoroutine(slideMechanic.SlideCoroutine());
+                if (crouchVariables.canSlide)
+                    if (playerState != PlayerState.Sliding && rb.velocity.magnitude > slideVariables.velocityToSlide) StartCoroutine(SlideCoroutine());
 
             }
             //Stand Up

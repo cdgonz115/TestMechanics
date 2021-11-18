@@ -17,6 +17,7 @@ public partial class PlayerController : MonoBehaviour
     public BaseMovementVariables baseMovementVariables = new BaseMovementVariables();
     public CrouchVariables crouchVariables = new CrouchVariables();
     public JumpVariables jumpVariables = new JumpVariables();
+    public SlideVariables slideVariables = new SlideVariables();
     #endregion
 
     #region Player States
@@ -99,6 +100,7 @@ public partial class PlayerController : MonoBehaviour
     {
         capCollider = GetComponent<CapsuleCollider>();
         rb = GetComponent<Rigidbody>();
+        moveCamera = GetComponent<MoveCamera>();
         fixedUpdate = new WaitForFixedUpdate();
         friction = baseMovementVariables.inAirFriction;
         airControl = baseMovementVariables.inAirControl;
@@ -109,8 +111,9 @@ public partial class PlayerController : MonoBehaviour
 
     void Update()
     {
-        CrouchInput();
+        if(crouchMechanic)CrouchInput();
         MovementInput();
+        if(jumpMechanic)JumpInput();
     }
 
     private void FixedUpdate()
