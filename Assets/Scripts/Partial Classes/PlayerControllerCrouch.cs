@@ -10,7 +10,7 @@ public partial class PlayerController
         [HideInInspector]public bool crouchBuffer;
         [HideInInspector] public bool topIsClear;
         [HideInInspector] public bool isCrouching;
-        public bool canSlide;
+        public bool slideMechanic;
     }
 
     void CrouchInput()=> crouchVariables.crouchBuffer = Input.GetKey(KeyCode.LeftControl);
@@ -29,7 +29,7 @@ public partial class PlayerController
                 moveCamera.AdjustCameraHeight(true);
 
                 //Sliding Mechanic
-                if (crouchVariables.canSlide)
+                if (crouchVariables.slideMechanic)
                     if (playerState != PlayerState.Sliding && rb.velocity.magnitude > slideVariables.velocityToSlide) StartCoroutine(SlideCoroutine());
 
             }

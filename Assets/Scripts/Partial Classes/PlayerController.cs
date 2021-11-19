@@ -16,8 +16,10 @@ public partial class PlayerController : MonoBehaviour
     #region Additional Mechanics Variables
     public BaseMovementVariables baseMovementVariables = new BaseMovementVariables();
     public CrouchVariables crouchVariables = new CrouchVariables();
-    public JumpVariables jumpVariables = new JumpVariables();
     public SlideVariables slideVariables = new SlideVariables();
+    public JumpVariables jumpVariables = new JumpVariables();
+    public VaultVariables vaultVariables = new VaultVariables();
+    public ClimbVariables climbVariables = new ClimbVariables();
     #endregion
 
     #region Player States
@@ -72,6 +74,7 @@ public partial class PlayerController : MonoBehaviour
     #region Raycast hits
     [HideInInspector] public RaycastHit hit;
     [HideInInspector] public RaycastHit feetHit;
+    [HideInInspector] public RaycastHit forwardHit;
     #endregion
 
     #region Events and delegates
@@ -129,5 +132,6 @@ public partial class PlayerController : MonoBehaviour
             rb.velocity = Vector3.zero;
             isSprinting = false;
         }
+        if (vaultMechanic) ClimbChecks();
     }
 }

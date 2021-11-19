@@ -75,8 +75,6 @@ public partial class PlayerController
         else if (Input.GetKey(KeyCode.A)) x = -speedIncrease;
         else x = 0;
 
-        //if (jumpMechanic) jumpMechanic.UpdateMechanic();
-
         if (Input.GetKeyDown(KeyCode.E))
         {
             if (Time.timeScale == 1f) Time.timeScale = .1f;
@@ -132,7 +130,7 @@ public partial class PlayerController
                 rb.velocity = (groundedRight * x + groundedForward * z).normalized * rb.velocity.magnitude;          //This is to prevent the weird glitch where the player bounces on slopes if they land on them without jumping
             friction = baseMovementVariables.groundFriction;
             _inAirJumps = jumpVariables.inAirJumps;
-            //_climbingCooldown = 0;
+            climbVariables._climbingCooldown = 0;
             previousState = playerState;
             playerState = PlayerState.Grounded;
             g = 0;

@@ -28756,8 +28756,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed2fc54a1dbeac042aab2f2230b91f6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  jumpMechanic: 0
-  crouchMechanic: 0
+  jumpMechanic: 1
+  crouchMechanic: 1
   vaultMechanic: 0
   baseMovementVariables:
     maxSlope: 60
@@ -28781,7 +28781,14 @@ MonoBehaviour:
     crouchBuffer: 0
     topIsClear: 0
     isCrouching: 0
-    canSlide: 0
+    slideMechanic: 1
+  slideVariables:
+    velocityToSlide: 13
+    slideForce: 1.1
+    downwardSlideForce: 1.05
+    slidingFriction: 0.02
+    downwardSlideAcceleration: -0.001
+    slideControl: 0.025
   jumpVariables:
     scrollWheelDelta: 0
     jumpBuffer: 0.3
@@ -28794,6 +28801,39 @@ MonoBehaviour:
     justJumpedCooldown: 0.1
     coyoteTime: 0.15
     inAirJumps: 1
+  vaultVariables:
+    climbMechanic: 1
+    feetSphereCheck: 0
+    kneesCheck: 0
+    minClimbCheckDistance: 0.1
+    maxClimbCheckDistance: 0.6
+    minClimbSlope: 65
+    feetCheck: 0
+    headCheck: 0
+    forwardCheck: 0
+    vaultClimbStrength: 10
+    vaultEndStrength: 6
+    vaultDuration: 0.8
+  climbVariables:
+    negativeVelocityToClimb: -45
+    climbingDuration: 1
+    _climbingTime: 0
+    climbAcceleration: 0.5
+    maxClimbingVelocity: 10
+    initialClimbingGravity: 0.5
+    _climbingGravity: 0
+    climbingGravityMultiplier: 1.005
+    climbingStrafe: 0.3
+    _climbingStrafe: 0
+    climbStrafeDecreaser: 0.001
+    maxClimbStrafeVelocity: 5
+    climbingStrafeFriction: 0.01
+    endOfClimbJumpStrength: 3
+    endOfClimbJumpHeight: 4
+    climbingCooldown: 2
+    _climbingCooldown: 0
+    wallJumpHeightStrenght: 5
+    wallJumpNormalStrength: 5
   isGrounded: 0
   isSprinting: 0
   onFakeGround: 0
