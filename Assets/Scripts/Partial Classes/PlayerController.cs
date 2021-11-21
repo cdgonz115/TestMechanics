@@ -20,6 +20,7 @@ public partial class PlayerController : MonoBehaviour
     public JumpVariables jumpVariables = new JumpVariables();
     public VaultVariables vaultVariables = new VaultVariables();
     public ClimbVariables climbVariables = new ClimbVariables();
+    public DownLungeVariables downLungeVariables = new DownLungeVariables();
     #endregion
 
     #region Player States
@@ -57,6 +58,11 @@ public partial class PlayerController : MonoBehaviour
     private int _inAirJumps;
     #endregion
 
+    #region InAirVariables
+    private float distanceToGround;
+    private float timeSinceGrounded;
+    #endregion
+
     #endregion
 
     #region Vectors
@@ -75,6 +81,7 @@ public partial class PlayerController : MonoBehaviour
     [HideInInspector] public RaycastHit hit;
     [HideInInspector] public RaycastHit feetHit;
     [HideInInspector] public RaycastHit forwardHit;
+    [HideInInspector] public RaycastHit rayToGround;
     #endregion
 
     #region Events and delegates

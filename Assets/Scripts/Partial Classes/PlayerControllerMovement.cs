@@ -107,7 +107,7 @@ public partial class PlayerController
         groundedForward = Vector3.Cross(hit.normal, -transform.right);
         groundedRight = Vector3.Cross(hit.normal, transform.forward);
 
-        //If close to a small step, raise the player to the height of the step for a smoother feeling movement
+        //Change the value of the groundcheck if the player is on the fakeGround state
         if (onFakeGround)
         {
             if (groundCheck) onFakeGround = false;
@@ -121,9 +121,8 @@ public partial class PlayerController
         //Player just landed
         if (groundCheck && (playerState == PlayerState.Jumping || playerState == PlayerState.InAir || playerState == PlayerState.Climbing))
         {
-            lastViablePosition = transform.position;
-            //timeSinceGrounded = 0;
             if (playerJustLanded != null) playerJustLanded();
+            PlayerLanded();
             rb.velocity = rb.velocity - Vector3.up * rb.velocity.y;
             float angleOfSurfaceAndVelocity = Vector3.Angle(rb.velocity, (hit.normal - Vector3.up * hit.normal.y));
             if (!onFakeGround && hit.normal.y != 1 && angleOfSurfaceAndVelocity < 5 && z > 0)
@@ -150,6 +149,7 @@ public partial class PlayerController
         }
         isGrounded = groundCheck;
 
+        //If close to a small step, raise the player to the height of the step for a smoother feeling movement
         float maxDistance = capCollider.radius * (1 + ((isSprinting) ? (rb.velocity.magnitude / baseMovementVariables.maxSprintVelocity) : 0));
         if (playerState == PlayerState.Grounded) baseMovementVariables.feetSphereCheck = Physics.SphereCast(transform.position - Vector3.up * .5f, capCollider.radius + .01f, rb.velocity.normalized, out feetHit, maxDistance);
         if (baseMovementVariables.feetSphereCheck && !onFakeGround)
@@ -162,6 +162,13 @@ public partial class PlayerController
                 StartCoroutine(FakeGround());
                 isGrounded = true;
             }
+        }
+
+        if (!isGrounded)                                                                        //This is just for the downward launch, should be removed for jsut mvoement script 
+        {
+            Physics.SphereCast(transform.position, .1f, -transform.up, out rayToGround, 50);
+            distanceToGround = rayToGround.distance;
+            timeSinceGrounded += Time.fixedDeltaTime;
         }
     }
     private void Move()
@@ -242,5 +249,15 @@ public partial class PlayerController
         rb.velocity = Vector3.zero;
         g = 0;
         transform.position = lastViablePosition;
+    }
+
+    private void PlayerLanded()
+    {
+        lastViablePosition = transform.position;
+        timeSinceGrounded = 0;
+        downLungeVariables.lungedUsed = false;
+    }
+    private void PlayerLeftGround()
+    { 
     }
 }

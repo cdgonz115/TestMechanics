@@ -11,6 +11,7 @@ public partial class PlayerController
         [HideInInspector] public bool topIsClear;
         [HideInInspector] public bool isCrouching;
         public bool slideMechanic;
+        public bool lungeMechanic;
     }
 
     void CrouchInput()=> crouchVariables.crouchBuffer = Input.GetKey(KeyCode.LeftControl);
@@ -45,9 +46,13 @@ public partial class PlayerController
                 }
             }
         }
-        //else if (crouchBuffer && playerState == PlayerState.InAir && timeSinceGrounded > .3f && distanceToGround > 5)
-        //{
-        //    GetComponent<DownLunge>().LungeDown(rb);
-        //}
+        else if (crouchVariables.lungeMechanic 
+            && crouchVariables.crouchBuffer && playerState == PlayerState.InAir 
+            && timeSinceGrounded > downLungeVariables.minTimeSinceGround 
+            && distanceToGround > downLungeVariables.minDistanceToGround
+            && !downLungeVariables.lungedUsed)
+        {
+            StartCoroutine(DownLunge());  
+        }
     }
 }
