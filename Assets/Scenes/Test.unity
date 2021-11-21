@@ -28737,6 +28737,7 @@ GameObject:
   - component: {fileID: 1453785565}
   - component: {fileID: 1453785564}
   - component: {fileID: 1453785563}
+  - component: {fileID: 1453785570}
   m_Layer: 10
   m_Name: PlayerController
   m_TagString: Player
@@ -28758,7 +28759,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   jumpMechanic: 1
   crouchMechanic: 1
-  vaultMechanic: 0
+  vaultMechanic: 1
+  launchMechanic: 1
   baseMovementVariables:
     maxSlope: 60
     groundCheckDistance: 0
@@ -28782,6 +28784,7 @@ MonoBehaviour:
     topIsClear: 0
     isCrouching: 0
     slideMechanic: 1
+    lungeMechanic: 1
   slideVariables:
     velocityToSlide: 13
     slideForce: 1.1
@@ -28834,11 +28837,29 @@ MonoBehaviour:
     _climbingCooldown: 0
     wallJumpHeightStrenght: 5
     wallJumpNormalStrength: 5
+  downLungeVariables:
+    lungeForce: 50
+    lungedUsed: 0
+    lungeDuration: 0.25
+    minDistanceToGround: 5
+    minTimeSinceGround: 0.3
+  launchVariables:
+    indicator: {fileID: 1194264447}
+    maxDistance: 50
+    timeToReachTarget: 2
+    launchForce: 2
+    launchDestination: {x: 0, y: 0, z: 0}
+    cooldown: 2
+    abilityUsed: 0
+    xzFrictionCompesator: 0
+    calculatedYVelocityLost: -15.25889
+    valideTarget: 0
   isGrounded: 0
   isSprinting: 0
   onFakeGround: 0
   playerState: 0
   previousState: 0
+  _inAirJumps: 0
 --- !u!114 &1453785564
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -28950,6 +28971,23 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 29
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
+--- !u!114 &1453785570
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1453785562}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ebba97cd67cb0b4c885b1212b662ad7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  button: 323
+  projectile: {fileID: 1564184303}
+  projectileSpeed: 100
+  thrown: 0
+  used: 0
 --- !u!1 &1460330902
 GameObject:
   m_ObjectHideFlags: 0

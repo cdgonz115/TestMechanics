@@ -12,7 +12,7 @@ public class ShootProjectile : MonoBehaviour
 
     private void Start()
     {
-        TestMoveThree.singleton.playerJustLanded += CheckValidLanding;
+        PlayerController.singleton.playerJustLanded += CheckValidLanding;
     }
 
     private void Update()
@@ -37,9 +37,9 @@ public class ShootProjectile : MonoBehaviour
     }
     void CheckValidLanding()
     {
-        if (TestMoveThree.singleton.hit.collider)
+        if (PlayerController.singleton.hit.collider)
         {
-            if (!TestMoveThree.singleton.hit.collider.gameObject.CompareTag("PlayerPlatform"))
+            if (!PlayerController.singleton.hit.collider.gameObject.CompareTag("PlayerPlatform"))
             {
                 if (!ProjectilePlatform.singleton.gameObject.activeSelf) thrown = false;
                 used = false;

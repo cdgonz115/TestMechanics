@@ -11,6 +11,7 @@ public partial class PlayerController : MonoBehaviour
     public bool jumpMechanic;
     public bool crouchMechanic;
     public bool vaultMechanic;
+    public bool launchMechanic;
     #endregion
 
     #region Additional Mechanics Variables
@@ -21,6 +22,7 @@ public partial class PlayerController : MonoBehaviour
     public VaultVariables vaultVariables = new VaultVariables();
     public ClimbVariables climbVariables = new ClimbVariables();
     public DownLungeVariables downLungeVariables = new DownLungeVariables();
+    public LaunchVariables launchVariables = new LaunchVariables();
     #endregion
 
     #region Player States
@@ -55,7 +57,7 @@ public partial class PlayerController : MonoBehaviour
     private float _highestPointHoldTimer;
     private float _justJumpedCooldown;
     private float _coyoteTimer;
-    private int _inAirJumps;
+    public int _inAirJumps;
     #endregion
 
     #region InAirVariables
@@ -102,10 +104,17 @@ public partial class PlayerController : MonoBehaviour
 
     #region Other
     private WaitForFixedUpdate fixedUpdate;
-    public static BaseMovement singleton;
+    public static PlayerController singleton;
     #endregion
 
     #endregion
+    private void Awake()
+    {
+        if (singleton == null)
+            singleton = this;
+        else
+            Destroy(gameObject);
+    }
     void Start()
     {
         capCollider = GetComponent<CapsuleCollider>();
@@ -117,6 +126,7 @@ public partial class PlayerController : MonoBehaviour
         g = baseMovementVariables.initialGravity;
         playerState = PlayerState.InAir;
         baseMovementVariables.StartVariables(capCollider);
+        launchVariables.xzFrictionCompesator = Mathf.Pow(1.0f - baseMovementVariables.inAirFriction, launchVariables.timeToReachTarget * 50);
     }
 
     void Update()
@@ -124,6 +134,7 @@ public partial class PlayerController : MonoBehaviour
         if(crouchMechanic)CrouchInput();
         MovementInput();
         if(jumpMechanic)JumpInput();
+        if(launchMechanic)LaunchInput();
     }
 
     private void FixedUpdate()
@@ -140,5 +151,6 @@ public partial class PlayerController : MonoBehaviour
             isSprinting = false;
         }
         if (vaultMechanic) ClimbChecks();
+        if (launchMechanic && launchVariables.valideTarget) PerformLaunch();
     }
 }

@@ -86,7 +86,7 @@ public partial class PlayerController
     {
         if (jumpMechanic)
         {
-            if (_coyoteTimer > 0) jumpVariables.coyoteTime -= Time.fixedDeltaTime;
+            if (_coyoteTimer > 0) _coyoteTimer -= Time.fixedDeltaTime;
             if (jumpVariables.justJumpedCooldown > 0) _justJumpedCooldown -= Time.fixedDeltaTime;
         }
         groundCheck = (!jumpMechanic || _justJumpedCooldown <= 0) ? Physics.SphereCast(transform.position, capCollider.radius, -transform.up, out hit, baseMovementVariables.groundCheckDistance + 0.01f) : false;
@@ -121,17 +121,16 @@ public partial class PlayerController
         //Player just landed
         if (groundCheck && (playerState == PlayerState.Jumping || playerState == PlayerState.InAir || playerState == PlayerState.Climbing))
         {
-            if (playerJustLanded != null) playerJustLanded();
-            PlayerLanded();
             rb.velocity = rb.velocity - Vector3.up * rb.velocity.y;
             float angleOfSurfaceAndVelocity = Vector3.Angle(rb.velocity, (hit.normal - Vector3.up * hit.normal.y));
             if (!onFakeGround && hit.normal.y != 1 && angleOfSurfaceAndVelocity < 5 && z > 0)
                 rb.velocity = (groundedRight * x + groundedForward * z).normalized * rb.velocity.magnitude;          //This is to prevent the weird glitch where the player bounces on slopes if they land on them without jumping
             friction = baseMovementVariables.groundFriction;
             _inAirJumps = jumpVariables.inAirJumps;
-            climbVariables._climbingCooldown = 0;
             previousState = playerState;
             playerState = PlayerState.Grounded;
+            if (playerJustLanded != null) playerJustLanded();
+            PlayerLanded();
             g = 0;
         }
         //Player just left the ground
@@ -166,7 +165,7 @@ public partial class PlayerController
 
         if (!isGrounded)                                                                        //This is just for the downward launch, should be removed for jsut mvoement script 
         {
-            Physics.SphereCast(transform.position, .1f, -transform.up, out rayToGround, 50);
+            Physics.Raycast(transform.position, -transform.up, out rayToGround, 50);
             distanceToGround = rayToGround.distance;
             timeSinceGrounded += Time.fixedDeltaTime;
         }
@@ -250,14 +249,12 @@ public partial class PlayerController
         g = 0;
         transform.position = lastViablePosition;
     }
-
     private void PlayerLanded()
     {
+        climbVariables._climbingCooldown = 0;
         lastViablePosition = transform.position;
         timeSinceGrounded = 0;
         downLungeVariables.lungedUsed = false;
-    }
-    private void PlayerLeftGround()
-    { 
+        launchVariables.abilityUsed = false;
     }
 }
