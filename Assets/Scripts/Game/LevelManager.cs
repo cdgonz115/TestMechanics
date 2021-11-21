@@ -22,6 +22,6 @@ public class LevelManager : MonoBehaviour
         timer += Time.deltaTime;
         int minutes = (int)(timer / 60);
         timerText.text = minutes+ ":"+(timer % 60).ToString(".00");
-        if (Input.GetKeyDown(button)) TestMoveThree.singleton.ResetPosition();
+        if (Input.GetKeyDown(button)) PlayerController.singleton.ResetPosition();
     }
 }
