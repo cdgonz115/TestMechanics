@@ -19,7 +19,10 @@ public class ProjectilePlatform : MonoBehaviour
         parent = transform.parent.gameObject;
     }
 
-    public void PlayerStepedOnPlatform() => StartCoroutine(Disable());
+    public void PlayerStepedOnPlatform()
+    {
+        if(gameObject.activeSelf)StartCoroutine(Disable());
+    } 
     IEnumerator Disable()
     {
         yield return new WaitForSeconds(despawnTimer);
