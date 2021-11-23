@@ -7,7 +7,7 @@ public class MoveCamera : MonoBehaviour
     public float mouseSensitvity = 100f;
 
     public Transform player;
-    public Transform camera;
+    public Transform cam;
 
     float xRotation = 0f;
 
@@ -24,13 +24,13 @@ public class MoveCamera : MonoBehaviour
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90, 90f);
 
-        camera.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+        cam.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
         player.Rotate(Vector2.up * mouseX);
     }
 
     public void AdjustCameraHeight(bool moveDown)
     {
-        if (moveDown) camera.transform.position -= Vector3.up;
-        else camera.transform.position += Vector3.up;
+        if (moveDown) cam.position -= Vector3.up;
+        else cam.position += Vector3.up;
     }
 }
