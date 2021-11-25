@@ -27,7 +27,7 @@ public partial class PlayerController
                 capCollider.height *= .5f;
                 capCollider.center += Vector3.up * -.5f;
                 crouchVariables.isCrouching = true;
-                moveCamera.AdjustCameraHeight(true);
+                playerCamera.AdjustCameraHeight(true);
 
                 //Sliding Mechanic
                 if (crouchVariables.slideMechanic)
@@ -42,7 +42,7 @@ public partial class PlayerController
                     capCollider.height *= 2f;
                     capCollider.center += Vector3.up * .5f;
                     crouchVariables.isCrouching = false;
-                    moveCamera.AdjustCameraHeight(false);
+                    playerCamera.AdjustCameraHeight(false);
                 }
             }
         }

@@ -96,10 +96,7 @@ public partial class PlayerController : MonoBehaviour
     #region Components
     Rigidbody rb;
     CapsuleCollider capCollider;
-    MoveCamera moveCamera;
-    //[HideInInspector] public CrouchMechanic crouchMechanic;
-    //[HideInInspector] public JumpMechanic jumpMechanic;
-    //[HideInInspector] public VaultMechanic vaultMechanic;
+    public PlayerCamera playerCamera;
     #endregion
 
     #region Other
@@ -119,7 +116,7 @@ public partial class PlayerController : MonoBehaviour
     {
         capCollider = GetComponent<CapsuleCollider>();
         rb = GetComponent<Rigidbody>();
-        moveCamera = GetComponent<MoveCamera>();
+        //moveCamera = GetComponent<MoveCamera>();
         fixedUpdate = new WaitForFixedUpdate();
         friction = baseMovementVariables.inAirFriction;
         airControl = baseMovementVariables.inAirControl;
@@ -139,6 +136,7 @@ public partial class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        transform.localRotation = Quaternion.Euler(0f, playerCamera.transform.rotation.eulerAngles.y, 0f);
         GroundCheck();
         Move();
         if (crouchMechanic) HandleCrouchInput();

@@ -2,18 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MoveCamera : MonoBehaviour
+public class PlayerCamera : MonoBehaviour
 {
     public float mouseSensitvity = 100f;
-
+    public float camHeight = .75f;
     public Transform player;
-    public Transform cam;
 
     float xRotation = 0f;
+    float yRotation;
 
     private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
+        transform.localRotation = player.transform.rotation;
+        yRotation = transform.localEulerAngles.y;
     }
 
     private void Update()
@@ -23,14 +25,16 @@ public class MoveCamera : MonoBehaviour
 
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90, 90f);
+        yRotation += mouseX;
+        yRotation %= 360;
 
-        cam.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
-        player.Rotate(Vector2.up * mouseX);
+        transform.position = player.position + new Vector3(0, camHeight, 0);
+        transform.localRotation = Quaternion.Euler(xRotation, yRotation, 0f);
     }
 
     public void AdjustCameraHeight(bool moveDown)
     {
-        if (moveDown) cam.position -= Vector3.up;
-        else cam.position += Vector3.up;
+        if (moveDown) camHeight -= 1;
+        else camHeight += 1;
     }
 }
