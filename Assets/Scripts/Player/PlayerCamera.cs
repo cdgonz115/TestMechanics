@@ -16,6 +16,7 @@ public class PlayerCamera : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         transform.localRotation = player.transform.rotation;
         yRotation = transform.localEulerAngles.y;
+        xRotation = transform.localEulerAngles.x;
     }
 
     private void Update()
@@ -23,8 +24,8 @@ public class PlayerCamera : MonoBehaviour
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitvity * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitvity * Time.deltaTime;
 
-        xRotation -= mouseY;
-        xRotation = Mathf.Clamp(xRotation, -90, 90f);
+        //xRotation -= mouseY;
+        //xRotation = Mathf.Clamp(xRotation, -90, 90f);
         yRotation += mouseX;
         yRotation %= 360;
 
