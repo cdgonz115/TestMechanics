@@ -254,7 +254,5 @@ public partial class PlayerController
         climbVariables._climbingCooldown = 0;
         lastViablePosition = transform.position;
         timeSinceGrounded = 0;
-        downLungeVariables.lungedUsed = false;
-        launchVariables.abilityUsed = false;
     }
 }

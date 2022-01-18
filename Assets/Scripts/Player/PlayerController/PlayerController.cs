@@ -11,7 +11,6 @@ public partial class PlayerController : MonoBehaviour
     public bool jumpMechanic;
     public bool crouchMechanic;
     public bool vaultMechanic;
-    public bool launchMechanic;
     #endregion
 
     #region Additional Mechanics Variables
@@ -21,8 +20,6 @@ public partial class PlayerController : MonoBehaviour
     public JumpVariables jumpVariables = new JumpVariables();
     public VaultVariables vaultVariables = new VaultVariables();
     public ClimbVariables climbVariables = new ClimbVariables();
-    public DownLungeVariables downLungeVariables = new DownLungeVariables();
-    public LaunchVariables launchVariables = new LaunchVariables();
     #endregion
 
     #region Player States
@@ -104,6 +101,17 @@ public partial class PlayerController : MonoBehaviour
     public static PlayerController singleton;
     #endregion
 
+    public enum PlayerState
+    {
+        NotMoving,
+        Grounded,
+        Sliding,
+        Jumping,
+        Climbing,
+        Vaulting,
+        InAir,
+    };
+
     #endregion
     private void Awake()
     {
@@ -122,7 +130,6 @@ public partial class PlayerController : MonoBehaviour
         g = baseMovementVariables.initialGravity;
         playerState = PlayerState.InAir;
         baseMovementVariables.StartVariables(capCollider);
-        launchVariables.xzFrictionCompesator = Mathf.Pow(1.0f - baseMovementVariables.inAirFriction, launchVariables.timeToReachTarget * 50);
     }
 
     void Update()
@@ -130,7 +137,6 @@ public partial class PlayerController : MonoBehaviour
         if (crouchMechanic) CrouchInput();
         MovementInput();
         if (jumpMechanic) JumpInput();
-        if (launchMechanic) LaunchInput();
     }
 
     private void FixedUpdate()
@@ -148,6 +154,5 @@ public partial class PlayerController : MonoBehaviour
             isSprinting = false;
         }
         if (vaultMechanic) ClimbChecks();
-        if (launchMechanic && launchVariables.valideTarget) PerformLaunch();
     }
 }

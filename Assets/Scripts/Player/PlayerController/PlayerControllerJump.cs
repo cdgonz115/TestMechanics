@@ -2,16 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum PlayerState
-{
-    NotMoving,
-    Grounded,
-    Sliding,
-    Jumping,
-    Climbing,
-    Vaulting,
-    InAir,
-};
 public partial class PlayerController
 {
     [System.Serializable]

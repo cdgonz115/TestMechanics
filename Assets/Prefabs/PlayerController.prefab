@@ -243,9 +243,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   jumpMechanic: 1
-  crouchMechanic: 0
+  crouchMechanic: 1
   vaultMechanic: 1
-  launchMechanic: 1
   baseMovementVariables:
     maxSlope: 60
     groundCheckDistance: 0
@@ -269,7 +268,6 @@ MonoBehaviour:
     topIsClear: 0
     isCrouching: 0
     slideMechanic: 1
-    lungeMechanic: 1
   slideVariables:
     velocityToSlide: 13
     slideForce: 1.1
@@ -288,7 +286,7 @@ MonoBehaviour:
     highestPointHoldTime: 0.05
     justJumpedCooldown: 0.1
     coyoteTime: 0.15
-    inAirJumps: 1
+    inAirJumps: 0
   vaultVariables:
     climbMechanic: 1
     feetSphereCheck: 0
@@ -322,23 +320,6 @@ MonoBehaviour:
     _climbingCooldown: 0
     wallJumpHeightStrenght: 5
     wallJumpNormalStrength: 5
-  downLungeVariables:
-    lungeForce: 50
-    lungedUsed: 0
-    lungeDuration: 0.25
-    minDistanceToGround: 5
-    minTimeSinceGround: 0.3
-  launchVariables:
-    indicator: {fileID: 0}
-    maxDistance: 50
-    timeToReachTarget: 2
-    launchForce: 2
-    launchDestination: {x: 0, y: 0, z: 0}
-    cooldown: 2
-    abilityUsed: 0
-    xzFrictionCompesator: 0
-    calculatedYVelocityLost: -15.25889
-    valideTarget: 0
   isGrounded: 0
   isSprinting: 0
   onFakeGround: 0
@@ -356,7 +337,6 @@ GameObject:
   - component: {fileID: 9006726554218767302}
   - component: {fileID: 9006726554218767299}
   - component: {fileID: 9006726554218767300}
-  - component: {fileID: 9006726554218767301}
   m_Layer: 10
   m_Name: Model
   m_TagString: Untagged
@@ -428,17 +408,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &9006726554218767301
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9006726554218767303}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
