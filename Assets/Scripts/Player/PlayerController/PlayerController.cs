@@ -57,7 +57,7 @@ public partial class PlayerController : MonoBehaviour
     private float _highestPointHoldTimer;
     private float _justJumpedCooldown;
     private float _coyoteTimer;
-    public int _inAirJumps;
+    private int _inAirJumps;
     #endregion
 
     #region InAirVariables
