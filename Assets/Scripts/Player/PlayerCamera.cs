@@ -8,29 +8,54 @@ public class PlayerCamera : MonoBehaviour
     public float camHeight = .75f;
     public Transform player;
 
-    float xRotation = 0f;
-    float yRotation;
+    public Transform horizontalRotationHelper;
+    float horizontalAngularVelocity;
+    float verticalAngularVelocity;
+    public float smoothTime = .02f;
+
+    float xRotationHelper;
 
     private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         transform.localRotation = player.transform.rotation;
-        yRotation = transform.localEulerAngles.y;
-        xRotation = transform.localEulerAngles.x;
+
+        if (transform.parent) transform.parent = null;
+        transform.localRotation = player.localRotation;
+
+        horizontalRotationHelper.parent = null;
+        horizontalRotationHelper.localRotation = transform.localRotation;
+        xRotationHelper = transform.eulerAngles.x;
+
     }
 
     private void Update()
     {
+        horizontalRotationHelper.position = transform.position;
+        transform.position = player.position + player.up * camHeight;
+
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitvity * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitvity * Time.deltaTime;
 
-        //xRotation -= mouseY;
-        //xRotation = Mathf.Clamp(xRotation, -90, 90f);
-        yRotation += mouseX;
-        yRotation %= 360;
+        mouseX = HorizontalRotation(mouseX);
+        mouseY = VerticalRotation(mouseY);
+        transform.localRotation = Quaternion.Euler(mouseY, mouseX, 0f);
 
-        transform.position = player.position + new Vector3(0, camHeight, 0);
-        transform.localRotation = Quaternion.Euler(xRotation, yRotation, 0f);
+    }
+
+    public float HorizontalRotation(float mouseX)
+    {
+        horizontalRotationHelper.Rotate(Vector3.up * mouseX, Space.Self);
+        float angle = Mathf.SmoothDampAngle(
+            transform.localEulerAngles.y, horizontalRotationHelper.localEulerAngles.y, ref horizontalAngularVelocity, smoothTime);
+        return angle;
+    }
+    public float VerticalRotation(float mouseY)
+    {
+        xRotationHelper = Mathf.Clamp(xRotationHelper - mouseY,-90,90);
+        float angle = Mathf.SmoothDampAngle(
+            transform.localEulerAngles.x, xRotationHelper, ref verticalAngularVelocity, smoothTime);
+        return angle;
     }
 
     public void AdjustCameraHeight(bool moveDown)

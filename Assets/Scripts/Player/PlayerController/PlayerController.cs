@@ -116,7 +116,6 @@ public partial class PlayerController : MonoBehaviour
     {
         capCollider = GetComponent<CapsuleCollider>();
         rb = GetComponent<Rigidbody>();
-        //moveCamera = GetComponent<MoveCamera>();
         fixedUpdate = new WaitForFixedUpdate();
         friction = baseMovementVariables.inAirFriction;
         airControl = baseMovementVariables.inAirControl;
@@ -128,15 +127,15 @@ public partial class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if(crouchMechanic)CrouchInput();
+        if (crouchMechanic) CrouchInput();
         MovementInput();
-        if(jumpMechanic)JumpInput();
-        if(launchMechanic)LaunchInput();
+        if (jumpMechanic) JumpInput();
+        if (launchMechanic) LaunchInput();
     }
 
     private void FixedUpdate()
     {
-        transform.localRotation = Quaternion.Euler(0f, playerCamera.transform.rotation.eulerAngles.y, 0f);
+        transform.localRotation = Quaternion.Euler(0f, playerCamera.transform.localEulerAngles.y, 0f);
         GroundCheck();
         Move();
         if (crouchMechanic) HandleCrouchInput();
