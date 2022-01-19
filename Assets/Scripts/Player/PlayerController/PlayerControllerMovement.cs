@@ -57,7 +57,8 @@ public partial class PlayerController
 
         #endregion
 
-        public void StartVariables(CapsuleCollider capCollider)=> groundCheckDistance = capCollider.height * .5f - capCollider.radius;       
+        public void StartVariables(CapsuleCollider capCollider, Transform transform)=> groundCheckDistance = ((capCollider.radius * transform.localScale.x * 2f) > (capCollider.height * transform.localScale.y))?
+            0f : (capCollider.height * .5f * transform.localScale.y) - (capCollider.radius * transform.localScale.x);       
     }
     private void MovementInput()
     {
@@ -89,7 +90,8 @@ public partial class PlayerController
             if (_coyoteTimer > 0) _coyoteTimer -= Time.fixedDeltaTime;
             if (jumpVariables.justJumpedCooldown > 0) _justJumpedCooldown -= Time.fixedDeltaTime;
         }
-        groundCheck = (!jumpMechanic || _justJumpedCooldown <= 0) ? Physics.SphereCast(transform.position, capCollider.radius, -transform.up, out hit, baseMovementVariables.groundCheckDistance + 0.01f) : false;
+        //print();
+        groundCheck = (!jumpMechanic || _justJumpedCooldown <= 0) ? Physics.SphereCast(transform.position, (capCollider.radius - (baseMovementVariables.groundCheckDistance == 0? 0f:.01f)) * transform.localScale.x, -transform.up, out hit, baseMovementVariables.groundCheckDistance + (baseMovementVariables.groundCheckDistance > 0? .01f:0.02f * transform.localScale.y)) : false;
         surfaceSlope = Vector3.Angle(hit.normal, Vector3.up);
         if (surfaceSlope > baseMovementVariables.maxSlope)
         {
@@ -150,15 +152,15 @@ public partial class PlayerController
 
         //If close to a small step, raise the player to the height of the step for a smoother feeling movement
         float maxDistance = capCollider.radius * (1 + ((isSprinting) ? (rb.velocity.magnitude / baseMovementVariables.maxSprintVelocity) : 0));
-        if (playerState == PlayerState.Grounded) baseMovementVariables.feetSphereCheck = Physics.SphereCast(transform.position - Vector3.up * .5f, capCollider.radius + .01f, rb.velocity.normalized, out feetHit, maxDistance);
+        if (playerState == PlayerState.Grounded) baseMovementVariables.feetSphereCheck = Physics.SphereCast(transform.position - (Vector3.up * .5f * transform.localScale.y), capCollider.radius + .01f, rb.velocity.normalized, out feetHit, maxDistance);
         if (baseMovementVariables.feetSphereCheck && !onFakeGround)
         {
-            Vector3 direction = feetHit.point - (transform.position - Vector3.up * .5f);
+            Vector3 direction = feetHit.point - (transform.position - Vector3.up * .5f * transform.localScale.y);
             float dist = direction.magnitude;
             baseMovementVariables.kneesCheck = Physics.Raycast(transform.position - Vector3.up * capCollider.height * .24f, (direction - rb.velocity.y * Vector3.up), dist);
             if (!baseMovementVariables.kneesCheck && playerState == PlayerState.Grounded && (x != 0 || z != 0))
             {
-                StartCoroutine(FakeGround());
+                //StartCoroutine(FakeGround());
                 isGrounded = true;
             }
         }

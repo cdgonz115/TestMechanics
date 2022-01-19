@@ -129,7 +129,7 @@ public partial class PlayerController : MonoBehaviour
         airControl = baseMovementVariables.inAirControl;
         g = baseMovementVariables.initialGravity;
         playerState = PlayerState.InAir;
-        baseMovementVariables.StartVariables(capCollider);
+        baseMovementVariables.StartVariables(capCollider,transform);
     }
 
     void Update()
