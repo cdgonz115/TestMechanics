@@ -31,10 +31,10 @@ public partial class PlayerController
     public void ClimbChecks()
     {
         float maxDistance = capCollider.radius * (1 + ((isSprinting) ? (rb.velocity.magnitude / baseMovementVariables.maxSprintVelocity) : 0));
-        if (playerState == PlayerState.Grounded) vaultVariables.feetSphereCheck = Physics.SphereCast(transform.position - Vector3.up * .5f, capCollider.radius + .01f, rb.velocity.normalized, out feetHit, maxDistance);
+        if (playerState == PlayerState.Grounded) vaultVariables.feetSphereCheck = Physics.SphereCast(transform.position - Vector3.up * .5f, capCollider.radius + .01f, rb.velocity.normalized, out feetHit, maxDistance, ~ignores);
 
-        vaultVariables.headCheck = Physics.Raycast(Camera.main.transform.position + Vector3.up * .25f, transform.forward, capCollider.radius + ((surfaceSlope >= vaultVariables.minClimbSlope) ? vaultVariables.maxClimbCheckDistance * 2 : vaultVariables.minClimbCheckDistance));
-        vaultVariables.forwardCheck = Physics.Raycast(transform.position, transform.forward, capCollider.radius + ((surfaceSlope >= vaultVariables.minClimbSlope) ? vaultVariables.maxClimbCheckDistance : vaultVariables.minClimbCheckDistance));
+        vaultVariables.headCheck = Physics.Raycast(Camera.main.transform.position + Vector3.up * .25f, transform.forward, capCollider.radius + ((surfaceSlope >= vaultVariables.minClimbSlope) ? vaultVariables.maxClimbCheckDistance * 2 : vaultVariables.minClimbCheckDistance), ~ignores);
+        vaultVariables.forwardCheck = Physics.Raycast(transform.position, transform.forward, capCollider.radius + ((surfaceSlope >= vaultVariables.minClimbSlope) ? vaultVariables.maxClimbCheckDistance : vaultVariables.minClimbCheckDistance), ~ignores);
 
         if (vaultVariables.forwardCheck && currentForwardAndRight.magnitude > 1)
         {
@@ -59,8 +59,8 @@ public partial class PlayerController
     {
         rb.velocity = Vector3.up * vaultVariables.vaultClimbStrength;
         float height = Camera.main.transform.position.y;
-        Physics.BoxCast(transform.position - transform.forward.normalized * capCollider.radius * .5f, Vector3.one * capCollider.radius, transform.forward, out forwardHit, Quaternion.identity, 1f);
-        vaultVariables.feetCheck = (Physics.Raycast(transform.position - Vector3.up * capCollider.height * .5f, transform.forward, capCollider.radius + .1f));
+        Physics.BoxCast(transform.position - transform.forward.normalized * capCollider.radius * .5f, Vector3.one * capCollider.radius, transform.forward, out forwardHit, Quaternion.identity, 1f, ~ignores);
+        vaultVariables.feetCheck = Physics.Raycast(transform.position - Vector3.up * capCollider.height * .5f, transform.forward, capCollider.radius + .1f, ~ignores);
         while ((transform.position.y - capCollider.height * .5) < height && rb.velocity.y > 0)
         {
             rb.velocity += .05f * Vector3.up;

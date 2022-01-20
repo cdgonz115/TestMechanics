@@ -38,6 +38,7 @@ public partial class PlayerController
         [Header("In Air Variables")]
         [Range(0, 1)]
         public float inAirControl = .021f;
+        public float minAirVelocity = 2f;
         #endregion
 
         #region Gravity
@@ -57,7 +58,8 @@ public partial class PlayerController
 
         #endregion
 
-        public void StartVariables(CapsuleCollider capCollider, Transform transform)=> groundCheckDistance = ((capCollider.radius * transform.localScale.x * 2f) > (capCollider.height * transform.localScale.y))?
+        public void StartVariables(CapsuleCollider capCollider, Transform transform)=> groundCheckDistance =
+            ((capCollider.radius * transform.localScale.x * 2f) > (capCollider.height * transform.localScale.y))?
             0f : (capCollider.height * .5f * transform.localScale.y) - (capCollider.radius * transform.localScale.x);       
     }
     private void MovementInput()
@@ -85,13 +87,31 @@ public partial class PlayerController
     }
     private void GroundCheck()
     {
+        hit = new RaycastHit();
+        currentForwardAndRight = new Vector3(rb.velocity.x, 0, rb.velocity.z);
         if (jumpMechanic)
         {
             if (_coyoteTimer > 0) _coyoteTimer -= Time.fixedDeltaTime;
             if (jumpVariables.justJumpedCooldown > 0) _justJumpedCooldown -= Time.fixedDeltaTime;
         }
-        //print();
-        groundCheck = (!jumpMechanic || _justJumpedCooldown <= 0) ? Physics.SphereCast(transform.position, (capCollider.radius - (baseMovementVariables.groundCheckDistance == 0? 0f:.01f)) * transform.localScale.x, -transform.up, out hit, baseMovementVariables.groundCheckDistance + (baseMovementVariables.groundCheckDistance > 0? .01f:0.02f * transform.localScale.y)) : false;
+
+        RaycastHit[] hits = Physics.SphereCastAll(transform.position, capCollider.radius * transform.localScale.x, -transform.up,
+           baseMovementVariables.groundCheckDistance + .01f  * transform.localScale.y, ~ignores);
+
+        foreach (RaycastHit collision in hits) {
+            if (collision.collider)
+            {
+                if (collision.point != Vector3.zero)
+                {
+                    surfaceSlope = Vector3.Angle(collision.normal, Vector3.up);
+                    if (surfaceSlope <= baseMovementVariables.maxSlope) hit = collision;
+
+                }
+            }
+        }
+
+        groundCheck = (!jumpMechanic || _justJumpedCooldown <= 0) ? (hit.collider) : false;
+
         surfaceSlope = Vector3.Angle(hit.normal, Vector3.up);
         if (surfaceSlope > baseMovementVariables.maxSlope)
         {
@@ -152,12 +172,16 @@ public partial class PlayerController
 
         //If close to a small step, raise the player to the height of the step for a smoother feeling movement
         float maxDistance = capCollider.radius * (1 + ((isSprinting) ? (rb.velocity.magnitude / baseMovementVariables.maxSprintVelocity) : 0));
-        if (playerState == PlayerState.Grounded) baseMovementVariables.feetSphereCheck = Physics.SphereCast(transform.position - (Vector3.up * .5f * transform.localScale.y), capCollider.radius + .01f, rb.velocity.normalized, out feetHit, maxDistance);
+
+        if (playerState == PlayerState.Grounded) baseMovementVariables.feetSphereCheck = Physics.SphereCast(
+            transform.position - (Vector3.up * .5f * transform.localScale.y),
+            capCollider.radius + .01f, rb.velocity.normalized, out feetHit, maxDistance, ~ignores);
+
         if (baseMovementVariables.feetSphereCheck && !onFakeGround)
         {
             Vector3 direction = feetHit.point - (transform.position - Vector3.up * .5f * transform.localScale.y);
             float dist = direction.magnitude;
-            baseMovementVariables.kneesCheck = Physics.Raycast(transform.position - Vector3.up * capCollider.height * .24f, (direction - rb.velocity.y * Vector3.up), dist);
+            baseMovementVariables.kneesCheck = Physics.Raycast(transform.position - Vector3.up * capCollider.height * .24f, (direction - rb.velocity.y * Vector3.up), dist, ~ignores);
             if (!baseMovementVariables.kneesCheck && playerState == PlayerState.Grounded && (x != 0 || z != 0))
             {
                 //StartCoroutine(FakeGround());
@@ -174,9 +198,7 @@ public partial class PlayerController
     }
     private void Move()
     {
-        currentForwardAndRight = new Vector3(rb.velocity.x, 0, rb.velocity.z);
-
-        if (!isGrounded)
+        if (!isGrounded)//InAirMovement
         {
             if (playerState != PlayerState.Climbing && playerState != PlayerState.Vaulting)
             {
@@ -185,7 +207,11 @@ public partial class PlayerController
                 newForwardandRight = (transform.right * x + transform.forward * z);
                 if (z != 0 || x != 0)
                 {
-                    rb.velocity = newForwardandRight.normalized * currentForwardAndRight.magnitude * airControl + currentForwardAndRight * (1f - airControl) + rb.velocity.y * Vector3.up;
+                    Vector3 newVelocity = newForwardandRight.normalized * currentForwardAndRight.magnitude * airControl + currentForwardAndRight * (1f - airControl) + rb.velocity.y * Vector3.up;
+                    //print(newVelocity + " before ");
+                    if (newVelocity.magnitude < baseMovementVariables.minAirVelocity) newVelocity = newVelocity.normalized * baseMovementVariables.minAirVelocity;
+                    //print(newVelocity + " after ");
+                    rb.velocity = newVelocity;
                 }
             }
         }
