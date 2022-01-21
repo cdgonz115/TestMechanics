@@ -60,6 +60,7 @@ public partial class PlayerController : MonoBehaviour
     #region InAirVariables
     private float distanceToGround;
     private float timeSinceGrounded;
+    private int stuckBetweenSurfacesHelper;
     #endregion
 
     #endregion
@@ -154,6 +155,7 @@ public partial class PlayerController : MonoBehaviour
             rb.velocity = Vector3.zero;
             isSprinting = false;
         }
+        if (stuckBetweenSurfacesHelper >= 2) rb.velocity -= rb.velocity.y * Vector3.up;     //Allows the palyer to slide around when stuck between two or more surfaces
         if (vaultMechanic) ClimbChecks();
     }
 }

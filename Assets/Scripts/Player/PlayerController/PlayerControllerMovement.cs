@@ -87,6 +87,7 @@ public partial class PlayerController
     }
     private void GroundCheck()
     {
+        stuckBetweenSurfacesHelper = 0;
         hit = new RaycastHit();
         currentForwardAndRight = new Vector3(rb.velocity.x, 0, rb.velocity.z);
         if (jumpMechanic)
@@ -104,8 +105,9 @@ public partial class PlayerController
                 if (collision.point != Vector3.zero)
                 {
                     surfaceSlope = Vector3.Angle(collision.normal, Vector3.up);
+                    //print(surfaceSlope + collision.collider.name);
                     if (surfaceSlope <= baseMovementVariables.maxSlope) hit = collision;
-
+                    else stuckBetweenSurfacesHelper++;
                 }
             }
         }
@@ -207,11 +209,12 @@ public partial class PlayerController
                 newForwardandRight = (transform.right * x + transform.forward * z);
                 if (z != 0 || x != 0)
                 {
-                    Vector3 newVelocity = newForwardandRight.normalized * currentForwardAndRight.magnitude * airControl + currentForwardAndRight * (1f - airControl) + rb.velocity.y * Vector3.up;
-                    //print(newVelocity + " before ");
+                    //If the game detects the player beeing stuck between two surfaces then it guarantees a min velocity to avoid a case where the stuck player's in air velocity would get stuck on zero 
+                    Vector3 newVelocity = newForwardandRight.normalized * (currentForwardAndRight.magnitude <.1f && stuckBetweenSurfacesHelper>1?
+                        1f: currentForwardAndRight.magnitude) * airControl + 
+                        currentForwardAndRight * (1f - airControl);     
                     if (newVelocity.magnitude < baseMovementVariables.minAirVelocity) newVelocity = newVelocity.normalized * baseMovementVariables.minAirVelocity;
-                    //print(newVelocity + " after ");
-                    rb.velocity = newVelocity;
+                    rb.velocity = newVelocity + rb.velocity.y * Vector3.up;
                 }
             }
         }
