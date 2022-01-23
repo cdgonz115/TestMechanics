@@ -15,6 +15,7 @@ public partial class PlayerController
         public float minClimbCheckDistance = .1f;
         public float maxClimbCheckDistance = .6f;
         public float minClimbSlope = 65;
+        public float heightAboveCamera = .25f;
 
         [HideInInspector] public bool feetCheck;
         [HideInInspector] public bool headCheck;
@@ -30,12 +31,59 @@ public partial class PlayerController
     }
     public void ClimbChecks()
     {
-        float maxDistance = capCollider.radius * (1 + ((isSprinting) ? (rb.velocity.magnitude / baseMovementVariables.maxSprintVelocity) : 0));
-        if (playerState == PlayerState.Grounded) vaultVariables.feetSphereCheck = Physics.SphereCast(transform.position - Vector3.up * .5f, capCollider.radius + .01f, rb.velocity.normalized, out feetHit, maxDistance, ~ignores);
+        vaultVariables.headCheck = false;
+        vaultVariables.forwardCheck = false;
+        if (playerState != PlayerState.Grounded)
+        {
+            if (hit.collider && surfaceSlope!=-1)
+            {
 
-        vaultVariables.headCheck = Physics.Raycast(Camera.main.transform.position + Vector3.up * .25f, transform.forward, capCollider.radius + ((surfaceSlope >= vaultVariables.minClimbSlope) ? vaultVariables.maxClimbCheckDistance * 2 : vaultVariables.minClimbCheckDistance), ~ignores);
-        vaultVariables.forwardCheck = Physics.Raycast(transform.position, transform.forward, capCollider.radius + ((surfaceSlope >= vaultVariables.minClimbSlope) ? vaultVariables.maxClimbCheckDistance : vaultVariables.minClimbCheckDistance), ~ignores);
+                float angleInRadians = (90f - surfaceSlope) * Mathf.Deg2Rad;
 
+                Vector3 posToPoint = hit.point - transform.position;
+                Vector3 pointProjection = Vector3.Project(posToPoint, transform.forward);
+
+                //Debug.DrawLine(transform.position, transform.position + posToPoint, Color.cyan);
+                //Debug.DrawLine(transform.position, transform.position + pointProjection, Color.cyan);
+
+                Vector3 headCheckPosition = (playerCamera.transform.position + transform.up * vaultVariables.heightAboveCamera * transform.localScale.y + pointProjection);
+
+                Vector3 newPosition = transform.position + pointProjection;
+
+                Vector3 newPosToHit = hit.point - newPosition;
+
+                float maxDistance = Mathf.Abs(newPosToHit.magnitude * Mathf.Tan(angleInRadians)) + .05f;
+
+                //Debug.DrawLine(newPosition, newPosition + newPosToHit, Color.cyan);
+                //Debug.DrawLine(newPosition, newPosition + (transform.forward) * maxDistance, Color.magenta);
+
+                vaultVariables.forwardCheck = Physics.Raycast(newPosition, transform.forward, maxDistance, ~ignores);
+
+                //Debug.DrawLine(newPosition, newPosition + transform.forward * maxDistance, Color.green);
+
+                maxDistance = Mathf.Abs((hit.point - headCheckPosition).magnitude * Mathf.Tan(angleInRadians)) + .05f;
+                vaultVariables.headCheck = Physics.Raycast(headCheckPosition, transform.forward, maxDistance, ~ignores);
+
+                //Debug.DrawLine(headCheckPosition, headCheckPosition + transform.forward * maxDistance, Color.green);
+                //Debug.DrawLine(hit.point, (headCheckPosition + transform.forward * maxDistance), Color.black);
+                //Debug.DrawLine(hit.point, headCheckPosition, Color.black);
+            }
+            else
+            {
+                vaultVariables.headCheck = Physics.Raycast(playerCamera.transform.position +
+                    transform.up * vaultVariables.heightAboveCamera,
+                    transform.forward, capCollider.radius + .05f, ~ignores);
+
+                Debug.DrawLine(playerCamera.transform.position + transform.up * vaultVariables.heightAboveCamera,
+                   (playerCamera.transform.position + transform.up * vaultVariables.heightAboveCamera) + transform.forward * (capCollider.radius + .05f), Color.green);
+
+                vaultVariables.forwardCheck = Physics.Raycast(transform.position, transform.forward,
+                    capCollider.radius + .05f, ~ignores);
+
+                Debug.DrawLine(transform.position,
+                   transform.position + transform.forward * (capCollider.radius + .05f), Color.green);
+            }
+        }
         if (vaultVariables.forwardCheck && currentForwardAndRight.magnitude > 1)
         {
             velocityAtCollision = currentForwardAndRight;
@@ -44,6 +92,7 @@ public partial class PlayerController
         vaultVariables.kneesCheck = false;
         if (vaultVariables.climbMechanic) HandleClimb();
         HandleVault();
+
     }
     public void HandleVault()
     {

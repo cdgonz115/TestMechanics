@@ -38,10 +38,10 @@ public partial class PlayerController
     public void HandleClimb()
     {
         if (climbVariables._climbingCooldown > 0) climbVariables._climbingCooldown -= Time.fixedDeltaTime;
-        if (playerState == PlayerState.InAir && vaultVariables.forwardCheck
-            && rb.velocity.y > climbVariables.negativeVelocityToClimb
-            && (z > 0 || currentForwardAndRight.magnitude > 0f)
-            && climbVariables._climbingCooldown <= 0)
+        if (playerState == PlayerState.InAir && vaultVariables.forwardCheck     //Check that the player is in the air and there is a valid wall in front of their center
+            && rb.velocity.y > climbVariables.negativeVelocityToClimb           //Check that player is not falling too fast to be able to start climbing
+            && (z > 0 || currentForwardAndRight.magnitude > 0f)                 //Check that the player pressed the forward input or that the current forwardAndRight is  bigger than 0
+            && climbVariables._climbingCooldown <= 0)                           //Check that the climbing ability is not on cooldown
         {
             previousState = playerState;
             playerState = PlayerState.Climbing;
@@ -52,9 +52,12 @@ public partial class PlayerController
     {
         climbVariables._climbingTime = climbVariables.climbingDuration;
         if (jumpMechanic) _justJumpedCooldown = 0;
-        climbVariables._climbingGravity = climbVariables.initialClimbingGravity;
-        Physics.BoxCast(transform.position - transform.forward.normalized * capCollider.radius * .5f, Vector3.one * capCollider.radius, transform.forward, out forwardHit, Quaternion.identity, 1f, ~ignores);
+        climbVariables._climbingGravity = climbVariables.initialClimbingGravity;       
         climbVariables._climbingStrafe = climbVariables.climbingStrafe;
+
+        Physics.BoxCast(transform.position - transform.forward.normalized * capCollider.radius * .5f,
+            Vector3.one * capCollider.radius, transform.forward, out forwardHit, Quaternion.identity, 1f, ~ignores);
+
         Vector3 playerOnWallRightDirection = Vector3.Cross(forwardHit.normal, Vector3.up).normalized;
         Vector3 originalHorizontalClimbingDirection = Vector3.Project(velocityAtCollision, playerOnWallRightDirection);
         Vector3 upwardDirection = (surfaceSlope == 0) ? Vector3.up : -Vector3.Cross(hit.normal, playerOnWallRightDirection).normalized;
@@ -80,7 +83,7 @@ public partial class PlayerController
             yield return fixedUpdate;
         }
         if (playerState == PlayerState.Vaulting) yield break;
-        rb.velocity += Vector3.up * climbVariables.endOfClimbJumpHeight + playerOnWallRightDirection * x + forwardHit.normal * climbVariables.endOfClimbJumpStrength;
+        rb.velocity += Vector3.up * climbVariables.endOfClimbJumpHeight + groundedRight * x + hit.normal * climbVariables.endOfClimbJumpStrength;
         climbVariables._climbingCooldown = climbVariables.climbingCooldown;
         previousState = playerState;
         if (!isGrounded) playerState = PlayerState.InAir;

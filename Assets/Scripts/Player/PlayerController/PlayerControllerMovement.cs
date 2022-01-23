@@ -126,7 +126,6 @@ public partial class PlayerController
         }
 
         groundCheck = (!jumpMechanic || _justJumpedCooldown <= 0) ? (hit.collider) : false;
-
         if (surfaceSlope > baseMovementVariables.maxSlope)
         {
             groundCheck = false;
@@ -142,6 +141,9 @@ public partial class PlayerController
 
         groundedForward = Vector3.Cross(hit.normal, -transform.right);
         groundedRight = Vector3.Cross(hit.normal, transform.forward);
+
+        //print(groundedForward + " " + hit.normal);
+        //print(groundedRight + " " + hit.normal);
 
         //Change the value of the groundcheck if the player is on the fakeGround state
         if (onFakeGround)
@@ -178,6 +180,7 @@ public partial class PlayerController
                 playerState = PlayerState.InAir;
                 SetInitialGravity();
             }
+            surfaceSlope = 0;
             friction = baseMovementVariables.inAirFriction;
             _coyoteTimer = jumpVariables.coyoteTime;
             if (playerLeftGround != null) playerLeftGround();
