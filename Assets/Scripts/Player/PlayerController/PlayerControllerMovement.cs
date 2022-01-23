@@ -99,22 +99,34 @@ public partial class PlayerController
         RaycastHit[] hits = Physics.SphereCastAll(transform.position, capCollider.radius * transform.localScale.x, -transform.up,
            baseMovementVariables.groundCheckDistance + .01f  * transform.localScale.y, ~ignores);
 
-        foreach (RaycastHit collision in hits) {
+
+        foreach (RaycastHit collision in hits)
+        {
             if (collision.collider)
             {
                 if (collision.point != Vector3.zero)
                 {
-                    surfaceSlope = Vector3.Angle(collision.normal, Vector3.up);
-                    //print(surfaceSlope + collision.collider.name);
-                    if (surfaceSlope <= baseMovementVariables.maxSlope) hit = collision;
-                    else stuckBetweenSurfacesHelper++;
+                    float newSurfaceSlope = Vector3.Angle(collision.normal, Vector3.up);
+                    if (!hit.collider)
+                    {
+                        hit = collision;
+                        surfaceSlope = newSurfaceSlope;
+                    }
+                    else
+                    {
+                        if (newSurfaceSlope <= surfaceSlope)
+                        {
+                            hit = collision;
+                            surfaceSlope = newSurfaceSlope;
+                        }
+                    }
+                    if (newSurfaceSlope > baseMovementVariables.maxSlope) stuckBetweenSurfacesHelper++;
                 }
             }
         }
 
         groundCheck = (!jumpMechanic || _justJumpedCooldown <= 0) ? (hit.collider) : false;
 
-        surfaceSlope = Vector3.Angle(hit.normal, Vector3.up);
         if (surfaceSlope > baseMovementVariables.maxSlope)
         {
             groundCheck = false;
