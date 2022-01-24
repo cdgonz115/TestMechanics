@@ -16,7 +16,7 @@ public partial class PlayerController
         public float maxClimbingVelocity = 10;
         public float initialClimbingGravity = .5f;
         [HideInInspector] public float _climbingGravity;
-        public float climbingGravityMultiplier = 1.005f;
+        public float climbingGravityRate = 1.005f;
         public float climbingStrafe = .3f;
         [HideInInspector] public float _climbingStrafe;
         public float climbStrafeDecreaser = .001f;
@@ -62,33 +62,37 @@ public partial class PlayerController
         Vector3 originalHorizontalClimbingDirection = Vector3.Project(velocityAtCollision, playerOnWallRightDirection);
         Vector3 upwardDirection = (surfaceSlope == 0) ? Vector3.up : -Vector3.Cross(hit.normal, playerOnWallRightDirection).normalized;
         rb.velocity = originalHorizontalClimbingDirection;
+        SetInitialGravity(climbVariables.initialClimbingGravity);
+        SetGravityRate(climbVariables.climbingGravityRate);
+        baseMovementVariables.gravityRate = climbVariables.climbingGravityRate;
         while (!isGrounded && vaultVariables.forwardCheck && playerState == PlayerState.Climbing && climbVariables._climbingTime > 0)
         {
             if (_jumpBuffer > 0)
             {
                 rb.velocity += Vector3.up * climbVariables.wallJumpHeightStrenght + forwardHit.normal * climbVariables.wallJumpNormalStrength;
-                g = jumpVariables.jumpingInitialGravity;
+                SetInitialGravity(jumpVariables.jumpingInitialGravity);
                 SetVariablesOnJump();
                 climbVariables._climbingCooldown = climbVariables.climbingCooldown;
                 previousState = playerState;
                 playerState = PlayerState.InAir;
                 yield break;
             }
-            rb.velocity += upwardDirection.normalized * ((z > 0) ? (rb.velocity.y > climbVariables.maxClimbingVelocity ? 0 : climbVariables.climbAcceleration) : (originalHorizontalClimbingDirection.magnitude > 7.5f) ? 0 : -climbVariables._climbingGravity);
+            rb.velocity += upwardDirection.normalized * ((z > 0 && rb.velocity.y < climbVariables.maxClimbingVelocity)? climbVariables.climbAcceleration : 0f);
             rb.velocity += (currentForwardAndRight.magnitude < climbVariables.maxClimbStrafeVelocity) ? playerOnWallRightDirection * x * climbVariables._climbingStrafe : Vector3.zero - currentForwardAndRight * climbVariables.climbingStrafeFriction;
-            climbVariables._climbingGravity *= climbVariables.climbingGravityMultiplier;
+            climbVariables._climbingGravity *= climbVariables.climbingGravityRate;
             climbVariables._climbingTime -= Time.fixedDeltaTime;
             climbVariables._climbingStrafe -= climbVariables.climbStrafeDecreaser;
 
             yield return fixedUpdate;
         }
+        SetGravityRate(climbVariables.climbingGravityRate);
         if (playerState == PlayerState.Vaulting) yield break;
         rb.velocity += Vector3.up * climbVariables.endOfClimbJumpHeight + groundedRight * x + hit.normal * climbVariables.endOfClimbJumpStrength;
         climbVariables._climbingCooldown = climbVariables.climbingCooldown;
         previousState = playerState;
         if (!isGrounded) playerState = PlayerState.InAir;
         else rb.velocity = -Vector3.up * rb.velocity.y;
-        SetInitialGravity();
+        SetInitialGravity(baseMovementVariables.initialGravity);
         StartCoroutine(EndOfClimbAirControl());
     }
     private IEnumerator EndOfClimbAirControl()

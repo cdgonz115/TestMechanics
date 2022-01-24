@@ -47,6 +47,7 @@ public partial class PlayerController : MonoBehaviour
     private float speedIncrease;
     private float friction;
     private float airControl;
+    private float _gravityRate;
     #endregion
 
     #region Jump
@@ -129,7 +130,8 @@ public partial class PlayerController : MonoBehaviour
         fixedUpdate = new WaitForFixedUpdate();
         friction = baseMovementVariables.inAirFriction;
         airControl = baseMovementVariables.inAirControl;
-        g = baseMovementVariables.initialGravity;
+        SetInitialGravity(baseMovementVariables.initialGravity);
+        _gravityRate = baseMovementVariables.gravityRate;
         playerState = PlayerState.InAir;
         baseMovementVariables.StartVariables(capCollider,transform);
     }

@@ -133,7 +133,7 @@ public partial class PlayerController
             {
                 previousState = playerState;
                 playerState = PlayerState.InAir;
-                g = baseMovementVariables.initialGravity;
+                SetInitialGravity(baseMovementVariables.initialGravity);
             }
         }
         totalVelocityToAdd = Vector3.zero;
@@ -169,7 +169,7 @@ public partial class PlayerController
             playerState = PlayerState.Grounded;
             if (playerJustLanded != null) playerJustLanded();
             PlayerLanded();
-            g = 0;
+            SetInitialGravity(0);
         }
         //Player just left the ground
         if (isGrounded && !groundCheck)
@@ -178,7 +178,7 @@ public partial class PlayerController
             {
                 previousState = playerState;
                 playerState = PlayerState.InAir;
-                SetInitialGravity();
+                SetInitialGravity(baseMovementVariables.initialGravity);
             }
             surfaceSlope = 0;
             friction = baseMovementVariables.inAirFriction;
@@ -264,23 +264,24 @@ public partial class PlayerController
             pvZ = z;
         }
     }
-    public void SetInitialGravity() => g = baseMovementVariables.initialGravity;
+    public void SetInitialGravity(float value) => g = value;
+    public void SetGravityRate(float value) => _gravityRate = value;
     private void ApplyGravity()
     {
-        if (playerState != PlayerState.Climbing)
-        {
+        //if (playerState != PlayerState.Climbing)
+        //{
             if (!isGrounded)
             {
                 totalVelocityToAdd += Vector3.up * g;
             }
-            if (g > baseMovementVariables.maxGravity) g *= baseMovementVariables.gravityRate;
-        }
+            if (g > baseMovementVariables.maxGravity) g *= _gravityRate;
+        //}
     }
     private IEnumerator FakeGround()
     {
         onFakeGround = true;
         transform.position = new Vector3(transform.position.x, feetHit.point.y + 1f, transform.position.z);
-        g = 0;
+        SetInitialGravity(0);
         baseMovementVariables._fakeGroundTimer = baseMovementVariables.fakeGroundTime;
         while (baseMovementVariables._fakeGroundTimer > 0 && onFakeGround)
         {
@@ -292,7 +293,7 @@ public partial class PlayerController
     public void ResetPosition()
     {
         rb.velocity = Vector3.zero;
-        g = 0;
+        SetInitialGravity(0);
         transform.position = lastViablePosition;
     }
     private void PlayerLanded()
