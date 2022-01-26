@@ -134,6 +134,8 @@ public partial class PlayerController : MonoBehaviour
         _gravityRate = baseMovementVariables.gravityRate;
         playerState = PlayerState.InAir;
         baseMovementVariables.StartVariables(capCollider,transform);
+        if (capCollider.radius * 2 * transform.localScale.x >=
+            transform.localScale.y * capCollider.height) crouchMechanic = false;
     }
 
     void Update()

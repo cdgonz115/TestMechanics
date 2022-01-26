@@ -58,9 +58,9 @@ public class PlayerCamera : MonoBehaviour
         return angle;
     }
 
-    public void AdjustCameraHeight(bool moveDown)
+    public void AdjustCameraHeight(bool moveDown, float cameraDisplacement)
     {
-        if (moveDown) camHeight -= 1;
-        else camHeight += 1;
+        if (moveDown) camHeight -= cameraDisplacement;
+        else camHeight += cameraDisplacement;
     }
 }
