@@ -59,8 +59,8 @@ public partial class PlayerController
         #endregion
 
         public void StartVariables(CapsuleCollider capCollider, Transform transform)=> groundCheckDistance =
-            ((capCollider.radius * transform.localScale.x * 2f) > (capCollider.height * transform.localScale.y))?
-            0f : (capCollider.height * .5f * transform.localScale.y) - (capCollider.radius * transform.localScale.x);       
+            ((capCollider.radius * transform.lossyScale.x * 2f) > (capCollider.height * transform.lossyScale.y))?
+            0f : (capCollider.height * .5f * transform.lossyScale.y) - (capCollider.radius * transform.lossyScale.x);       
     }
     private void MovementInput()
     {
@@ -96,8 +96,8 @@ public partial class PlayerController
             if (jumpVariables.justJumpedCooldown > 0) _justJumpedCooldown -= Time.fixedDeltaTime;
         }
 
-        RaycastHit[] hits = Physics.SphereCastAll(transform.position, capCollider.radius * transform.localScale.x, -transform.up,
-           baseMovementVariables.groundCheckDistance + .01f  * transform.localScale.y, ~ignores);
+        RaycastHit[] hits = Physics.SphereCastAll(transform.position, capCollider.radius * transform.lossyScale.x, -transform.up,
+           baseMovementVariables.groundCheckDistance + .01f  * transform.lossyScale.y, ~ignores);
 
 
         foreach (RaycastHit collision in hits)
@@ -191,26 +191,21 @@ public partial class PlayerController
         float maxDistance = capCollider.radius * (1 + ((isSprinting) ? (rb.velocity.magnitude / baseMovementVariables.maxSprintVelocity) : 0));
 
         if (playerState == PlayerState.Grounded) baseMovementVariables.feetSphereCheck = Physics.SphereCast(
-            transform.position - (Vector3.up * .5f * transform.localScale.y),
+            transform.position - (transform.up * (transform.lossyScale.y * capCollider.height * .5f - capCollider.radius * transform.lossyScale.z)),
             capCollider.radius + .01f, rb.velocity.normalized, out feetHit, maxDistance, ~ignores);
 
         if (baseMovementVariables.feetSphereCheck && !onFakeGround)
         {
-            Vector3 direction = feetHit.point - (transform.position - Vector3.up * .5f * transform.localScale.y);
+            Vector3 direction = feetHit.point - (transform.position - Vector3.up * .5f * transform.lossyScale.y);
             float dist = direction.magnitude;
+            Debug.DrawLine(transform.position - Vector3.up * capCollider.height * .24f, (transform.position - Vector3.up * capCollider.height * .24f)+ (direction - rb.velocity.y * Vector3.up));
             baseMovementVariables.kneesCheck = Physics.Raycast(transform.position - Vector3.up * capCollider.height * .24f, (direction - rb.velocity.y * Vector3.up), dist, ~ignores);
             if (!baseMovementVariables.kneesCheck && playerState == PlayerState.Grounded && (x != 0 || z != 0))
             {
-                //StartCoroutine(FakeGround());
+                StartCoroutine(FakeGround());
                 isGrounded = true;
             }
-        }
-
-        if (!isGrounded)                                                                        //This is just for the downward launch, should be removed for jsut mvoement script 
-        {
-            Physics.Raycast(transform.position, -transform.up, out rayToGround, 50);
-            distanceToGround = rayToGround.distance;
-            timeSinceGrounded += Time.fixedDeltaTime;
+            baseMovementVariables.kneesCheck = false;
         }
     }
     private void Move()
@@ -264,6 +259,21 @@ public partial class PlayerController
             pvZ = z;
         }
     }
+    public void ToggleGravity(bool active)
+    {
+        previousState = playerState;
+        playerState = PlayerState.InAir;
+        if (active)
+        {
+            useGravity = true;
+            SetInitialGravity(0);
+        }
+        else
+        {
+            useGravity = false;
+            g = 0;
+        }
+    }
     public void SetInitialGravity(float value) => g = value;
     public void SetGravityRate(float value) => _gravityRate = value;
     private void ApplyGravity()
@@ -277,10 +287,12 @@ public partial class PlayerController
             if (g > baseMovementVariables.maxGravity) g *= _gravityRate;
         //}
     }
+
     private IEnumerator FakeGround()
     {
         onFakeGround = true;
-        transform.position = new Vector3(transform.position.x, feetHit.point.y + 1f, transform.position.z);
+        transform.position = new Vector3(transform.position.x, feetHit.point.y + capCollider.height * .5f * transform.lossyScale.y, transform.position.z);
+
         SetInitialGravity(0);
         baseMovementVariables._fakeGroundTimer = baseMovementVariables.fakeGroundTime;
         while (baseMovementVariables._fakeGroundTimer > 0 && onFakeGround)
@@ -300,6 +312,5 @@ public partial class PlayerController
     {
         climbVariables._climbingCooldown = 0;
         lastViablePosition = transform.position;
-        timeSinceGrounded = 0;
     }
 }

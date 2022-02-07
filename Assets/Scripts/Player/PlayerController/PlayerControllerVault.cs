@@ -43,10 +43,7 @@ public partial class PlayerController
                 Vector3 posToPoint = hit.point - transform.position;
                 Vector3 pointProjection = Vector3.Project(posToPoint, transform.forward);
 
-                //Debug.DrawLine(transform.position, transform.position + posToPoint, Color.cyan);
-                //Debug.DrawLine(transform.position, transform.position + pointProjection, Color.cyan);
-
-                Vector3 headCheckPosition = (playerCamera.transform.position + transform.up * vaultVariables.heightAboveCamera * transform.localScale.y + pointProjection);
+                Vector3 headCheckPosition = (playerCamera.transform.position + transform.up * vaultVariables.heightAboveCamera * transform.lossyScale.y + pointProjection);
 
                 Vector3 newPosition = transform.position + pointProjection;
 
@@ -54,19 +51,10 @@ public partial class PlayerController
 
                 float maxDistance = Mathf.Abs(newPosToHit.magnitude * Mathf.Tan(angleInRadians)) + .05f;
 
-                //Debug.DrawLine(newPosition, newPosition + newPosToHit, Color.cyan);
-                //Debug.DrawLine(newPosition, newPosition + (transform.forward) * maxDistance, Color.magenta);
-
                 vaultVariables.forwardCheck = Physics.Raycast(newPosition, transform.forward, maxDistance, ~ignores);
-
-                //Debug.DrawLine(newPosition, newPosition + transform.forward * maxDistance, Color.green);
 
                 maxDistance = Mathf.Abs((hit.point - headCheckPosition).magnitude * Mathf.Tan(angleInRadians)) + .05f;
                 vaultVariables.headCheck = Physics.Raycast(headCheckPosition, transform.forward, maxDistance, ~ignores);
-
-                //Debug.DrawLine(headCheckPosition, headCheckPosition + transform.forward * maxDistance, Color.green);
-                //Debug.DrawLine(hit.point, (headCheckPosition + transform.forward * maxDistance), Color.black);
-                //Debug.DrawLine(hit.point, headCheckPosition, Color.black);
             }
             else
             {
@@ -74,14 +62,8 @@ public partial class PlayerController
                     transform.up * vaultVariables.heightAboveCamera,
                     transform.forward, capCollider.radius + .05f, ~ignores);
 
-                Debug.DrawLine(playerCamera.transform.position + transform.up * vaultVariables.heightAboveCamera,
-                   (playerCamera.transform.position + transform.up * vaultVariables.heightAboveCamera) + transform.forward * (capCollider.radius + .05f), Color.green);
-
                 vaultVariables.forwardCheck = Physics.Raycast(transform.position, transform.forward,
                     capCollider.radius + .05f, ~ignores);
-
-                Debug.DrawLine(transform.position,
-                   transform.position + transform.forward * (capCollider.radius + .05f), Color.green);
             }
         }
         if (vaultVariables.forwardCheck && currentForwardAndRight.magnitude > 1)

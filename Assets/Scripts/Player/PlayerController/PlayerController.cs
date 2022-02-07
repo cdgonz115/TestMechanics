@@ -48,6 +48,7 @@ public partial class PlayerController : MonoBehaviour
     private float friction;
     private float airControl;
     private float _gravityRate;
+    [HideInInspector] public bool useGravity = true;
     #endregion
 
     #region Jump
@@ -59,8 +60,6 @@ public partial class PlayerController : MonoBehaviour
     #endregion
 
     #region InAirVariables
-    private float distanceToGround;
-    private float timeSinceGrounded;
     private int stuckBetweenSurfacesHelper;
     #endregion
 
@@ -76,6 +75,8 @@ public partial class PlayerController : MonoBehaviour
     Vector3 velocityAtCollision;
 
     Vector3 lastViablePosition;
+
+    Vector3 originalScale;
     #endregion
 
     #region Raycast hits
@@ -134,8 +135,8 @@ public partial class PlayerController : MonoBehaviour
         _gravityRate = baseMovementVariables.gravityRate;
         playerState = PlayerState.InAir;
         baseMovementVariables.StartVariables(capCollider,transform);
-        if (capCollider.radius * 2 * transform.localScale.x >=
-            transform.localScale.y * capCollider.height) crouchMechanic = false;
+        if (capCollider.radius * 2 * transform.lossyScale.x >=
+            transform.lossyScale.y * capCollider.height) crouchMechanic = false;
     }
 
     void Update()
@@ -145,14 +146,34 @@ public partial class PlayerController : MonoBehaviour
         if (jumpMechanic) JumpInput();
     }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("MovingPlatform"))
+        {
+            originalScale = transform.localScale;
+            transform.parent = collision.transform;
+        }
+    }
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("MovingPlatform"))
+        {
+            transform.parent = null;
+            transform.localScale = originalScale;
+        }
+    }
     private void FixedUpdate()
     {
-        transform.localRotation = Quaternion.Euler(0f, playerCamera.transform.localEulerAngles.y, 0f);
+        transform.rotation = Quaternion.Euler(0f, playerCamera.transform.localEulerAngles.y, 0f);
         GroundCheck();
         Move();
-        if (crouchMechanic) HandleCrouchInput();
-        if (jumpMechanic) HandleJumpInput();
-        ApplyGravity();
+        if (useGravity)
+        {
+            if (crouchMechanic) HandleCrouchInput();
+            if (jumpMechanic) HandleJumpInput();
+            if (vaultMechanic) ClimbChecks();
+            ApplyGravity();
+        }
         rb.velocity += totalVelocityToAdd;
         if (rb.velocity.magnitude < baseMovementVariables.minVelocity && x == 0 && z == 0 && (isGrounded))        //If the player stops moving set its maxVelocity to walkingSpeed and set its rb velocity to 0
         {
