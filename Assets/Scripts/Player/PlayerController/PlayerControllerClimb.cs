@@ -76,10 +76,10 @@ public partial class PlayerController
 
         /* Get all the vetors based on the plane of the wall collided with */
         Vector3 playerOnWallRightDirection = Vector3.Cross(forwardHit.normal, Vector3.up).normalized;
-        Vector3 originalHorizontalClimbingDirection = Vector3.Project(velocityAtCollision, playerOnWallRightDirection);
         Vector3 upwardDirection = (surfaceSlope == 0) ? Vector3.up : -Vector3.Cross(hit.normal, playerOnWallRightDirection).normalized;
 
         //retain the players right momentum
+        Vector3 originalHorizontalClimbingDirection = Vector3.Project(velocityAtCollision, playerOnWallRightDirection);
         rb.velocity = (originalHorizontalClimbingDirection.magnitude>climbVariables.minVelocityToPreserveOriginalMomentum)?originalHorizontalClimbingDirection: Vector3.zero + rb.velocity.y * transform.up;
 
         SetInitialGravity(climbVariables.initialClimbingGravity);

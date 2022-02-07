@@ -191,9 +191,11 @@ public partial class PlayerController
         float maxDistance = capCollider.radius * (1 + ((isSprinting) ? (rb.velocity.magnitude / baseMovementVariables.maxSprintVelocity) : 0));
 
         if (playerState == PlayerState.Grounded) baseMovementVariables.feetSphereCheck = Physics.SphereCast(
-            transform.position - (transform.up * (transform.lossyScale.y * capCollider.height * .5f - capCollider.radius * transform.lossyScale.z)),
+            (transform.position + capCollider.center * capCollider.height * transform.lossyScale.y) - 
+            (transform.up * (transform.lossyScale.y * capCollider.height * .5f - capCollider.radius * transform.lossyScale.z)),
             capCollider.radius + .01f, rb.velocity.normalized, out feetHit, maxDistance, ~ignores);
 
+        //print( transform.position + capCollider.center*capCollider.height*transform.lossyScale.y);
         if (baseMovementVariables.feetSphereCheck && !onFakeGround)
         {
             Vector3 direction = feetHit.point - (transform.position - Vector3.up * .5f * transform.lossyScale.y);
@@ -291,7 +293,7 @@ public partial class PlayerController
     private IEnumerator FakeGround()
     {
         onFakeGround = true;
-        transform.position = new Vector3(transform.position.x, feetHit.point.y + capCollider.height * .5f * transform.lossyScale.y, transform.position.z);
+        transform.position = new Vector3(transform.position.x, feetHit.point.y + capCollider.height * (crouchVariables.isCrouching? 1f: .5f)* transform.lossyScale.y, transform.position.z);
 
         SetInitialGravity(0);
         baseMovementVariables._fakeGroundTimer = baseMovementVariables.fakeGroundTime;
