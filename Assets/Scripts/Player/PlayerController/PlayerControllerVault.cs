@@ -92,7 +92,7 @@ public partial class PlayerController
         float height = Camera.main.transform.position.y;
         Physics.BoxCast(transform.position - transform.forward.normalized * capCollider.radius * .5f, Vector3.one * capCollider.radius, transform.forward, out forwardHit, Quaternion.identity, 1f, ~ignores);
         vaultVariables.feetCheck = Physics.Raycast(transform.position - Vector3.up * capCollider.height * .5f, transform.forward, capCollider.radius + .1f, ~ignores);
-        while ((transform.position.y - capCollider.height * .5) < height && rb.velocity.y > 0)
+        while ((transform.position.y - capCollider.height * .5 * transform.lossyScale.y) < height && rb.velocity.y > 0)
         {
             rb.velocity += .05f * Vector3.up;
             yield return fixedUpdate;
