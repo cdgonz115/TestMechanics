@@ -25,7 +25,8 @@ public partial class PlayerController
         #region Vault
         [Header("Vault Variables")]
         public float vaultClimbStrength = 10;
-        public float vaultEndStrength = 6;
+        public float vaultAcceleration = .05f;
+        public float vaultEndForwardStrength = 6;
         public float vaultDuration = .8f;
         #endregion
     }
@@ -94,13 +95,13 @@ public partial class PlayerController
         vaultVariables.feetCheck = Physics.Raycast(transform.position - Vector3.up * capCollider.height * .5f, transform.forward, capCollider.radius + .1f, ~ignores);
         while ((transform.position.y - capCollider.height * .5 * transform.lossyScale.y) < height && rb.velocity.y > 0)
         {
-            rb.velocity += .05f * Vector3.up;
+            rb.velocity += vaultVariables.vaultAcceleration * Vector3.up;
             yield return fixedUpdate;
         }
         vaultVariables.feetCheck = false;
         previousState = playerState;
         if (!isGrounded) playerState = PlayerState.InAir;
-        rb.velocity = ((forwardHit.normal.magnitude == 0) ? transform.forward : -forwardHit.normal) * vaultVariables.vaultEndStrength;
+        rb.velocity = ((forwardHit.normal.magnitude == 0) ? transform.forward : -forwardHit.normal) * vaultVariables.vaultEndForwardStrength;
     }
 
 }
