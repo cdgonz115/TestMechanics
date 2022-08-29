@@ -12,7 +12,8 @@ public partial class PlayerController
         #region General
         [Header("General")]
         public float maxSlope = 60;
-        public float groundCheckDistance;
+        public bool holdSprint;
+        [HideInInspector] public float groundCheckDistance;
         #endregion
 
         #region Acceleration
@@ -30,6 +31,7 @@ public partial class PlayerController
 
         #region Friction
         [Header("Friction Values")]
+        public float noInputFriction = .2f;
         public float groundFriction = .1f;
         public float inAirFriction = .004f;
         #endregion
@@ -56,17 +58,43 @@ public partial class PlayerController
         [HideInInspector] public bool kneesCheck;
         #endregion
 
+        #region OriginalValues
+
+        [HideInInspector] public float originalWalkingSpeed;
+        [HideInInspector] public float originalSprintSpeed;
         #endregion
 
-        public void StartVariables(CapsuleCollider capCollider, Transform transform)=> groundCheckDistance =
-            ((capCollider.radius * transform.lossyScale.x * 2f) > (capCollider.height * transform.lossyScale.y))?
-            0f : (capCollider.height * .5f * transform.lossyScale.y) - (capCollider.radius * transform.lossyScale.x);       
+        #endregion
+
+        public void StartVariables(CapsuleCollider capCollider, Transform transform) 
+        {
+            groundCheckDistance =
+            ((capCollider.radius * transform.lossyScale.x * 2f) > (capCollider.height * transform.lossyScale.y)) ?
+            0f : (capCollider.height * .5f * transform.lossyScale.y) - (capCollider.radius * transform.lossyScale.x);
+
+            originalSprintSpeed = maxSprintVelocity;
+            originalWalkingSpeed = maxWalkVelocity;
+
+            if (transform.position.x == 0 && transform.position.z == 0) transform.position = new Vector3(.01f,transform.position.y,.01f);
+        } 
     }
     private void MovementInput()
     {
-        if (Input.GetKeyDown(KeyCode.LeftShift))
-            if (crouchMechanic) isSprinting = (crouchVariables.isCrouching ? false : true);
-            else isSprinting = true;
+        //  Sprinting only disables when the player fully stops
+        //if (InputManager.GetButtonDown(PlayerInput.PlayerButton.Sprint))
+        //    if (crouchMechanic) isSprinting = (crouchVariables.isCrouching ? false : true);
+        //    else isSprinting = true;
+
+        if (baseMovementVariables.holdSprint)
+        {
+            //isSprinting = InputManager.GetButton(PlayerInput.PlayerButton.Sprint);
+            isSprinting = Input.GetKey(KeyCode.LeftShift);
+        }
+        else if (Input.GetKeyDown(KeyCode.LeftShift)) isSprinting = !isSprinting;
+        //else if (InputManager.GetButtonDown(PlayerInput.PlayerButton.Sprint)) isSprinting = !isSprinting;
+        if (crouchMechanic) isSprinting = (crouchVariables.isCrouching ? false : isSprinting);
+
+
 
         speedIncrease = (isSprinting) ? baseMovementVariables.sprintSpeedIncrease : baseMovementVariables.walkSpeedIncrease;
         maxVelocity = (isSprinting) ? baseMovementVariables.maxSprintVelocity : baseMovementVariables.maxWalkVelocity;
@@ -78,15 +106,12 @@ public partial class PlayerController
         else if (Input.GetKey(KeyCode.A)) x = -speedIncrease;
         else x = 0;
 
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            if (Time.timeScale == 1f) Time.timeScale = .1f;
-            else Time.timeScale = 1;
-        }
-        else if (Input.GetKeyDown(KeyCode.Q)) Time.timeScale = 0;
+        //x = InputManager.GetAxis(PlayerInput.PlayerAxis.MoveHorizontal);
+        //z = InputManager.GetAxis(PlayerInput.PlayerAxis.MoveVertical);
     }
     private void GroundCheck()
     {
+        sumOfAllAngles = 0;
         stuckBetweenSurfacesHelper = 0;
         hit = new RaycastHit();
         currentForwardAndRight = new Vector3(rb.velocity.x, 0, rb.velocity.z);
@@ -97,11 +122,12 @@ public partial class PlayerController
         }
 
         RaycastHit[] hits = Physics.SphereCastAll(transform.position, capCollider.radius * transform.lossyScale.x, -transform.up,
-           baseMovementVariables.groundCheckDistance + .01f  * transform.lossyScale.y, ~ignores);
+           baseMovementVariables.groundCheckDistance + .01f * transform.lossyScale.y, collisionMask, QueryTriggerInteraction.Ignore);
 
 
         foreach (RaycastHit collision in hits)
         {
+            //print(collision.point);
             if (collision.collider)
             {
                 if (collision.point != Vector3.zero)
@@ -111,6 +137,8 @@ public partial class PlayerController
                     {
                         hit = collision;
                         surfaceSlope = newSurfaceSlope;
+                        sumOfAllAngles += newSurfaceSlope;
+                        numerOfAngles++;
                     }
                     else
                     {
@@ -118,6 +146,8 @@ public partial class PlayerController
                         {
                             hit = collision;
                             surfaceSlope = newSurfaceSlope;
+                            sumOfAllAngles += newSurfaceSlope;
+                            numerOfAngles++;
                         }
                     }
                     if (newSurfaceSlope > baseMovementVariables.maxSlope) stuckBetweenSurfacesHelper++;
@@ -186,24 +216,32 @@ public partial class PlayerController
             if (playerLeftGround != null) playerLeftGround();
         }
         isGrounded = groundCheck;
-
+        if (isGrounded)
+        {
+            if (x == 0 && z == 0) friction = baseMovementVariables.noInputFriction;
+            else friction = baseMovementVariables.groundFriction;
+        } 
         //If close to a small step, raise the player to the height of the step for a smoother feeling movement
         float maxDistance = capCollider.radius * (1 + ((isSprinting) ? (rb.velocity.magnitude / baseMovementVariables.maxSprintVelocity) : 0));
 
         if (playerState == PlayerState.Grounded) baseMovementVariables.feetSphereCheck = Physics.SphereCast(
-            (transform.position + capCollider.center * capCollider.height * transform.lossyScale.y) - 
+            (transform.position + capCollider.center * capCollider.height * transform.lossyScale.y) -
             (transform.up * (transform.lossyScale.y * capCollider.height * .5f - capCollider.radius * transform.lossyScale.z)),
-            capCollider.radius + .01f, rb.velocity.normalized, out feetHit, maxDistance, ~ignores);
+            capCollider.radius + .01f, rb.velocity.normalized, out feetHit, maxDistance, collisionMask, QueryTriggerInteraction.Ignore);
 
         //print( transform.position + capCollider.center*capCollider.height*transform.lossyScale.y);
         if (baseMovementVariables.feetSphereCheck && !onFakeGround)
         {
             Vector3 direction = feetHit.point - (transform.position - Vector3.up * .5f * transform.lossyScale.y);
+            direction -= rb.velocity.y * Vector3.up;
             float dist = direction.magnitude;
-            Debug.DrawLine(transform.position - Vector3.up * capCollider.height * .24f, (transform.position - Vector3.up * capCollider.height * .24f)+ (direction - rb.velocity.y * Vector3.up));
-            baseMovementVariables.kneesCheck = Physics.Raycast(transform.position - Vector3.up * capCollider.height * .24f, (direction - rb.velocity.y * Vector3.up), dist, ~ignores);
+            Debug.DrawLine(transform.position - Vector3.up * capCollider.height * .24f, (transform.position - Vector3.up * capCollider.height * .24f) + direction);
+            baseMovementVariables.kneesCheck = Physics.Raycast(transform.position - Vector3.up * capCollider.height * .24f, direction, dist+.05f, collisionMask, QueryTriggerInteraction.Ignore);
+
             if (!baseMovementVariables.kneesCheck && playerState == PlayerState.Grounded && (x != 0 || z != 0))
             {
+                //print(sumOfAllAngles / numerOfAngles);
+                //Time.timeScale = 0;
                 StartCoroutine(FakeGround());
                 isGrounded = true;
             }
@@ -222,9 +260,9 @@ public partial class PlayerController
                 if (z != 0 || x != 0)
                 {
                     //If the game detects the player beeing stuck between two surfaces then it guarantees a min velocity to avoid a case where the stuck player's in air velocity would get stuck on zero 
-                    Vector3 newVelocity = newForwardandRight.normalized * (currentForwardAndRight.magnitude <.1f && stuckBetweenSurfacesHelper>1?
-                        1f: currentForwardAndRight.magnitude) * airControl + 
-                        currentForwardAndRight * (1f - airControl);     
+                    Vector3 newVelocity = newForwardandRight.normalized * (currentForwardAndRight.magnitude < .1f && stuckBetweenSurfacesHelper > 1 ?
+                        1f : currentForwardAndRight.magnitude) * airControl +
+                        currentForwardAndRight * (1f - airControl);
                     if (newVelocity.magnitude < baseMovementVariables.minAirVelocity) newVelocity = newVelocity.normalized * baseMovementVariables.minAirVelocity;
                     rb.velocity = newVelocity + rb.velocity.y * Vector3.up;
                 }
@@ -245,10 +283,11 @@ public partial class PlayerController
             }
             else if (playerState != PlayerState.Sliding)
             {
+                //If the palyer changes direction when going at the maxSpeed then decrease speed for smoother momentum shift
                 if ((z == 0 && x == 0) || (pvX < 0 && x > 0)
                     || (x < 0 && pvX > 0) || (pvZ < 0 && z > 0)
-                    || (z < 0 && pvZ > 0)) rb.velocity *= .99f; //If the palyer changes direction when going at the maxSpeed then decrease speed for smoother momentum shift
-                else if (rb.velocity.magnitude < maxVelocity + 1f) rb.velocity = newForwardandRight.normalized * maxVelocity;
+                    || (z < 0 && pvZ > 0)) rb.velocity *= .99f; 
+                else if (rb.velocity.magnitude < maxVelocity + 1f && (x!=0 || y!=0)) rb.velocity = newForwardandRight.normalized * maxVelocity;
                 totalVelocityToAdd = Vector3.zero;
             }
 
@@ -273,7 +312,7 @@ public partial class PlayerController
         else
         {
             useGravity = false;
-            g = 0;
+            SetInitialGravity(0);
         }
     }
     public void SetInitialGravity(float value) => g = value;
@@ -282,18 +321,18 @@ public partial class PlayerController
     {
         //if (playerState != PlayerState.Climbing)
         //{
-            if (!isGrounded)
-            {
-                totalVelocityToAdd += Vector3.up * g;
-            }
-            if (g > baseMovementVariables.maxGravity) g *= _gravityRate;
+        if (!isGrounded)
+        {
+            totalVelocityToAdd += Vector3.up * g;
+        }
+        if (g > baseMovementVariables.maxGravity) g *= _gravityRate;
         //}
     }
 
     private IEnumerator FakeGround()
     {
         onFakeGround = true;
-        transform.position = new Vector3(transform.position.x, feetHit.point.y + capCollider.height * (crouchVariables.isCrouching? 1f: .5f)* transform.lossyScale.y, transform.position.z);
+        transform.position = new Vector3(transform.position.x, feetHit.point.y + capCollider.height * (crouchVariables.isCrouching ? 1f : .5f) * transform.lossyScale.y, transform.position.z);
 
         SetInitialGravity(0);
         baseMovementVariables._fakeGroundTimer = baseMovementVariables.fakeGroundTime;
@@ -304,15 +343,9 @@ public partial class PlayerController
         }
         onFakeGround = false;
     }
-    public void ResetPosition()
-    {
-        rb.velocity = Vector3.zero;
-        SetInitialGravity(0);
-        transform.position = lastViablePosition;
-    }
     private void PlayerLanded()
     {
         climbVariables._climbingCooldown = 0;
-        lastViablePosition = transform.position;
+        //lastViablePosition = transform.position;
     }
 }

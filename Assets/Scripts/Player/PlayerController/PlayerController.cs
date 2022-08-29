@@ -11,6 +11,7 @@ public partial class PlayerController : MonoBehaviour
     public bool jumpMechanic;
     public bool crouchMechanic;
     public bool vaultMechanic;
+    private bool movementDisabled;
     #endregion
 
     #region Additional Mechanics Variables
@@ -43,6 +44,8 @@ public partial class PlayerController : MonoBehaviour
 
     #region Basic Movement
     private float surfaceSlope;
+    private float numerOfAngles;
+    private float sumOfAllAngles;
     private float maxVelocity;
     private float speedIncrease;
     private float friction;
@@ -75,8 +78,6 @@ public partial class PlayerController : MonoBehaviour
     Vector3 velocityAtCollision;
 
     Vector3 lastViablePosition;
-
-    Vector3 originalScale;
     #endregion
 
     #region Raycast hits
@@ -102,7 +103,7 @@ public partial class PlayerController : MonoBehaviour
     #region Other
     private WaitForFixedUpdate fixedUpdate;
     public static PlayerController singleton;
-    public LayerMask ignores;
+    public LayerMask collisionMask;
     #endregion
 
     public enum PlayerState
@@ -126,40 +127,32 @@ public partial class PlayerController : MonoBehaviour
     }
     void Start()
     {
+        lastViablePosition = transform.position;
         capCollider = GetComponent<CapsuleCollider>();
         rb = GetComponent<Rigidbody>();
         fixedUpdate = new WaitForFixedUpdate();
         friction = baseMovementVariables.inAirFriction;
         airControl = baseMovementVariables.inAirControl;
         SetInitialGravity(baseMovementVariables.initialGravity);
-        _gravityRate = baseMovementVariables.gravityRate;
+        SetGravityRate(baseMovementVariables.gravityRate);
         playerState = PlayerState.InAir;
-        baseMovementVariables.StartVariables(capCollider,transform);
+        baseMovementVariables.StartVariables(capCollider, transform);
         if (capCollider.radius * 2 * transform.lossyScale.x >=
             transform.lossyScale.y * capCollider.height) crouchMechanic = false;
+        //if (InputManager.inputMode == InputManager.InputMode.controller)
+        //{
+        //    baseMovementVariables.holdSprint = false;
+        //    crouchVariables.holdCrouch = false;
+        //}
     }
 
     void Update()
     {
-        if (crouchMechanic) CrouchInput();
-        MovementInput();
-        if (jumpMechanic) JumpInput();
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.CompareTag("MovingPlatform"))
+        if (!movementDisabled)
         {
-            originalScale = transform.localScale;
-            transform.parent = collision.transform;
-        }
-    }
-    private void OnCollisionExit(Collision collision)
-    {
-        if (collision.gameObject.CompareTag("MovingPlatform"))
-        {
-            transform.parent = null;
-            transform.localScale = originalScale;
+            if (crouchMechanic) CrouchInput();
+            MovementInput();
+            if (jumpMechanic) JumpInput();
         }
     }
     private void FixedUpdate()
@@ -171,8 +164,8 @@ public partial class PlayerController : MonoBehaviour
         {
             if (crouchMechanic) HandleCrouchInput();
             if (jumpMechanic) HandleJumpInput();
-            if (vaultMechanic) ClimbChecks();
             ApplyGravity();
+            if (vaultMechanic) ClimbChecks();
         }
         rb.velocity += totalVelocityToAdd;
         if (rb.velocity.magnitude < baseMovementVariables.minVelocity && x == 0 && z == 0 && (isGrounded))        //If the player stops moving set its maxVelocity to walkingSpeed and set its rb velocity to 0
@@ -181,6 +174,29 @@ public partial class PlayerController : MonoBehaviour
             isSprinting = false;
         }
         if (stuckBetweenSurfacesHelper >= 2) rb.velocity -= rb.velocity.y * Vector3.up;     //Allows the palyer to slide around when stuck between two or more surfaces
-        if (vaultMechanic) ClimbChecks();
     }
+
+    public void UpdateRespawnPoint() => lastViablePosition = transform.position;
+    /// <summary>
+    /// Reset the players position to the one set by a checkpoint
+    /// </summary>
+    public void ResetPosition()
+    {
+        rb.velocity = Vector3.zero;
+        SetInitialGravity(baseMovementVariables.initialGravity);
+        transform.position = lastViablePosition;
+        previousState = playerState;
+        playerState = PlayerState.InAir;
+    }
+    public void ChangeWalkingSpeed(float newWalkingSpeed) =>baseMovementVariables.maxWalkVelocity = newWalkingSpeed;
+    public void ResetWalkingSpeed() => baseMovementVariables.maxWalkVelocity = baseMovementVariables.originalWalkingSpeed;
+    public void ChangeSprintSpeed(float newSprintSpeed) => baseMovementVariables.maxSprintVelocity = newSprintSpeed;
+    public void ResetSprintSpeed() => baseMovementVariables.maxSprintVelocity = baseMovementVariables.originalSprintSpeed;
+    public void DisableMovement()
+    {
+        x = 0;
+        z = 0;
+        movementDisabled = true;
+    }
+    public void EnableMovement() => movementDisabled = false;
 }

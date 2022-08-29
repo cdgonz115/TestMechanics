@@ -6,7 +6,7 @@ public partial class PlayerController
 {
     [System.Serializable]
     public class ClimbVariables
-    { 
+    {
         #region Climb Requirements
         [Header("Climbing Requirements")]
         public float maxNegativeVelocityToClimb = -45;
@@ -41,7 +41,7 @@ public partial class PlayerController
         public float endOfClimbJumpHeight = 8;
         public float endOfClimbSideStrength = 3;
         public float endOfClimbAwayFromWallStrength = 3;
-        public float slopedMaxYVelocity =-2f;
+        public float slopedMaxYVelocity = -2f;
         public float maxYVelocity = 0;
         #endregion
 
@@ -72,7 +72,7 @@ public partial class PlayerController
         float climbingStrafe = climbVariables.climbingStrafe;
 
         Physics.BoxCast(transform.position - transform.forward.normalized * capCollider.radius * .5f,
-           Vector3.one * capCollider.radius, transform.forward, out forwardHit, Quaternion.identity, 1f, ~ignores);
+           Vector3.one * capCollider.radius, transform.forward, out forwardHit, Quaternion.identity, 1f, collisionMask, QueryTriggerInteraction.Ignore);
 
         /* Get all the vetors based on the plane of the wall collided with */
         Vector3 playerOnWallRightDirection = Vector3.Cross(forwardHit.normal, Vector3.up).normalized;
@@ -80,7 +80,7 @@ public partial class PlayerController
 
         //retain the players right momentum
         Vector3 originalHorizontalClimbingDirection = Vector3.Project(velocityAtCollision, playerOnWallRightDirection);
-        rb.velocity = (originalHorizontalClimbingDirection.magnitude>climbVariables.minVelocityToPreserveOriginalMomentum)?originalHorizontalClimbingDirection: Vector3.zero + rb.velocity.y * transform.up;
+        rb.velocity = (originalHorizontalClimbingDirection.magnitude > climbVariables.minVelocityToPreserveOriginalMomentum) ? originalHorizontalClimbingDirection : Vector3.zero + rb.velocity.y * transform.up;
 
         SetInitialGravity(climbVariables.initialClimbingGravity);
         SetGravityRate(climbVariables.climbingGravityRate);
@@ -100,7 +100,7 @@ public partial class PlayerController
                 yield break;
             }
             //Add the up and side forces based on the players input if they are not past their max velocities
-            rb.velocity += upwardDirection.normalized * ((z > 0 && rb.velocity.y < climbVariables.maxClimbingVelocity)? climbAcceleration : 0f);
+            rb.velocity += upwardDirection.normalized * ((z > 0 && rb.velocity.y < climbVariables.maxClimbingVelocity) ? climbAcceleration : 0f);
             rb.velocity += (currentForwardAndRight.magnitude < climbVariables.maxClimbStrafeVelocity) ? playerOnWallRightDirection * x * climbingStrafe : Vector3.zero - currentForwardAndRight * climbVariables.climbingStrafeFriction;
             climbAcceleration -= climbVariables.climbAccelerationDecreaser;
             climbingTime -= Time.fixedDeltaTime;
@@ -114,7 +114,7 @@ public partial class PlayerController
 
         /*if the player is not going down at the end of the climb then hold their psotition for a brief moment to allow
          * them to aim where they want to go with the end of climb jump*/
-        if (surfaceSlope!=0? rb.velocity.y>climbVariables.slopedMaxYVelocity: rb.velocity.y > climbVariables.maxYVelocity)
+        if (surfaceSlope != 0 ? rb.velocity.y > climbVariables.slopedMaxYVelocity : rb.velocity.y > climbVariables.maxYVelocity)
         {
             float highestPointHoldTimer = climbVariables.endOfClimbHoldTime;
             SetInitialGravity(0);
@@ -137,7 +137,7 @@ public partial class PlayerController
             playerState = PlayerState.InAir;
             //Give the player better in air control for a brief moment to allow them to better decide where to go after the climb ends
             StartCoroutine(EndOfClimbAirControl());
-        } 
+        }
         else rb.velocity = -Vector3.up * rb.velocity.y;
         SetInitialGravity(baseMovementVariables.initialGravity);
     }

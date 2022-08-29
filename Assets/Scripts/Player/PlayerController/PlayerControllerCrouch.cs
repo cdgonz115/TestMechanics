@@ -7,23 +7,32 @@ public partial class PlayerController
     [System.Serializable]
     public class CrouchVariables
     {
-        [HideInInspector]public bool crouchBuffer;
+        [HideInInspector] public bool crouchBuffer;
         [HideInInspector] public bool topIsClear;
         [HideInInspector] public bool isCrouching;
+        public bool holdCrouch;
         public bool slideMechanic;
         public float playerYScaleWhenCrouched = .5f;
         public float cameraDisplacement = 1;
+        public bool standingUp;
     }
-    void CrouchInput()=> crouchVariables.crouchBuffer = Input.GetKey(KeyCode.LeftControl);
+    void CrouchInput()
+    {
+        if (crouchVariables.holdCrouch)
+        {
+            //crouchVariables.crouchBuffer = InputManager.GetButton(PlayerInput.PlayerButton.Crouch);
+            crouchVariables.crouchBuffer = Input.GetKey(KeyCode.LeftControl);
+        }
+        else if (Input.GetKeyDown(KeyCode.LeftControl)) crouchVariables.crouchBuffer = !crouchVariables.crouchBuffer;
+        //else if (InputManager.GetButtonDown(PlayerInput.PlayerButton.Crouch)) crouchVariables.crouchBuffer = !crouchVariables.crouchBuffer;
+    } 
     public void HandleCrouchInput()
     {
-        crouchVariables.topIsClear = !Physics.Raycast(transform.position - newForwardandRight.normalized * capCollider.radius,
-            transform.up, capCollider.height + .01f * transform.lossyScale.y, ~ignores); // Check if thee's nothing blocking the player from standing up
+        crouchVariables.topIsClear = !Physics.Raycast(transform.position + newForwardandRight.normalized * capCollider.radius,
+            transform.up, capCollider.height + .01f * transform.lossyScale.y, collisionMask, QueryTriggerInteraction.Ignore); // Check if thee's nothing blocking the player from standing up
 
-        if (isGrounded)
-        {
             //Crouch
-            if (!crouchVariables.isCrouching && crouchVariables.crouchBuffer)
+            if (!crouchVariables.isCrouching && crouchVariables.crouchBuffer && isGrounded)
             {
                 capCollider.height *= crouchVariables.playerYScaleWhenCrouched;
                 capCollider.center += Vector3.up * -crouchVariables.playerYScaleWhenCrouched;
@@ -38,14 +47,25 @@ public partial class PlayerController
             //Stand Up
             if (crouchVariables.isCrouching && !crouchVariables.crouchBuffer && playerState != PlayerState.Sliding)
             {
-                if (crouchVariables.topIsClear) //Checks that there are no obstacles on top of the player so they can stand up
+                if (crouchVariables.topIsClear && !crouchVariables.standingUp) //Checks that there are no obstacles on top of the player so they can stand up
                 {
-                    capCollider.height *= (1f / crouchVariables.playerYScaleWhenCrouched);
-                    capCollider.center += Vector3.up * crouchVariables.playerYScaleWhenCrouched;
-                    crouchVariables.isCrouching = false;
-                    playerCamera.AdjustCameraHeight(false, crouchVariables.cameraDisplacement);
+                    StandUp();
                 }
             }
-        }
+    }
+    private void StandUp()
+    {
+        crouchVariables.standingUp = true;
+        if (Physics.Raycast(transform.position - newForwardandRight.normalized * capCollider.radius,
+            transform.up, capCollider.height + .01f * transform.lossyScale.y, collisionMask, QueryTriggerInteraction.Ignore))
+        {
+            crouchVariables.standingUp = false;
+            return;
+        } 
+        capCollider.height *= (1f / crouchVariables.playerYScaleWhenCrouched);
+        capCollider.center += Vector3.up * crouchVariables.playerYScaleWhenCrouched;
+        crouchVariables.isCrouching = false;
+        playerCamera.AdjustCameraHeight(false, crouchVariables.cameraDisplacement);
+        crouchVariables.standingUp = false;
     }
 }
