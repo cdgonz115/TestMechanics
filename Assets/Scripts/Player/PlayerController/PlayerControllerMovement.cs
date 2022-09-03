@@ -254,7 +254,7 @@ public partial class PlayerController
         {
             if (playerState != PlayerState.Climbing && playerState != PlayerState.Vaulting)
             {
-                rb.velocity -= currentForwardAndRight * friction;
+                rb.velocity -= new Vector3(previousInputVelocity.x, 0 ,previousInputVelocity.y) * friction;
 
                 newForwardandRight = (transform.right * x + transform.forward * z);
                 if (z != 0 || x != 0)
@@ -348,4 +348,9 @@ public partial class PlayerController
         climbVariables._climbingCooldown = 0;
         //lastViablePosition = transform.position;
     }
+
+    public void ChangeWalkingSpeed(float newWalkingSpeed) => baseMovementVariables.maxWalkVelocity = newWalkingSpeed;
+    public void ResetWalkingSpeed() => baseMovementVariables.maxWalkVelocity = baseMovementVariables.originalWalkingSpeed;
+    public void ChangeSprintSpeed(float newSprintSpeed) => baseMovementVariables.maxSprintVelocity = newSprintSpeed;
+    public void ResetSprintSpeed() => baseMovementVariables.maxSprintVelocity = baseMovementVariables.originalSprintSpeed;
 }

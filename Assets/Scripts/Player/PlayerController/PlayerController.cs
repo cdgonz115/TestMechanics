@@ -73,6 +73,8 @@ public partial class PlayerController : MonoBehaviour
     Vector3 groundedRight;
 
     Vector3 totalVelocityToAdd;
+    Vector3 previousInputVelocity;
+    Vector3 externalForce;
     Vector3 newForwardandRight;
     Vector3 currentForwardAndRight;
     Vector3 velocityAtCollision;
@@ -168,6 +170,8 @@ public partial class PlayerController : MonoBehaviour
             if (vaultMechanic) ClimbChecks();
         }
         rb.velocity += totalVelocityToAdd;
+        previousInputVelocity = totalVelocityToAdd;
+        rb.velocity += externalForce;
         if (rb.velocity.magnitude < baseMovementVariables.minVelocity && x == 0 && z == 0 && (isGrounded))        //If the player stops moving set its maxVelocity to walkingSpeed and set its rb velocity to 0
         {
             rb.velocity = Vector3.zero;
@@ -188,10 +192,8 @@ public partial class PlayerController : MonoBehaviour
         previousState = playerState;
         playerState = PlayerState.InAir;
     }
-    public void ChangeWalkingSpeed(float newWalkingSpeed) =>baseMovementVariables.maxWalkVelocity = newWalkingSpeed;
-    public void ResetWalkingSpeed() => baseMovementVariables.maxWalkVelocity = baseMovementVariables.originalWalkingSpeed;
-    public void ChangeSprintSpeed(float newSprintSpeed) => baseMovementVariables.maxSprintVelocity = newSprintSpeed;
-    public void ResetSprintSpeed() => baseMovementVariables.maxSprintVelocity = baseMovementVariables.originalSprintSpeed;
+    public void AddVelocicty(Vector3 direction, float magnitude) => externalForce += direction.normalized * magnitude;
+    public void SetVelocicty(Vector3 direction, float magnitude) => rb.velocity = direction.normalized * magnitude;
     public void DisableMovement()
     {
         x = 0;
