@@ -18,16 +18,14 @@ public class MovingPlatform : MonoBehaviour
     {
         if (collision.gameObject.GetComponent<PlayerController>())
         {
-            collision.gameObject.GetComponent<PlayerController>().AddVelocicty(transform.forward, speed * multiplier);
-            print("idk");
+            collision.gameObject.GetComponent<PlayerController>().SetParentVelocity(transform.forward, speed * multiplier);
         }
     }
     private void OnCollisionExit(Collision collision)
     {
         if (collision.gameObject.GetComponent<PlayerController>())
         {
-            collision.gameObject.GetComponent<PlayerController>().AddVelocicty(-transform.forward, speed * multiplier);
-            print("idk");
+            collision.gameObject.GetComponent<PlayerController>().SetParentVelocity(Vector3.zero, speed * multiplier);
         }
     }
 }

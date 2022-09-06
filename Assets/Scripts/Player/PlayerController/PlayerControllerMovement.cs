@@ -254,7 +254,7 @@ public partial class PlayerController
         {
             if (playerState != PlayerState.Climbing && playerState != PlayerState.Vaulting)
             {
-                rb.velocity -= new Vector3(previousInputVelocity.x, 0 ,previousInputVelocity.y) * friction;
+                rb.velocity -= currentForwardAndRight * friction;
 
                 newForwardandRight = (transform.right * x + transform.forward * z);
                 if (z != 0 || x != 0)

@@ -73,8 +73,8 @@ public partial class PlayerController : MonoBehaviour
     Vector3 groundedRight;
 
     Vector3 totalVelocityToAdd;
-    Vector3 previousInputVelocity;
-    Vector3 externalForce;
+    Vector3 externalVelocity;
+    Vector3 parentVelocity;
     Vector3 newForwardandRight;
     Vector3 currentForwardAndRight;
     Vector3 velocityAtCollision;
@@ -150,6 +150,12 @@ public partial class PlayerController : MonoBehaviour
 
     void Update()
     {
+        //if (Input.GetKeyDown(KeyCode.E))
+        //{
+        //    if (Time.timeScale == 1) Time.timeScale = .1f;
+        //    else Time.timeScale = 1;
+        //}
+        //if (Input.GetKeyDown(KeyCode.P)) Time.timeScale = 0;
         if (!movementDisabled)
         {
             if (crouchMechanic) CrouchInput();
@@ -159,6 +165,7 @@ public partial class PlayerController : MonoBehaviour
     }
     private void FixedUpdate()
     {
+        if (parentVelocity != Vector3.zero) rb.velocity -= parentVelocity;
         transform.rotation = Quaternion.Euler(0f, playerCamera.transform.localEulerAngles.y, 0f);
         GroundCheck();
         Move();
@@ -170,14 +177,15 @@ public partial class PlayerController : MonoBehaviour
             if (vaultMechanic) ClimbChecks();
         }
         rb.velocity += totalVelocityToAdd;
-        previousInputVelocity = totalVelocityToAdd;
-        rb.velocity += externalForce;
+        rb.velocity += externalVelocity;
+        rb.velocity += parentVelocity;
+        externalVelocity = Vector3.zero;
         if (rb.velocity.magnitude < baseMovementVariables.minVelocity && x == 0 && z == 0 && (isGrounded))        //If the player stops moving set its maxVelocity to walkingSpeed and set its rb velocity to 0
         {
             rb.velocity = Vector3.zero;
             isSprinting = false;
         }
-        if (stuckBetweenSurfacesHelper >= 2) rb.velocity -= rb.velocity.y * Vector3.up;     //Allows the palyer to slide around when stuck between two or more surfaces
+        if (stuckBetweenSurfacesHelper >= 2) rb.velocity -= rb.velocity.y * Vector3.up;     //Allows the player to slide around when stuck between two or more surfaces
     }
 
     public void UpdateRespawnPoint() => lastViablePosition = transform.position;
@@ -192,8 +200,10 @@ public partial class PlayerController : MonoBehaviour
         previousState = playerState;
         playerState = PlayerState.InAir;
     }
-    public void AddVelocicty(Vector3 direction, float magnitude) => externalForce += direction.normalized * magnitude;
-    public void SetVelocicty(Vector3 direction, float magnitude) => rb.velocity = direction.normalized * magnitude;
+    public void AddVelocity(Vector3 direction, float magnitude) => externalVelocity += direction.normalized * magnitude;
+    public void SetVelocity(Vector3 direction, float magnitude) => rb.velocity = direction.normalized * magnitude;
+
+    public void SetParentVelocity(Vector3 direction, float magnitude) => parentVelocity = direction.normalized * magnitude;
     public void DisableMovement()
     {
         x = 0;
