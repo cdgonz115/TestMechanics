@@ -180,12 +180,14 @@ public partial class PlayerController : MonoBehaviour
         rb.velocity += externalVelocity;
         rb.velocity += parentVelocity;
         externalVelocity = Vector3.zero;
-        if (rb.velocity.magnitude < baseMovementVariables.minVelocity && x == 0 && z == 0 && (isGrounded))        //If the player stops moving set its maxVelocity to walkingSpeed and set its rb velocity to 0
+        if (rb.velocity.magnitude < baseMovementVariables.minVelocity && x == 0 && z == 0
+         && (playerState == PlayerState.Grounded))        //If the player stops moving set its maxVelocity to walkingSpeed and set its rb velocity to 0
         {
             rb.velocity = Vector3.zero;
             isSprinting = false;
         }
         if (stuckBetweenSurfacesHelper >= 2) rb.velocity -= rb.velocity.y * Vector3.up;     //Allows the player to slide around when stuck between two or more surfaces
+        print(playerState);
     }
 
     public void UpdateRespawnPoint() => lastViablePosition = transform.position;

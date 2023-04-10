@@ -238,7 +238,9 @@ public partial class PlayerController
             Debug.DrawLine(transform.position - Vector3.up * capCollider.height * .24f, (transform.position - Vector3.up * capCollider.height * .24f) + direction);
             baseMovementVariables.kneesCheck = Physics.Raycast(transform.position - Vector3.up * capCollider.height * .24f, direction, dist+.05f, collisionMask, QueryTriggerInteraction.Ignore);
 
-            if (!baseMovementVariables.kneesCheck && playerState == PlayerState.Grounded && (x != 0 || z != 0))
+            if (!baseMovementVariables.kneesCheck && 
+                playerState == PlayerState.Grounded &&
+                 (x != 0 || z != 0))
             {
                 //print(sumOfAllAngles / numerOfAngles);
                 //Time.timeScale = 0;
@@ -250,7 +252,7 @@ public partial class PlayerController
     }
     private void Move()
     {
-        if (!isGrounded)//InAirMovement
+        if (playerState!=PlayerState.Grounded)//InAirMovement
         {
             if (playerState != PlayerState.Climbing && playerState != PlayerState.Vaulting)
             {
@@ -321,7 +323,7 @@ public partial class PlayerController
     {
         //if (playerState != PlayerState.Climbing)
         //{
-        if (!isGrounded)
+        if (playerState!=PlayerState.Grounded)
         {
             totalVelocityToAdd += Vector3.up * g;
         }

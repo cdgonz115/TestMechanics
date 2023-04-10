@@ -87,7 +87,7 @@ public partial class PlayerController
 
         float climbAcceleration = climbVariables.climbAcceleration;
 
-        while (!isGrounded && vaultVariables.forwardCheck && playerState == PlayerState.Climbing && climbingTime > 0)
+        while (playerState == PlayerState.Climbing && vaultVariables.forwardCheck && climbingTime > 0)
         {
             if (_jumpBuffer > 0)        //If a jump input was detected perform a wall jump
             {
@@ -112,7 +112,7 @@ public partial class PlayerController
         //Exit early if performing a vault
         if (playerState == PlayerState.Vaulting) yield break;
 
-        /*if the player is not going down at the end of the climb then hold their psotition for a brief moment to allow
+        /*if the player is not going down at the end of the climb then hold their position for a brief moment to allow
          * them to aim where they want to go with the end of climb jump*/
         if (surfaceSlope != 0 ? rb.velocity.y > climbVariables.slopedMaxYVelocity : rb.velocity.y > climbVariables.maxYVelocity)
         {
@@ -132,7 +132,7 @@ public partial class PlayerController
         //Reset and set the necessary variables 
         climbVariables._climbingCooldown = climbVariables.climbingCooldown;
         previousState = playerState;
-        if (!isGrounded)
+        if (playerState!=PlayerState.Grounded)
         {
             playerState = PlayerState.InAir;
             //Give the player better in air control for a brief moment to allow them to better decide where to go after the climb ends

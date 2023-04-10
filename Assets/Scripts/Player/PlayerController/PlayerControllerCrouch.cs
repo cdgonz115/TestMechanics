@@ -32,7 +32,8 @@ public partial class PlayerController
             transform.up, capCollider.height + .01f * transform.lossyScale.y, collisionMask, QueryTriggerInteraction.Ignore); // Check if thee's nothing blocking the player from standing up
 
             //Crouch
-            if (!crouchVariables.isCrouching && crouchVariables.crouchBuffer && isGrounded)
+            if (!crouchVariables.isCrouching && crouchVariables.crouchBuffer
+             && playerState==PlayerState.Grounded)
             {
                 capCollider.height *= crouchVariables.playerYScaleWhenCrouched;
                 capCollider.center += Vector3.up * -crouchVariables.playerYScaleWhenCrouched;
