@@ -28,7 +28,8 @@ public partial class PlayerController
         {
             if (playerState == PlayerState.Jumping) yield break;
             rb.velocity = newForwardandRight.normalized * rb.velocity.magnitude * slideVariables.slideControl + rb.velocity * (1f - slideVariables.slideControl);
-            if (playerState!=PlayerState.Grounded)
+            //print(playerState);
+            if (!isGrounded)
             {
                 friction = baseMovementVariables.inAirFriction;
                 previousState = PlayerState.Sliding;
@@ -46,6 +47,6 @@ public partial class PlayerController
         }
         friction = baseMovementVariables.groundFriction;
         previousState = playerState;
-        playerState = PlayerState.Grounded;
+        playerState = PlayerState.Crouching;
     }
 }

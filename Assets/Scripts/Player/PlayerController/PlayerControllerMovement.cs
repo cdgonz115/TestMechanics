@@ -118,7 +118,7 @@ public partial class PlayerController
         if (jumpMechanic)
         {
             if (_coyoteTimer > 0) _coyoteTimer -= Time.fixedDeltaTime;
-            if (jumpVariables.justJumpedCooldown > 0) _justJumpedCooldown -= Time.fixedDeltaTime;
+            if (_justJumpedCooldown > 0) _justJumpedCooldown -= Time.fixedDeltaTime;
         }
 
         RaycastHit[] hits = Physics.SphereCastAll(transform.position, capCollider.radius * transform.lossyScale.x, -transform.up,
@@ -195,8 +195,6 @@ public partial class PlayerController
                 rb.velocity = (groundedRight * x + groundedForward * z).normalized * rb.velocity.magnitude;          //This is to prevent the weird glitch where the player bounces on slopes if they land on them without jumping
             friction = baseMovementVariables.groundFriction;
             _inAirJumps = jumpVariables.inAirJumps;
-            previousState = playerState;
-            playerState = PlayerState.Grounded;
             if (playerJustLanded != null) playerJustLanded();
             PlayerLanded();
             SetInitialGravity(0);
@@ -216,15 +214,30 @@ public partial class PlayerController
             if (playerLeftGround != null) playerLeftGround();
         }
         isGrounded = groundCheck;
+
         if (isGrounded)
         {
-            if (x == 0 && z == 0) friction = baseMovementVariables.noInputFriction;
-            else friction = baseMovementVariables.groundFriction;
+            if (x == 0 && z == 0)
+            {
+                isSprinting = false;
+                friction = baseMovementVariables.noInputFriction;
+                previousState = playerState;
+                playerState = PlayerState.NotMoving;
+            }
+            else
+            {
+                friction = baseMovementVariables.groundFriction;
+                if (crouchMechanic && (playerState != PlayerState.Crouching && playerState != PlayerState.Sliding))
+                {
+                    previousState = playerState;
+                    playerState = isSprinting ? PlayerState.Sprinting : PlayerState.MovingInGround;
+                }
+            } 
         } 
         //If close to a small step, raise the player to the height of the step for a smoother feeling movement
         float maxDistance = capCollider.radius * (1 + ((isSprinting) ? (rb.velocity.magnitude / baseMovementVariables.maxSprintVelocity) : 0));
 
-        if (playerState == PlayerState.Grounded) baseMovementVariables.feetSphereCheck = Physics.SphereCast(
+        if (isGrounded) baseMovementVariables.feetSphereCheck = Physics.SphereCast(
             (transform.position + capCollider.center * capCollider.height * transform.lossyScale.y) -
             (transform.up * (transform.lossyScale.y * capCollider.height * .5f - capCollider.radius * transform.lossyScale.z)),
             capCollider.radius + .01f, rb.velocity.normalized, out feetHit, maxDistance, collisionMask, QueryTriggerInteraction.Ignore);
@@ -238,9 +251,7 @@ public partial class PlayerController
             Debug.DrawLine(transform.position - Vector3.up * capCollider.height * .24f, (transform.position - Vector3.up * capCollider.height * .24f) + direction);
             baseMovementVariables.kneesCheck = Physics.Raycast(transform.position - Vector3.up * capCollider.height * .24f, direction, dist+.05f, collisionMask, QueryTriggerInteraction.Ignore);
 
-            if (!baseMovementVariables.kneesCheck && 
-                playerState == PlayerState.Grounded &&
-                 (x != 0 || z != 0))
+            if (!baseMovementVariables.kneesCheck && isGrounded && (x != 0 || z != 0))
             {
                 //print(sumOfAllAngles / numerOfAngles);
                 //Time.timeScale = 0;
@@ -252,7 +263,7 @@ public partial class PlayerController
     }
     private void Move()
     {
-        if (playerState!=PlayerState.Grounded)//InAirMovement
+        if (!isGrounded)//InAirMovement
         {
             if (playerState != PlayerState.Climbing && playerState != PlayerState.Vaulting)
             {
@@ -323,7 +334,7 @@ public partial class PlayerController
     {
         //if (playerState != PlayerState.Climbing)
         //{
-        if (playerState!=PlayerState.Grounded)
+        if (!isGrounded)
         {
             totalVelocityToAdd += Vector3.up * g;
         }
@@ -350,7 +361,6 @@ public partial class PlayerController
         climbVariables._climbingCooldown = 0;
         //lastViablePosition = transform.position;
     }
-
     public void ChangeWalkingSpeed(float newWalkingSpeed) => baseMovementVariables.maxWalkVelocity = newWalkingSpeed;
     public void ResetWalkingSpeed() => baseMovementVariables.maxWalkVelocity = baseMovementVariables.originalWalkingSpeed;
     public void ChangeSprintSpeed(float newSprintSpeed) => baseMovementVariables.maxSprintVelocity = newSprintSpeed;

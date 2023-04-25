@@ -33,9 +33,9 @@ public partial class PlayerController
     {
         vaultVariables.headCheck = false;
         vaultVariables.forwardCheck = false;
-        if (playerState != PlayerState.Grounded)
+        if (!isGrounded)
         {
-            if (hit.collider && surfaceSlope != -1)
+            if (hit.collider && surfaceSlope!=0)
             {
 
                 float angleInRadians = (90f - surfaceSlope) * Mathf.Deg2Rad;
@@ -52,9 +52,12 @@ public partial class PlayerController
                 float maxDistance = Mathf.Abs(newPosToHit.magnitude * Mathf.Tan(angleInRadians)) + .05f;
 
                 vaultVariables.forwardCheck = Physics.Raycast(newPosition, transform.forward, maxDistance, collisionMask, QueryTriggerInteraction.Ignore);
-
+                Debug.DrawLine(newPosition, newPosition + transform.forward * maxDistance, Color.blue);
                 maxDistance = Mathf.Abs((hit.point - headCheckPosition).magnitude * Mathf.Tan(angleInRadians)) + .05f;
                 vaultVariables.headCheck = Physics.Raycast(headCheckPosition, transform.forward, maxDistance, collisionMask, QueryTriggerInteraction.Ignore);
+                Debug.DrawLine(headCheckPosition, headCheckPosition + transform.forward * maxDistance, Color.magenta);
+                Debug.DrawLine(newPosition, newPosition + transform.up * ((transform.position - playerCamera.transform.position).magnitude + vaultVariables.heightAboveCamera), Color.red);
+
             }
             else
             {
@@ -74,7 +77,7 @@ public partial class PlayerController
         vaultVariables.kneesCheck = false;
         if (vaultVariables.climbMechanic) HandleClimb();
         HandleVault();
-
+        Debug.DrawLine(playerCamera.transform.position + vaultVariables.heightAboveCamera * Vector3.up, playerCamera.transform.position + vaultVariables.heightAboveCamera * Vector3.up + transform.forward * 5, Color.red);
     }
     public void HandleVault()
     {
@@ -89,7 +92,7 @@ public partial class PlayerController
     private IEnumerator VaultCoroutine()
     {
         rb.velocity = Vector3.up * vaultVariables.vaultClimbStrength;
-        float height = Camera.main.transform.position.y;
+        float height = Camera.main.transform.position.y + playerCamera.camHeight;
         Physics.BoxCast(transform.position - transform.forward.normalized * capCollider.radius * .5f, Vector3.one * capCollider.radius, transform.forward, out forwardHit, Quaternion.identity, 1f, collisionMask, QueryTriggerInteraction.Ignore);
         vaultVariables.feetCheck = Physics.Raycast(transform.position - Vector3.up * capCollider.height * .5f, transform.forward, capCollider.radius + .1f, collisionMask, QueryTriggerInteraction.Ignore);
         while ((transform.position.y - capCollider.height * .5 * transform.lossyScale.y) < height && rb.velocity.y > 0)
@@ -101,6 +104,7 @@ public partial class PlayerController
         previousState = playerState;
         if (!isGrounded) playerState = PlayerState.InAir;
         rb.velocity = ((forwardHit.normal.magnitude == 0) ? transform.forward : -forwardHit.normal) * vaultVariables.vaultEndForwardStrength;
+        Time.timeScale = 0;
     }
 
 }

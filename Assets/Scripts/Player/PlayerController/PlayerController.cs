@@ -31,6 +31,7 @@ public partial class PlayerController : MonoBehaviour
     public bool onFakeGround;
     public PlayerState playerState;
     public PlayerState previousState;
+    public PlayerState animationState;
     #endregion
 
     #region Primitive Variables
@@ -100,6 +101,7 @@ public partial class PlayerController : MonoBehaviour
     Rigidbody rb;
     CapsuleCollider capCollider;
     public PlayerCamera playerCamera;
+    public Animator animator;
     #endregion
 
     #region Other
@@ -110,13 +112,15 @@ public partial class PlayerController : MonoBehaviour
 
     public enum PlayerState
     {
-        NotMoving,
-        Grounded,
-        Sliding,
-        Jumping,
-        Climbing,
-        Vaulting,
-        InAir,
+        NotMoving = 0,
+        MovingInGround = 1,
+        Sprinting = 2,
+        Crouching = 3,
+        Sliding = 4,
+        Jumping = 5,
+        Climbing = 6,
+        Vaulting = 7,
+        InAir = 8,
     };
 
     #endregion
@@ -150,18 +154,19 @@ public partial class PlayerController : MonoBehaviour
 
     void Update()
     {
-        //if (Input.GetKeyDown(KeyCode.E))
-        //{
-        //    if (Time.timeScale == 1) Time.timeScale = .1f;
-        //    else Time.timeScale = 1;
-        //}
-        //if (Input.GetKeyDown(KeyCode.P)) Time.timeScale = 0;
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            if (Time.timeScale == 1) Time.timeScale = .1f;
+            else Time.timeScale = 1;
+        }
+        if (Input.GetKeyDown(KeyCode.P)) Time.timeScale = 0;
         if (!movementDisabled)
         {
             if (crouchMechanic) CrouchInput();
             MovementInput();
             if (jumpMechanic) JumpInput();
         }
+        ChangeAnimation();
     }
     private void FixedUpdate()
     {
@@ -180,14 +185,9 @@ public partial class PlayerController : MonoBehaviour
         rb.velocity += externalVelocity;
         rb.velocity += parentVelocity;
         externalVelocity = Vector3.zero;
-        if (rb.velocity.magnitude < baseMovementVariables.minVelocity && x == 0 && z == 0
-         && (playerState == PlayerState.Grounded))        //If the player stops moving set its maxVelocity to walkingSpeed and set its rb velocity to 0
-        {
-            rb.velocity = Vector3.zero;
-            isSprinting = false;
-        }
+        if (rb.velocity.magnitude < baseMovementVariables.minVelocity && isGrounded) rb.velocity = Vector3.zero;    //If the players velocity goes below the miunimum velocity set it's rb velocity to 0
         if (stuckBetweenSurfacesHelper >= 2) rb.velocity -= rb.velocity.y * Vector3.up;     //Allows the player to slide around when stuck between two or more surfaces
-        print(playerState);
+        //print(playerState);
     }
 
     public void UpdateRespawnPoint() => lastViablePosition = transform.position;
@@ -213,4 +213,11 @@ public partial class PlayerController : MonoBehaviour
         movementDisabled = true;
     }
     public void EnableMovement() => movementDisabled = false;
+
+    public void ChangeAnimation()
+    {
+        if (playerState == animationState) return;
+        animator.SetInteger("PlayerState", (int)playerState);
+        animationState = playerState;
+    }
 }

@@ -132,7 +132,7 @@ public partial class PlayerController
         //Reset and set the necessary variables 
         climbVariables._climbingCooldown = climbVariables.climbingCooldown;
         previousState = playerState;
-        if (playerState!=PlayerState.Grounded)
+        if (!isGrounded)
         {
             playerState = PlayerState.InAir;
             //Give the player better in air control for a brief moment to allow them to better decide where to go after the climb ends

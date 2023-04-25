@@ -33,12 +33,14 @@ public partial class PlayerController
 
             //Crouch
             if (!crouchVariables.isCrouching && crouchVariables.crouchBuffer
-             && playerState==PlayerState.Grounded)
+             && isGrounded)
             {
                 capCollider.height *= crouchVariables.playerYScaleWhenCrouched;
                 capCollider.center += Vector3.up * -crouchVariables.playerYScaleWhenCrouched;
                 crouchVariables.isCrouching = true;
                 playerCamera.AdjustCameraHeight(true, crouchVariables.cameraDisplacement);
+                previousState = playerState;
+                playerState = PlayerState.Crouching;
 
                 //Sliding Mechanic
                 if (crouchVariables.slideMechanic)
@@ -68,5 +70,7 @@ public partial class PlayerController
         crouchVariables.isCrouching = false;
         playerCamera.AdjustCameraHeight(false, crouchVariables.cameraDisplacement);
         crouchVariables.standingUp = false;
+        previousState = playerState;
+        playerState = PlayerState.MovingInGround;
     }
 }

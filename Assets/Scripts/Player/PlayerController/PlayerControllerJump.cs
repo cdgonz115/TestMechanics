@@ -33,7 +33,9 @@ public partial class PlayerController
         if (_jumpBuffer <= 0) _jumpBuffer = 0;
         if (playerState != PlayerState.Climbing)
         {
-            if (_jumpBuffer > 0 && (isGrounded || _coyoteTimer > 0) && playerState != PlayerState.Jumping && (crouchMechanic ? crouchVariables.topIsClear : true)) StartCoroutine(JumpCoroutine(false));
+            if (_jumpBuffer > 0 && (isGrounded || _coyoteTimer > 0)
+            && playerState != PlayerState.Jumping
+            && (crouchMechanic ? crouchVariables.topIsClear : true)) StartCoroutine(JumpCoroutine(false));
             else if (playerState == PlayerState.InAir && _inAirJumps > 0 && _jumpBuffer > 0)
             {
                 _inAirJumps--;
@@ -57,13 +59,13 @@ public partial class PlayerController
             else rb.velocity = Vector3.zero;
         }
         else rb.velocity -= rb.velocity.y * Vector3.up;
-        while (rb.velocity.y >= 0f && playerState != PlayerState.Grounded)
+        while (rb.velocity.y >= 0f && !isGrounded)
         {
             y -= jumpVariables.jumpStregthDecreaser;
             totalVelocityToAdd += Vector3.up * y;
             yield return fixedUpdate;
         }
-        if (playerState != PlayerState.Grounded)
+        if (!isGrounded)
         {
             _highestPointHoldTimer = jumpVariables.highestPointHoldTime;
             SetInitialGravity(0);
@@ -84,5 +86,6 @@ public partial class PlayerController
     {
         _jumpBuffer = 0;
         _justJumpedCooldown = jumpVariables.justJumpedCooldown;
+        isGrounded = false;
     }
 }

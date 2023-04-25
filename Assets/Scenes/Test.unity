@@ -213,7 +213,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2635940}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -85.5, y: 24.7, z: -39.7}
+  m_LocalPosition: {x: -73.9, y: 4.5, z: -39.7}
   m_LocalScale: {x: 10, y: 1, z: 10}
   m_Children: []
   m_Father: {fileID: 0}
@@ -8144,7 +8144,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 456460560}
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: -242.5, y: 2.85, z: 92.6}
+  m_LocalPosition: {x: -226.84, y: 0.5, z: 58.72}
   m_LocalScale: {x: 10.337501, y: 0.5, z: 21.498001}
   m_Children: []
   m_Father: {fileID: 0}
@@ -8162,8 +8162,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f66576ccc39bdc24f904835c1f46dee0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 1
-  multiplier: 50
+  speed: 0.2
+  multiplier: 1
 --- !u!1 &460294535
 GameObject:
   m_ObjectHideFlags: 0
@@ -25245,7 +25245,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1267787585}
   m_LocalRotation: {x: -0, y: 0.70710576, z: -0, w: 0.70710784}
-  m_LocalPosition: {x: -60.509995, y: 26.92, z: -43.59}
+  m_LocalPosition: {x: -48.909996, y: 6.7199993, z: -43.59}
   m_LocalScale: {x: 0.5, y: 5, z: 40.897755}
   m_Children: []
   m_Father: {fileID: 1234656754}
@@ -35538,7 +35538,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1699718848}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -33.08, y: 24.7, z: -39.7}
+  m_LocalPosition: {x: -21.480003, y: 4.5, z: -39.7}
   m_LocalScale: {x: 10, y: 1, z: 10}
   m_Children: []
   m_Father: {fileID: 0}
@@ -37956,7 +37956,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1796284834}
   m_LocalRotation: {x: -0, y: 0.70710576, z: -0, w: 0.70710784}
-  m_LocalPosition: {x: -60.509995, y: 26.92, z: -35.71}
+  m_LocalPosition: {x: -48.909996, y: 6.7199993, z: -35.71}
   m_LocalScale: {x: 0.5, y: 5, z: 40.897755}
   m_Children: []
   m_Father: {fileID: 1234656754}
@@ -42034,7 +42034,7 @@ Transform:
   m_GameObject: {fileID: 2050628095}
   m_LocalRotation: {x: -0.020956768, y: 0.7953176, z: -0.60581344, w: -0.0045690318}
   m_LocalPosition: {x: 32.40394, y: 2.03, z: -41.97328}
-  m_LocalScale: {x: 5.199073, y: 0.19588038, z: 3.4100003}
+  m_LocalScale: {x: 5.199073, y: 0.19588038, z: 31.54523}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 7
@@ -45731,7 +45731,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7939601756642268615, guid: f534df4f017f5f545a9c6a8508810c65, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 44.83
+      value: 3.1
       objectReference: {fileID: 0}
     - target: {fileID: 7939601756642268615, guid: f534df4f017f5f545a9c6a8508810c65, type: 3}
       propertyPath: m_LocalPosition.z
@@ -45774,6 +45774,10 @@ PrefabInstance:
       value: PlayerController
       objectReference: {fileID: 0}
     - target: {fileID: 7939601756642268669, guid: f534df4f017f5f545a9c6a8508810c65, type: 3}
+      propertyPath: animator
+      value: 
+      objectReference: {fileID: 6107372638317085300}
+    - target: {fileID: 7939601756642268669, guid: f534df4f017f5f545a9c6a8508810c65, type: 3}
       propertyPath: vaultMechanic
       value: 1
       objectReference: {fileID: 0}
@@ -45811,7 +45815,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7939601756642268669, guid: f534df4f017f5f545a9c6a8508810c65, type: 3}
       propertyPath: vaultVariables.heightAboveCamera
-      value: 0.25
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 7939601756642268669, guid: f534df4f017f5f545a9c6a8508810c65, type: 3}
       propertyPath: climbVariables.endOfClimbHoldTime
