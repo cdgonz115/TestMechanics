@@ -133,6 +133,7 @@ public partial class PlayerController : MonoBehaviour
     }
     void Start()
     {
+        Time.timeScale = .1f;
         lastViablePosition = transform.position;
         capCollider = GetComponent<CapsuleCollider>();
         rb = GetComponent<Rigidbody>();
@@ -166,7 +167,6 @@ public partial class PlayerController : MonoBehaviour
             MovementInput();
             if (jumpMechanic) JumpInput();
         }
-        ChangeAnimation();
     }
     private void FixedUpdate()
     {
@@ -188,6 +188,10 @@ public partial class PlayerController : MonoBehaviour
         if (rb.velocity.magnitude < baseMovementVariables.minVelocity && isGrounded) rb.velocity = Vector3.zero;    //If the players velocity goes below the miunimum velocity set it's rb velocity to 0
         if (stuckBetweenSurfacesHelper >= 2) rb.velocity -= rb.velocity.y * Vector3.up;     //Allows the player to slide around when stuck between two or more surfaces
         //print(playerState);
+    }
+    private void LateUpdate()
+    {
+        ChangeAnimation();
     }
 
     public void UpdateRespawnPoint() => lastViablePosition = transform.position;
