@@ -14,16 +14,16 @@ public class RBMovingPlatform : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.GetComponent<PlayerController>())
+        if (collision.gameObject.GetComponent<PhysicsInteractableObject>())
         {
-            collision.gameObject.GetComponent<PlayerController>().SetParentVelocity(transform.forward, speed * multiplier);
+            collision.gameObject.GetComponent<PhysicsInteractableObject>().SetParentVelocity(transform.forward, speed * multiplier);
         }
     }
     private void OnCollisionExit(Collision collision)
     {
-        if (collision.gameObject.GetComponent<PlayerController>())
+        if (collision.gameObject.GetComponent<PhysicsInteractableObject>())
         {
-            collision.gameObject.GetComponent<PlayerController>().SetParentVelocity(Vector3.zero, speed * multiplier);
+            collision.gameObject.GetComponent<PhysicsInteractableObject>().SetParentVelocity(Vector3.zero, speed * multiplier);
         }
     }
 }
