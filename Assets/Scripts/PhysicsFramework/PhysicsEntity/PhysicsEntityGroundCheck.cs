@@ -8,9 +8,13 @@ public partial class PhysicsEntity
     protected float averageAngle;
     protected float surfaceSlope;
     protected int numberOfAngles;
-    public int maxNumberOfSurfaces;
 
-    protected int stuckBetweenSurfacesHelper = 0;
+    [Space(20)]
+    [Tooltip("The number of invalid surfaces needed to let the Entity in the slide around")]
+    [SerializeField] protected int maxNumberOfInvalidSurfaces = 1;
+    [SerializeField] protected float stuckBetweenSurfacesVelocity = 2f;
+
+    public int stuckBetweenSurfacesHelper = 0;
 
     protected RaycastHit groundCheckHit;
 
@@ -19,22 +23,26 @@ public partial class PhysicsEntity
     protected Vector3 currentForwardAndRightVelocity;
     protected Vector3 velocityGravityComponent;
     protected Vector3 newRigidBodyVelocity;
+
     #endregion
 
     [System.Serializable]
     public class GroundCheckMechanic : PhysicsMechanic
     {
-        [HideInInspector] public float groundCheckDistance;
+        [HideInInspector] public float colliderRadius;
         [HideInInspector] public float biggestSize = 0;
+        public float groundCheckMaxDistance = 0.05f;
+        public float groundCheckRadiusOffset = .01f;
+        public float groundCheckStartingPointOffset = .01f;
         public float maxSlope = 60;
 
-        internal void CalculateGroundCheckDistance(SphereCollider collider, Transform transform)
+        internal void CalculateColliderRadius(SphereCollider collider, Transform transform)
         {
             if (Mathf.Abs(transform.lossyScale.x) > Mathf.Abs(transform.lossyScale.y)) biggestSize = transform.lossyScale.x;
             else biggestSize = transform.lossyScale.y;
             if (Mathf.Abs(biggestSize) < Mathf.Abs(transform.lossyScale.z)) biggestSize = transform.lossyScale.z;
 
-            groundCheckDistance = biggestSize * collider.radius;
+            colliderRadius = biggestSize * collider.radius;
         }
     }
 
@@ -49,8 +57,11 @@ public partial class PhysicsEntity
 
         if (_justJumpedCooldown > 0) _justJumpedCooldown -= Time.fixedDeltaTime;
 
-        RaycastHit[] hits = Physics.SphereCastAll(transform.position, (characterCollider.radius - .01f) * groundCheckMechanic.biggestSize, gravityDirection,
-          .02f * groundCheckMechanic.biggestSize, collisionMask, QueryTriggerInteraction.Ignore);
+        RaycastHit[] hits = new RaycastHit[2];
+
+        Physics.SphereCastNonAlloc(transform.position + (-gravityDirection * groundCheckMechanic.groundCheckStartingPointOffset),
+            groundCheckMechanic.colliderRadius - groundCheckMechanic.groundCheckRadiusOffset, gravityDirection, hits,
+          groundCheckMechanic.groundCheckMaxDistance * groundCheckMechanic.biggestSize, collisionMask, QueryTriggerInteraction.Ignore);
 
         foreach (RaycastHit hit in hits)
         {
@@ -58,7 +69,7 @@ public partial class PhysicsEntity
             {
                 if (hit.point != Vector3.zero)
                 {
-                    float newSurfaceSlope = Vector3.Angle(hit.normal, -WorldGravity.singleton.GravityDirection);
+                    float newSurfaceSlope = Vector3.Angle(hit.normal, -gravityDirection);
 
                     if (!groundCheckHit.collider)
                     {
@@ -77,8 +88,10 @@ public partial class PhysicsEntity
                             numberOfAngles++;
                         }
                     }
+                    //Debug.Log(newSurfaceSlope);
                     if (newSurfaceSlope > groundCheckMechanic.maxSlope) stuckBetweenSurfacesHelper++;
                 }
+                else stuckBetweenSurfacesHelper++;
             }
         }
 
@@ -114,11 +127,10 @@ public partial class PhysicsEntity
         isGrounded = groundCheck;
 
     }
-
     protected virtual void CharacterLanded() {
-        //_friction = _groundedFriction;
+        _friction = _groundedFriction;
     }
     protected virtual void CharacterLeftGround() {
-        //_friction = _inAirFriction;
+        _friction = _inAirFriction;
     }
 }

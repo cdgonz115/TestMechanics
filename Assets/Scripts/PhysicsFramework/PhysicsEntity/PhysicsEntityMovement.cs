@@ -38,7 +38,6 @@ public partial class PhysicsEntity {
         [Header("In Air Variables")]
         [Range(0, 1)]
         public float inAirControl = .021f;
-        public float minAirVelocity = 2f;
         #endregion
 
         [HideInInspector] public float startingWalkingSpeed;
@@ -48,21 +47,19 @@ public partial class PhysicsEntity {
     }
 
     protected Vector3 moveTargetPosition;
-
     protected virtual void SetTargetPosition(Vector3 position)
     {
         if (position == null) moveTargetPosition = Vector3.negativeInfinity;
         else moveTargetPosition = position;
     }
-
-    protected virtual void Move()
+    protected void MoveToTarget()
     {
         bool hasTarget = !(moveTargetPosition.Equals(Vector3.negativeInfinity));
         Vector3 direction = hasTarget ? moveTargetPosition - transform.position : currentForwardAndRightVelocity;
 
         if (isGrounded)
         {
-            if (direction.magnitude < .6f)
+            if (direction.magnitude < groundCheckMechanic.biggestSize + .1f)
             {
                 rb.velocity = Vector3.zero;
                 totalVelocityToAdd = Vector3.zero;
@@ -86,16 +83,21 @@ public partial class PhysicsEntity {
         {
             newForwardandRight = Vector3.ProjectOnPlane(direction, -gravityDirection).normalized;
 
-            Vector3 temp1 = newForwardandRight.normalized * (currentForwardAndRightVelocity.magnitude < .1f && stuckBetweenSurfacesHelper > 1 ?
-            1f : currentForwardAndRightVelocity.magnitude) * _inAirControl;
-
-            Vector3 temp2 = currentForwardAndRightVelocity * (1f - _inAirControl);
-
-            Vector3 newVelocity = newForwardandRight.normalized * (currentForwardAndRightVelocity.magnitude < .1f && stuckBetweenSurfacesHelper > 1 ?
-            1f : currentForwardAndRightVelocity.magnitude) * _inAirControl +
+            Vector3 newVelocity = newForwardandRight.normalized * currentForwardAndRightVelocity.magnitude * _inAirControl +
             currentForwardAndRightVelocity * (1f - _inAirControl);
 
-            if (newVelocity.magnitude < movementMechanic.minAirVelocity) newVelocity = newVelocity.normalized * movementMechanic.minAirVelocity;
+            Vector3 wtf = newForwardandRight * currentForwardAndRightVelocity.magnitude * _inAirControl;
+
+            print(wtf);
+
+            Debug.DrawLine(transform.position, transform.position + wtf, Color.red);
+            Debug.DrawLine(transform.position, transform.position + currentForwardAndRightVelocity * (1f - _inAirControl), Color.green);
+
+            if (stuckBetweenSurfacesHelper > maxNumberOfInvalidSurfaces &&
+                newVelocity.magnitude < stuckBetweenSurfacesVelocity)
+            {
+                newVelocity = newVelocity.normalized * stuckBetweenSurfacesVelocity;
+            }
 
             rb.velocity = -currentForwardAndRightVelocity * _friction + newVelocity + velocityGravityComponent;
         }

@@ -133,7 +133,7 @@ public partial class PlayerController : MonoBehaviour
     }
     void Start()
     {
-        Time.timeScale = .1f;
+        //Time.timeScale = .1f;
         lastViablePosition = transform.position;
         capCollider = GetComponent<CapsuleCollider>();
         rb = GetComponent<Rigidbody>();
@@ -155,11 +155,11 @@ public partial class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            if (Time.timeScale == 1) Time.timeScale = .1f;
-            else Time.timeScale = 1;
-        }
+        //if (Input.GetKeyDown(KeyCode.E))
+        //{
+        //    if (Time.timeScale == 1) Time.timeScale = .1f;
+        //    else Time.timeScale = 1;
+        //}
         if (Input.GetKeyDown(KeyCode.P)) Time.timeScale = 0;
         if (!movementDisabled)
         {

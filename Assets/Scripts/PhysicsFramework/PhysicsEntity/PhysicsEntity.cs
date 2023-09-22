@@ -8,6 +8,7 @@ public abstract partial class PhysicsEntity : PhysicsObject
     [Header("Collision Variables")]
     public LayerMask collisionMask;
 
+    [Space(20)]
     [Header("Mechanics")]
     #region Mechanics
     public GroundCheckMechanic groundCheckMechanic = new GroundCheckMechanic();

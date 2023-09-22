@@ -12,7 +12,9 @@ public abstract class PhysicsObject : MonoBehaviour
 
     #region BasicVariables
     [Space(20)]
-    [SerializeField] protected float _minVelocity = 0.1f;
+    [SerializeField]
+    [Tooltip("The minimum velocity that the objects RigidBody can have before being rounded to zero")]
+    protected float _minVelocity = 0.1f;
     protected bool groundCheck;
     protected bool isGrounded;
     #endregion
@@ -23,7 +25,7 @@ public abstract class PhysicsObject : MonoBehaviour
     #endregion
 
     #region Gravity
-    public Vector3 gravityDirection;
+    protected Vector3 gravityDirection;
     protected Vector3 gravityCenter;
     protected float _gravityRate;
     #endregion
@@ -55,16 +57,16 @@ public abstract class PhysicsObject : MonoBehaviour
         public float initialGravityVelocity = -.55f;
         public float gravityRate = 1.008f;
 
-        public float fixedUpdatesForMaxAcceleration;
+        [HideInInspector] public float fixedUpdatesForMaxAcceleration;
         public float timeForMaxAcceleration
         {
             get { return fixedUpdatesForMaxAcceleration / WorldGravity.fixedUpdatesPerSecond; }
         }
 
-        public float exponentialVelocityConstant;
-        public float exponentialVelocityScalar;
+        [HideInInspector] public float exponentialVelocityConstant;
+        [HideInInspector] public float exponentialVelocityScalar;
 
-        public float aproximatedConstantAcceleration;
+        [HideInInspector] public float aproximatedConstantAcceleration;
 
         public void CalculateVelocityEquationValues()
         {

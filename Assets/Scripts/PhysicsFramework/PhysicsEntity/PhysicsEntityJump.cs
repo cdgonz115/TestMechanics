@@ -5,14 +5,10 @@ using UnityEngine;
 public partial class PhysicsEntity
 {
     protected float _justJumpedCooldown;
-
-    public Vector3 jumpStartPosition;
     [System.Serializable]
     public class JumpMechanic : PhysicsMechanic
     {
         public float justJumpedCooldown = .1f;
-
-        public int inAirJumps = 0;
     }
 
     protected Vector3 jumpTargetPosition;
@@ -26,7 +22,7 @@ public partial class PhysicsEntity
     public virtual void Jump(Vector3 targetPosition)
     {
         Vector3 result = gravityMechanic.ProjectileLaunch(transform.position,
-            targetPosition + groundCheckMechanic.groundCheckDistance * -gravityDirection, gravityDirection);
+            targetPosition + groundCheckMechanic.colliderRadius * -gravityDirection, gravityDirection);
 
         rb.velocity = result;
         _justJumpedCooldown = jumpMechanic.justJumpedCooldown;
