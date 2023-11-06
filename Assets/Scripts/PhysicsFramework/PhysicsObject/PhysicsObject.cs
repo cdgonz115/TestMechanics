@@ -5,18 +5,16 @@ using UnityEngine;
 public abstract class PhysicsObject : MonoBehaviour
 {
     #region Components
-    [Header("Components Variables")]
+    [Header("Components")]
     public Rigidbody rb;
-    public SphereCollider characterCollider;
     #endregion
 
     #region BasicVariables
     [Space(20)]
+    [Header("Basic Variables")]
     [SerializeField]
     [Tooltip("The minimum velocity that the objects RigidBody can have before being rounded to zero")]
     protected float _minVelocity = 0.1f;
-    protected bool groundCheck;
-    protected bool isGrounded;
     #endregion
 
     #region Mechanics
@@ -30,16 +28,16 @@ public abstract class PhysicsObject : MonoBehaviour
     protected float _gravityRate;
     #endregion
 
-    #region Primitive Variables
+    #region Internal Variables
     protected float g;
     #endregion
 
     #region Vectors
     protected Vector3 totalVelocityToAdd;
-    protected Vector3 localVelocity;
     protected Vector3 externalVelocity;
     protected Vector3 parentVelocity;
-    protected Vector3 workingVelocity;
+    protected Vector3 beforeCollisionVelocity;
+    protected Vector3 afterCollisionVelocityDifference;
     #endregion
 
     [System.Serializable]
@@ -49,6 +47,7 @@ public abstract class PhysicsObject : MonoBehaviour
         public virtual void EnableMechanic() => enabled = true;
         public virtual void DisableMechanic() => enabled = false;
     }
+
     [System.Serializable]
     public class GravityMechanic : PhysicsMechanic
     {
@@ -128,26 +127,12 @@ public abstract class PhysicsObject : MonoBehaviour
             return final;
         }
     }
-    protected virtual void GroundCheck(Collision collision = null)
-    {
-        float smallestAngle = 181;
-        foreach (ContactPoint point in collision.contacts)
-        {
-            float angle = Vector3.Angle(gravityDirection, point.point - transform.position);
-            if (angle < smallestAngle) smallestAngle = angle;
-        }
-        groundCheck = (smallestAngle < 3);
-        if (!groundCheck && isGrounded) SetInitialGravity(gravityMechanic.initialGravityVelocity);
-        if (groundCheck && !isGrounded) SetInitialGravity(0);
-        isGrounded = groundCheck;
-    }
     protected virtual void RigidBodySetUp()
     {
         rb = GetComponent<Rigidbody>();
         rb.interpolation = RigidbodyInterpolation.Interpolate;
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
         rb.useGravity = false;
-        rb.constraints = RigidbodyConstraints.FreezeRotation;
     }
     public void SetParentVelocity(Vector3 direction, float magnitude)
     {
@@ -160,33 +145,48 @@ public abstract class PhysicsObject : MonoBehaviour
     protected void ApplyGravity()
     {
         if (gravityCenter != Vector3.zero) SetGravityDirection(gravityCenter - transform.position);
-        if (!isGrounded)
-        {
-            totalVelocityToAdd += (-gravityDirection) * g;
-            if (g > gravityMechanic.maxGravityAcceleration) g *= _gravityRate;
-        }
 
+        totalVelocityToAdd += (-gravityDirection) * g;
+        if (g > gravityMechanic.maxGravityAcceleration) g *= _gravityRate;
     }
-    public void SetGravityDirection(Vector3 direction, bool resetGroundCheck = false)
+    public void SetGravityDirection(Vector3 direction)
     {
         gravityDirection = direction.normalized;
-        groundCheck = resetGroundCheck ? false : groundCheck;
-        if (!groundCheck && isGrounded) SetInitialGravity(gravityMechanic.initialGravityVelocity);
-        isGrounded = groundCheck;
+        WakeUpObject();
+        //groundCheck = resetGroundCheck ? false : groundCheck;
+        //if (!groundCheck && isGrounded) SetInitialGravity(gravityMechanic.initialGravityVelocity);
+        //isGrounded = groundCheck;
     }
-    public void SetGravityCenter(Vector3 point, bool resetGroundCheck = false)
+    public void SetGravityCenter(Vector3 point)
     {
         gravityCenter = point;
-        groundCheck = resetGroundCheck;
-        isGrounded = groundCheck;
+        WakeUpObject();
+        //groundCheck = resetGroundCheck;
+        //isGrounded = groundCheck;
     }
     public void ToggleGravity(bool isActice)
     {
         gravityMechanic.enabled = isActice;
-        groundCheck = false;
-        isGrounded = groundCheck;
+        WakeUpObject();
+        //groundCheck = false;
+        //isGrounded = groundCheck;
         SetInitialGravity(0);
     }
     public void SetInitialGravity(float value) => g = value;
     public void SetGravityRate(float value) => _gravityRate = value;
+    public void StopVelocity() => rb.velocity = Vector3.zero;
+    public void StopMomentum() 
+    {
+        StopVelocity();
+        rb.angularVelocity = rb.velocity;
+    }
+    public void SleepObject() 
+    {
+        StopMomentum();
+        rb.Sleep();
+    }
+    public void WakeUpObject() 
+    {
+        if (rb.IsSleeping()) rb.WakeUp();
+    }
 }

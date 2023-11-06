@@ -47,37 +47,42 @@ public partial class PhysicsEntity {
     }
 
     protected Vector3 moveTargetPosition;
+    protected Vector3 localVelocity;
     protected virtual void SetTargetPosition(Vector3 position)
     {
         if (position == null) moveTargetPosition = Vector3.negativeInfinity;
         else moveTargetPosition = position;
     }
-    protected void MoveToTarget()
+    protected virtual void Move()
     {
+        //Debug.Log(rb.velocity);
         bool hasTarget = !(moveTargetPosition.Equals(Vector3.negativeInfinity));
         Vector3 direction = hasTarget ? moveTargetPosition - transform.position : currentForwardAndRightVelocity;
 
         if (isGrounded)
         {
-            if (direction.magnitude < groundCheckMechanic.biggestSize + .1f)
+            if (direction.magnitude < GetColliderRadius() + 1)
             {
-                rb.velocity = Vector3.zero;
-                totalVelocityToAdd = Vector3.zero;
+                totalVelocityToAdd = -rb.velocity;
+                frictionToApply = Vector3.zero;
                 return;
             }
-            newForwardandRight = Vector3.ProjectOnPlane(direction, groundCheckHit.normal).normalized * _acceleration;
-            if (hasTarget && rb.velocity.magnitude + newForwardandRight.magnitude > _maxVelocity)
+            newForwardandRight = Vector3.ProjectOnPlane(direction, averageNormal).normalized;
+
+            if (hasTarget)
             {
-                float changeInDirectionAngle = Vector3.Angle(rb.velocity, newForwardandRight);
-                rb.velocity = newForwardandRight.normalized * _maxVelocity;
-                if (changeInDirectionAngle > 5) rb.velocity *= .0001f;
-                totalVelocityToAdd = Vector3.zero;
+                if ((rb.velocity + newForwardandRight).magnitude > _maxVelocity)
+                {
+                    rb.velocity = newForwardandRight.normalized * _maxVelocity;
+                    totalVelocityToAdd = Vector3.zero;
+                    frictionToApply = Vector3.zero;
+                }
+                else
+                {
+                    totalVelocityToAdd += newForwardandRight;
+                }
             }
-            else
-            {
-                totalVelocityToAdd += hasTarget ? newForwardandRight : Vector3.zero;
-                rb.velocity -= currentForwardAndRightVelocity * _friction;
-            }
+            else totalVelocityToAdd = Vector3.zero;
         }
         else
         {
@@ -86,20 +91,13 @@ public partial class PhysicsEntity {
             Vector3 newVelocity = newForwardandRight.normalized * currentForwardAndRightVelocity.magnitude * _inAirControl +
             currentForwardAndRightVelocity * (1f - _inAirControl);
 
-            Vector3 wtf = newForwardandRight * currentForwardAndRightVelocity.magnitude * _inAirControl;
-
-            print(wtf);
-
-            Debug.DrawLine(transform.position, transform.position + wtf, Color.red);
-            Debug.DrawLine(transform.position, transform.position + currentForwardAndRightVelocity * (1f - _inAirControl), Color.green);
-
             if (stuckBetweenSurfacesHelper > maxNumberOfInvalidSurfaces &&
                 newVelocity.magnitude < stuckBetweenSurfacesVelocity)
             {
-                newVelocity = newVelocity.normalized * stuckBetweenSurfacesVelocity;
+                frictionToApply = Vector3.zero;
+                newVelocity = newForwardandRight.normalized * stuckBetweenSurfacesVelocity;
             }
-
-            rb.velocity = -currentForwardAndRightVelocity * _friction + newVelocity + velocityGravityComponent;
+            rb.velocity = newVelocity + velocityGravityComponent;
         }
     }
     public virtual void SetGroundedFriction(float friction) => _groundedFriction = friction;

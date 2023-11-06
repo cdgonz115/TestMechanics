@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class InteractablePhysicsObject : PhysicsObject
 {
+    float sleepDelay;
     protected void Awake()
     {
         RigidBodySetUp();
@@ -16,29 +17,35 @@ public class InteractablePhysicsObject : PhysicsObject
     }
     protected void FixedUpdate()
     {
-        if (parentVelocity != Vector3.zero) rb.velocity -= parentVelocity;
-        totalVelocityToAdd = Vector3.zero;
-        workingVelocity = rb.velocity;
-
-        if (gravityMechanic.enabled)
+        if (rb.IsSleeping())
         {
-            ApplyGravity();
+            sleepDelay = 0f;
+            return;
+        }
+        if (rb.velocity.magnitude < _minVelocity)
+        {
+            sleepDelay += Time.deltaTime;
+            if (sleepDelay >= 1f)
+            {
+                SleepObject();
+                return;
+            }
+        }
+        else
+        {
+            sleepDelay = 0f;
         }
 
+        if (parentVelocity != Vector3.zero) rb.velocity -= parentVelocity;
+        totalVelocityToAdd = Vector3.zero;
+
+        if (gravityMechanic.enabled) ApplyGravity();
+
         rb.velocity += totalVelocityToAdd;
-        localVelocity = rb.velocity;
         rb.velocity += parentVelocity;
         rb.velocity += externalVelocity;
 
         externalVelocity = Vector3.zero;
-        if (rb.velocity.magnitude < _minVelocity) rb.velocity = Vector3.zero;
-    }
-    protected void OnCollisionEnter(Collision collision)
-    {
-        GroundCheck(collision);
-    }
-    protected void OnCollisionExit(Collision collision)
-    {
-        GroundCheck(collision);
+        beforeCollisionVelocity = rb.velocity;
     }
 }

@@ -22,9 +22,9 @@ public partial class PhysicsEntity
     public virtual void Jump(Vector3 targetPosition)
     {
         Vector3 result = gravityMechanic.ProjectileLaunch(transform.position,
-            targetPosition + groundCheckMechanic.colliderRadius * -gravityDirection, gravityDirection);
+            targetPosition + GetColliderHeight() * -gravityDirection, gravityDirection);
 
-        rb.velocity = result;
+        rb.velocity += result;
         _justJumpedCooldown = jumpMechanic.justJumpedCooldown;
     }
 }

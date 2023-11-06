@@ -4,128 +4,126 @@ using UnityEngine;
 
 public partial class PhysicsEntity
 {
-    protected float sumOfAllAngles;
-    protected float averageAngle;
-    protected float surfaceSlope;
-    protected int numberOfAngles;
+    #region GroundCheck Variables
+    protected Dictionary<int, Vector3> collisionsAverage = new Dictionary<int, Vector3>();
+    protected Dictionary<int, Vector3> groundCollisionNormals = new Dictionary<int, Vector3>();
+    protected Vector3 averageNormal;
+    protected bool groundCheck;
+    public bool isGrounded;
+    #endregion
+
+    [SerializeField]protected float maxOffsetAngleFromContacts;
+
+    public GameObject plane;
 
     [Space(20)]
     [Tooltip("The number of invalid surfaces needed to let the Entity in the slide around")]
     [SerializeField] protected int maxNumberOfInvalidSurfaces = 1;
+    [SerializeField] protected int maxSlope = 45;
     [SerializeField] protected float stuckBetweenSurfacesVelocity = 2f;
 
     public int stuckBetweenSurfacesHelper = 0;
-
-    protected RaycastHit groundCheckHit;
 
     #region Vectors
     protected Vector3 newForwardandRight;
     protected Vector3 currentForwardAndRightVelocity;
     protected Vector3 velocityGravityComponent;
     protected Vector3 newRigidBodyVelocity;
-
+    protected Vector3 frictionToApply;
     #endregion
-
-    [System.Serializable]
-    public class GroundCheckMechanic : PhysicsMechanic
+    protected virtual void CheckForGroundCollision(Collision collision)
     {
-        [HideInInspector] public float colliderRadius;
-        [HideInInspector] public float biggestSize = 0;
-        public float groundCheckMaxDistance = 0.05f;
-        public float groundCheckRadiusOffset = .01f;
-        public float groundCheckStartingPointOffset = .01f;
-        public float maxSlope = 60;
-
-        internal void CalculateColliderRadius(SphereCollider collider, Transform transform)
+        Vector3 sumOfAllContactNormals = Vector3.zero;
+        foreach (ContactPoint contact in collision.contacts)
         {
-            if (Mathf.Abs(transform.lossyScale.x) > Mathf.Abs(transform.lossyScale.y)) biggestSize = transform.lossyScale.x;
-            else biggestSize = transform.lossyScale.y;
-            if (Mathf.Abs(biggestSize) < Mathf.Abs(transform.lossyScale.z)) biggestSize = transform.lossyScale.z;
-
-            colliderRadius = biggestSize * collider.radius;
+            float angle = Vector3.Angle(contact.normal, -gravityDirection);
+            if (angle < 90) {
+                sumOfAllContactNormals += contact.normal;
+                Debug.DrawRay(transform.position + GetColliderHeight() * gravityDirection, contact.normal, Color.yellow);
+                if (angle > maxSlope) {
+                    maxNumberOfInvalidSurfaces++;
+                }
+            }
         }
+        if (sumOfAllContactNormals.Equals(Vector3.zero)) RemoveVectorFromDictionary(collision.collider.GetInstanceID());
+        else groundCollisionNormals[collision.collider.GetInstanceID()] = sumOfAllContactNormals;
+        Debug.DrawRay(transform.position + GetColliderHeight() * gravityDirection,sumOfAllContactNormals, Color.cyan);
     }
-
     protected virtual void GroundCheck()
     {
-        sumOfAllAngles = 0;
-        stuckBetweenSurfacesHelper = 0;
-        numberOfAngles = 0;
-        groundCheckHit = new RaycastHit();
         velocityGravityComponent = Vector3.Project(rb.velocity, gravityDirection);
         currentForwardAndRightVelocity = rb.velocity - velocityGravityComponent;
 
-        if (_justJumpedCooldown > 0) _justJumpedCooldown -= Time.fixedDeltaTime;
+        Vector3 sumOfAllNormals = groundCollisionNormals.Count < 1 ? gravityDirection : Vector3.zero;
 
-        RaycastHit[] hits = new RaycastHit[2];
-
-        Physics.SphereCastNonAlloc(transform.position + (-gravityDirection * groundCheckMechanic.groundCheckStartingPointOffset),
-            groundCheckMechanic.colliderRadius - groundCheckMechanic.groundCheckRadiusOffset, gravityDirection, hits,
-          groundCheckMechanic.groundCheckMaxDistance * groundCheckMechanic.biggestSize, collisionMask, QueryTriggerInteraction.Ignore);
-
-        foreach (RaycastHit hit in hits)
+        foreach (KeyValuePair<int, Vector3> keyedItem in groundCollisionNormals)
         {
-            if (hit.collider)
-            {
-                if (hit.point != Vector3.zero)
-                {
-                    float newSurfaceSlope = Vector3.Angle(hit.normal, -gravityDirection);
-
-                    if (!groundCheckHit.collider)
-                    {
-                        groundCheckHit = hit;
-                        surfaceSlope = newSurfaceSlope;
-                        sumOfAllAngles += newSurfaceSlope;
-                        numberOfAngles++;
-                    }
-                    else
-                    {
-                        if (newSurfaceSlope <= surfaceSlope)
-                        {
-                            groundCheckHit = hit;
-                            surfaceSlope = newSurfaceSlope;
-                            sumOfAllAngles += newSurfaceSlope;
-                            numberOfAngles++;
-                        }
-                    }
-                    //Debug.Log(newSurfaceSlope);
-                    if (newSurfaceSlope > groundCheckMechanic.maxSlope) stuckBetweenSurfacesHelper++;
-                }
-                else stuckBetweenSurfacesHelper++;
-            }
+            //print("it happened? " + keyedItem.Value);
+            sumOfAllNormals += keyedItem.Value;
         }
+        averageNormal = sumOfAllNormals.normalized;
+        float normalsSlope = Vector3.Angle(sumOfAllNormals, -gravityDirection);
 
-        averageAngle = sumOfAllAngles / numberOfAngles * 1.0f;
-        groundCheck = (!jumpMechanic.enabled || _justJumpedCooldown <= 0) ? (groundCheckHit.collider) : false;
+        plane.transform.position = transform.position + GetColliderHeight() * gravityDirection;
+        plane.transform.up = sumOfAllNormals;
 
-        if (surfaceSlope > groundCheckMechanic.maxSlope)
-        {
-            SetInitialGravity(gravityMechanic.initialGravityVelocity);
-            groundCheck = false;
-        }
+        groundCheck = (normalsSlope < maxSlope);
 
         totalVelocityToAdd = Vector3.zero;
         newForwardandRight = Vector3.zero;
 
-        //Character just became grounded
         if (groundCheck && !isGrounded)
         {
-            Vector3 velocityOnSurfacePlane = Vector3.ProjectOnPlane(rb.velocity, groundCheckHit.normal).normalized * rb.velocity.magnitude;
+            _friction = _groundedFriction;
+            Vector3 velocityOnSurfacePlane = Vector3.ProjectOnPlane(rb.velocity, averageNormal).normalized * rb.velocity.magnitude;
             rb.velocity = velocityOnSurfacePlane;
 
             CharacterLanded();
             SetInitialGravity(0);
+            //isJumping = false;
         }
-        //Character just left the ground
+        ////Character just left the ground
         if (isGrounded && !groundCheck)
         {
-            _justJumpedCooldown = jumpMechanic.justJumpedCooldown;
-            surfaceSlope = 0;
+            //_justJumpedCooldown = jumpMechanic.justJumpedCooldown;
+            //Time.timeScale = .1f;
+            //_timer = timerDuration;
+            //surfaceSlope = 0;
+            _friction = _inAirFriction;
             CharacterLeftGround();
             SetInitialGravity(gravityMechanic.initialGravityVelocity);
         }
         isGrounded = groundCheck;
+    }
+    protected virtual void LegacyCheckForGroundCollision(Collision collision)
+    {
+        Debug.DrawLine(transform.position, transform.position + gravityDirection, Color.red);
+        Vector3 sumOfAllContactDirections = Vector3.zero;
+        foreach (ContactPoint contact in collision.contacts)
+        {
+            float angle = Vector3.Angle(contact.normal, -gravityDirection);
+            Vector3 directionToContact = contact.point - transform.position;
+            Debug.DrawLine(transform.position, transform.position + directionToContact, Color.cyan);
 
+            if (angle < 90) sumOfAllContactDirections += directionToContact;
+        }
+        print(sumOfAllContactDirections.Equals(Vector3.zero));
+        if (sumOfAllContactDirections.Equals(Vector3.zero)) RemoveVectorFromDictionary(collision.collider.GetInstanceID());
+        else collisionsAverage[collision.collider.GetInstanceID()] = sumOfAllContactDirections;
+    }
+    protected virtual void LegacyGroundCheck()
+    {
+        Vector3 sumOfAllContactDirections = collisionsAverage.Count < 1 ? -gravityDirection : Vector3.zero;
+        foreach (KeyValuePair<int, Vector3> keyedItem in collisionsAverage)
+        {
+            sumOfAllContactDirections += keyedItem.Value;
+        }
+        float contactsToGravityAngle = Vector3.Angle(sumOfAllContactDirections, gravityDirection);
+        Debug.DrawLine(transform.position, transform.position + sumOfAllContactDirections, Color.magenta);
+
+        groundCheck = (contactsToGravityAngle < maxOffsetAngleFromContacts);
+
+        isGrounded = groundCheck;
     }
     protected virtual void CharacterLanded() {
         _friction = _groundedFriction;
