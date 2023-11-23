@@ -4,8 +4,9 @@ using UnityEngine;
 
 public abstract partial class PhysicsEntity : PhysicsObject
 {
-    [SerializeField]protected Collider objectCollider;
     [Space(20)]
+    [SerializeField]protected Collider objectCollider;
+    [Space(10)]
     [Header("Collision Variables")]
     public LayerMask avoidMask;
 

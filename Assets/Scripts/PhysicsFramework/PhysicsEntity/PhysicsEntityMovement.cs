@@ -8,18 +8,11 @@ public partial class PhysicsEntity {
     protected float _groundedFriction;
     protected float _inAirControl;
     protected float _maxVelocity;
-    protected float _acceleration;
 
     [System.Serializable]
     public class MovementMechanic : PhysicsMechanic
     {
         #region Variables
-
-        #region Acceleration
-        [Header("Acceleration")]
-        public float walkingAcceleration = 1;
-        public float sprintingAcceleration = 2;
-        #endregion
 
         #region Velocity Caps
         [Header("Velocity Boundaries")]
@@ -29,7 +22,6 @@ public partial class PhysicsEntity {
 
         #region Friction
         [Header("Friction Values")]
-        public float noInputFriction = .2f;
         public float groundFriction = .1f;
         public float inAirFriction = .004f;
         #endregion
@@ -40,24 +32,20 @@ public partial class PhysicsEntity {
         public float inAirControl = .021f;
         #endregion
 
-        [HideInInspector] public float startingWalkingSpeed;
-        [HideInInspector] public float startingSprintSpeed;
-
         #endregion
     }
 
     protected Vector3 moveTargetPosition;
     protected Vector3 localVelocity;
+    protected bool hasTargetPosition;
     protected virtual void SetTargetPosition(Vector3 position)
     {
-        if (position == null) moveTargetPosition = Vector3.negativeInfinity;
-        else moveTargetPosition = position;
+        hasTargetPosition = (!moveTargetPosition.Equals(Vector3.negativeInfinity));
+        moveTargetPosition = position;
     }
-    protected virtual void Move()
+    protected virtual void MoveToTarget()
     {
-        //Debug.Log(rb.velocity);
-        bool hasTarget = !(moveTargetPosition.Equals(Vector3.negativeInfinity));
-        Vector3 direction = hasTarget ? moveTargetPosition - transform.position : currentForwardAndRightVelocity;
+        Vector3 direction = hasTargetPosition ? moveTargetPosition - transform.position : currentForwardAndRightVelocity;
 
         if (isGrounded)
         {
@@ -69,7 +57,7 @@ public partial class PhysicsEntity {
             }
             newForwardandRight = Vector3.ProjectOnPlane(direction, averageNormal).normalized;
 
-            if (hasTarget)
+            if(hasTargetPosition)
             {
                 if ((rb.velocity + newForwardandRight).magnitude > _maxVelocity)
                 {

@@ -17,20 +17,13 @@ public class InteractablePhysicsEntity : PhysicsEntity
         SetInAirFriction(movementMechanic.inAirFriction);
         SetJumpTargetPosition(Vector3.negativeInfinity);
         SetTargetPosition(Vector3.negativeInfinity);
-        //groundCheckMechanic.CalculateColliderRadius(objectCollider, transform);
         _friction = _inAirFriction;
         _maxVelocity = movementMechanic.maxSprintVelocity;
-        _acceleration = movementMechanic.sprintingAcceleration;
         _inAirControl = movementMechanic.inAirControl;
-        _justJumpedCooldown = jumpMechanic.justJumpedCooldown;
     }
 
     private void Update()
     {
-        //if (Input.GetKeyDown(KeyCode.E))
-        //{
-        //    Time.timeScale = (Time.timeScale == 1) ? .05f: 1;
-        //}
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
             Vector3 mouse = new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.nearClipPlane + 1);
@@ -50,7 +43,7 @@ public class InteractablePhysicsEntity : PhysicsEntity
         totalVelocityToAdd = Vector3.zero;
 
         GroundCheck();
-        if (movementMechanic.enabled) Move();
+        if (movementMechanic.enabled) MoveToTarget();
 
         if (gravityMechanic.enabled) ApplyGravity();
 
@@ -115,7 +108,6 @@ public class InteractablePhysicsEntity : PhysicsEntity
     }
     protected void OnCollisionExit(Collision collision)
     {
-        //print(collisionsAverage.Count + " "+ collision.collider.GetInstanceID());
         RemoveVectorFromDictionary(collision.collider.GetInstanceID());
     }
 }

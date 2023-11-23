@@ -4,7 +4,6 @@ using UnityEngine;
 
 public partial class PhysicsEntity
 {
-    protected float _justJumpedCooldown;
     [System.Serializable]
     public class JumpMechanic : PhysicsMechanic
     {
@@ -25,6 +24,5 @@ public partial class PhysicsEntity
             targetPosition + GetColliderHeight() * -gravityDirection, gravityDirection);
 
         rb.velocity += result;
-        _justJumpedCooldown = jumpMechanic.justJumpedCooldown;
     }
 }
