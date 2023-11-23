@@ -341,7 +341,6 @@ public partial class PlayerController
         if (g > baseMovementVariables.maxGravity) g *= _gravityRate;
         //}
     }
-
     private IEnumerator FakeGround()
     {
         onFakeGround = true;

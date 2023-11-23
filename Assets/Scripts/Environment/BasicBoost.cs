@@ -8,6 +8,6 @@ public class BasicBoost : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         //other.GetComponent<TestMovement>().launched = true;
-        other.GetComponent<PlayerController>().AddVelocity(transform.forward,force);
+        other.GetComponent<PhysicsInteractableObject>().AddVelocity(transform.forward,force);
     }
 }
