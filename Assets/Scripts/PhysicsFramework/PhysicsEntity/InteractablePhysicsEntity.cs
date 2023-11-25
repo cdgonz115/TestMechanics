@@ -20,6 +20,8 @@ public class InteractablePhysicsEntity : PhysicsEntity
         _friction = _inAirFriction;
         _maxVelocity = movementMechanic.maxSprintVelocity;
         _inAirControl = movementMechanic.inAirControl;
+        runningFakeGroundCoroutine = FakeGroundCoroutine();
+        fixedUpdate = new WaitForFixedUpdate();
     }
 
     private void Update()

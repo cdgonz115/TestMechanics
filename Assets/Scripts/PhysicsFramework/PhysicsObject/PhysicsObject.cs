@@ -15,6 +15,7 @@ public abstract class PhysicsObject : MonoBehaviour
     [SerializeField]
     [Tooltip("The minimum velocity that the objects RigidBody can have before being rounded to zero")]
     protected float _minVelocity = 0.1f;
+    [SerializeField] protected LayerMask collisionMask;
     #endregion
 
     #region Mechanics

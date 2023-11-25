@@ -4,6 +4,8 @@ using UnityEngine;
 
 public abstract partial class PhysicsEntity : PhysicsObject
 {
+    protected WaitForFixedUpdate fixedUpdate;
+
     [Space(20)]
     [SerializeField]protected Collider objectCollider;
     [Space(10)]

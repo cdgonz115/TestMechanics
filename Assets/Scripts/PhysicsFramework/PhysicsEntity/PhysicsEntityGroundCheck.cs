@@ -27,6 +27,44 @@ public partial class PhysicsEntity
     protected Vector3 newRigidBodyVelocity;
     protected Vector3 frictionToApply;
     #endregion
+
+
+    #region Fake Ground Checks
+    [Header("Fake Ground Variables")]
+    public float fakeGroundTime = .1f;
+    protected bool onFakeGround;
+    protected float _fakeGroundTimer;
+    protected IEnumerator runningFakeGroundCoroutine;
+    #endregion
+
+
+
+    #region FeetCheck
+    [Header("Feet Check Variable")]
+    public bool feetCheck;
+    protected RaycastHit feetHit;
+    [SerializeField]protected float feetCheckDistance;
+    #endregion
+
+    #region KneesCheck
+    [Header("Knees Check Variable")]
+    public bool kneesCheck;
+    protected RaycastHit kneestHit;
+    [SerializeField] protected float kneesCheckDistance;
+
+    Vector3 usedValue;
+    Vector3 usedValue2;
+    #endregion
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(usedValue, GetColliderRadius());
+
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawWireSphere(usedValue + usedValue2, GetColliderRadius());
+    }
+
     protected virtual void CheckForGroundCollision(Collision collision)
     {
         Vector3 sumOfAllContactNormals = Vector3.zero;
@@ -44,6 +82,40 @@ public partial class PhysicsEntity
         if (sumOfAllContactNormals.Equals(Vector3.zero)) RemoveVectorFromDictionary(collision.collider.GetInstanceID());
         else groundCollisionNormals[collision.collider.GetInstanceID()] = sumOfAllContactNormals;
         Debug.DrawRay(transform.position + GetColliderHeight() * gravityDirection,sumOfAllContactNormals, Color.cyan);
+    }
+    protected virtual void ForwardChecks()
+    {
+        usedValue = currentForwardAndRightVelocity;
+        if (isGrounded) {
+
+            feetCheck = Physics.SphereCast(
+                transform.position + (GetColliderHeight() - GetColliderRadius()) * gravityDirection,
+                GetColliderRadius(), currentForwardAndRightVelocity, out feetHit, feetCheckDistance, collisionMask, QueryTriggerInteraction.Ignore);
+        }
+
+        feetCheck = (feetHit.collider != null);
+        
+        kneesCheck = false;
+
+        if (feetCheck)
+        {
+            Vector3 kneesOrigin = transform.position + gravityDirection * GetColliderHeight() * .24f;
+            Vector3 kneesCheckDirection = Vector3.ProjectOnPlane(feetHit.point - kneesOrigin, -gravityDirection);
+
+            Debug.DrawLine(kneesOrigin, kneesOrigin + kneesCheckDirection, Color.green);
+
+            usedValue = kneesOrigin;
+            usedValue2 = kneesCheckDirection;
+
+            kneesCheck = Physics.Raycast(kneesOrigin,kneesCheckDirection, kneesCheckDirection.magnitude , collisionMask,QueryTriggerInteraction.Ignore);
+
+       
+            if (!kneesCheck)
+            {
+                if (onFakeGround) StopCoroutine(runningFakeGroundCoroutine);
+                StartCoroutine(runningFakeGroundCoroutine);
+            } 
+        }
     }
     protected virtual void GroundCheck()
     {
@@ -64,7 +136,7 @@ public partial class PhysicsEntity
         totalVelocityToAdd = Vector3.zero;
         newForwardandRight = Vector3.zero;
 
-        ////Character jsut got grounded
+        ////Character just got grounded
         if (groundCheck && !isGrounded)
         {
             _friction = _groundedFriction;
@@ -81,7 +153,23 @@ public partial class PhysicsEntity
             CharacterLeftGround();
             SetInitialGravity(gravityMechanic.initialGravityVelocity);
         }
-        isGrounded = groundCheck;
+        isGrounded = groundCheck || onFakeGround;
+        ForwardChecks();
+    }
+    protected IEnumerator FakeGroundCoroutine()
+    {
+        print("In coroutine");
+        onFakeGround = true;
+        transform.position = new Vector3(transform.position.x, feetHit.point.y + GetColliderHeight() * transform.lossyScale.y, transform.position.z);
+
+        SetInitialGravity(0);
+        float _fakeGroundTimer = fakeGroundTime;
+        while (_fakeGroundTimer > 0 && onFakeGround)
+        {
+            _fakeGroundTimer -= Time.fixedDeltaTime;
+            yield return fixedUpdate;
+        }
+        onFakeGround = false;
     }
     protected virtual void CharacterLanded() {
         _friction = _groundedFriction;
@@ -89,4 +177,5 @@ public partial class PhysicsEntity
     protected virtual void CharacterLeftGround() {
         _friction = _inAirFriction;
     }
+
 }
